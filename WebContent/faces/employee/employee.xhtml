@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+	<link rel="stylesheet" href="../../css/employee.css" />
+	<h:outputScript name="js/login.js"/>
+</h:head>
+<h:body>
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel id="condition" header="Employee Information">
+			<f:facet name="header">
+				<h:outputText value="Employee Information" style="float:left"/>
+				<p:selectOneButton value="#{workInfoControler.viewMode}" style="float:right">
+					<p:ajax update="employeeData" />
+					<f:selectItem itemLabel="List" itemValue="0" />
+					<f:selectItem itemLabel="Grid" itemValue="1" />
+				</p:selectOneButton>
+			</f:facet>
+			<p:panelGrid columns="5" style="border:none;margin:0 auto;width:100%">
+				<p:outputPanel style="width:100%">
+					<p:outputLabel style="display:block;" value="Employee Name" />
+					<p:autoComplete value="#{workInfoControler.condition.name}"
+						placeholder="Type for hint..."
+						completeMethod="#{userControler.completeEmployeeName}" />
+				</p:outputPanel>
+				<p:outputPanel style="width:100%">
+					<p:outputLabel style="display:block" value="Employee ID" />
+					<p:autoComplete value="#{workInfoControler.condition.id}"
+						placeholder="Type for hint..."
+						completeMethod="#{userControler.completeEmployeeID}" />
+				</p:outputPanel>
+				<p:outputPanel style="width:100%">
+					<p:outputLabel style="display:block" value="Employee Status" />
+					<p:selectOneMenu value="#{workInfoControler.condition.status}">
+						<f:selectItem itemLabel="All" itemValue="-1" />
+						<f:selectItems value="#{statusControler.baseList}" var="status"
+							itemLabel="#{status.name}" itemValue="#{status.seq}" />
+					</p:selectOneMenu>
+				</p:outputPanel>
+				<p:outputPanel style="width:100%">
+					<p:outputLabel style="display:block" value="Job Title" />
+					<p:selectOneMenu value="#{workInfoControler.condition.jobTitle}">
+						<f:selectItem itemLabel="All" itemValue="-1" />
+						<f:selectItems value="#{jobTitleControler.baseList}"
+							var="jobTitle" itemLabel="#{jobTitle.name}"
+							itemValue="#{jobTitle.seq}" />
+					</p:selectOneMenu>
+				</p:outputPanel>
+				<p:outputPanel style="width:100%">
+					<p:outputLabel style="display:block" value="Sub Unit" />
+					<p:selectOneMenu value="#{workInfoControler.condition.department}">
+						<f:selectItem itemLabel="All" itemValue="-1" />
+						<f:selectItems value="#{departmentControler.baseList}"
+							var="department" itemLabel="#{department.name}"
+							itemValue="#{department.seq}" />
+					</p:selectOneMenu>
+				</p:outputPanel>
+			</p:panelGrid>
+			<p:commandButton value="Search" update="employeeTable"
+				actionListener="#{workInfoControler.search}" />
+			<p:commandButton value="Reset"
+				actionListener="#{workInfoControler.condition.clear}"
+				update="condition" />
+		</p:panel>
+		<p:panel id="employeeData">
+			<p:panel rendered="#{workInfoControler.viewMode == 1}">
+				<p:dataGrid var="employee" value="#{workInfoControler.baseList}"
+					columns="4" rows="6" paginator="true"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+					<p:panel header="#{employee.name}" style="text-align:center">
+						<p:panelGrid columns="1">
+							<p:graphicImage value="/photo/#{employee.photoName}" width="200px" height="200px"/>
+							<p:outputLabel
+								value="#{employee.jobTitle.name == '' ? '&nbsp;' : employee.jobTitle.name}" />
+							<p:outputLabel
+								value="#{employee.department.name == '' ? '&nbsp;' : employee.department.name}" />
+						</p:panelGrid>
+					</p:panel>
+				</p:dataGrid>
+			</p:panel>
+			<p:panel rendered="#{workInfoControler.viewMode == 0}">
+				<p:commandButton value="Add"
+					actionListener="#{workInfoControler.startAdd}"
+					action="#{mainMenuControler.transfer}" onclick="blockui.show()">
+					<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+						value="/faces/hr/addEmployee.jsf" />
+				</p:commandButton>
+
+
+				<p:commandButton value="Delete"
+					actionListener="#{workInfoControler.startDelete}"
+					onclick="PF('deleteConfirm_w').show();" update="deleteConfirm" />
+				<p:dataTable id="employeeTable" paginator="true" rows="8"
+					value="#{workInfoControler.listModel}" var="employee"
+					selection="#{workInfoControler.selecteds}"
+					emptyMessage="No employee found with given criteria.">
+					<f:facet name="header">
+						<p:outputLabel value="Employee Information"/>
+						<h:commandLink style="float:right">
+							<p:graphicImage value="/images/pdf.png" width="24" />
+							<p:dataExporter type="pdf" target="employeeTable"
+								fileName="employees" />
+						</h:commandLink>
+
+						<h:commandLink style="float:right">
+							<p:graphicImage value="/images/csv.png" width="24" />
+							<p:dataExporter type="csv" target="employeeTable"
+								fileName="employees" />
+						</h:commandLink>
+						<h:commandLink style="float:right">
+							<p:graphicImage value="/images/excel.png" width="24" />
+							<p:dataExporter type="xls" target="employeeTable"
+								fileName="employees" />
+						</h:commandLink>
+					</f:facet>
+					<p:column selectionMode="multiple" exportable="false"
+						style="width:2%;text-align:center">
+					</p:column>
+
+					<p:column sortBy="#{employee.id}" style="width:6%">
+						<f:facet name="header">
+							<h:outputText value="ID" />
+						</f:facet>
+						<p:commandLink value="#{employee.id}"
+							action="#{mainMenuControler.transfer}" onclick="blockui.show()"
+							actionListener="#{personInfoControler.startLook}">
+							<f:attribute name="employee" value="#{employee}" />
+							<f:setPropertyActionListener
+								target="#{mainMenuControler.nextMenu}"
+								value="/faces/employee/employeeInfo.jsf" />
+						</p:commandLink>
+					</p:column>
+
+					<p:column sortBy="#{employee.firstName}" style="width:10%">
+						<f:facet name="header">
+							<h:outputText value="First Name" />
+						</f:facet>
+						<p:commandLink value="#{employee.firstName}"
+							action="#{mainMenuControler.transfer}" onclick="blockui.show()"
+							actionListener="#{personInfoControler.startLook}">
+							<f:attribute name="employee" value="#{employee}" />
+							<f:setPropertyActionListener
+								target="#{mainMenuControler.nextMenu}"
+								value="/faces/employee/employeeInfo.jsf" />
+						</p:commandLink>
+					</p:column>
+					<p:column sortBy="#{employee.lastName}" style="width:10%">
+						<f:facet name="header">
+							<h:outputText value="Last Name" />
+						</f:facet>
+						<p:commandLink value="#{employee.lastName}"
+							action="#{mainMenuControler.transfer}" onclick="blockui.show()"
+							actionListener="#{personInfoControler.startLook}">
+							<f:attribute name="employee" value="#{employee}" />
+							<f:setPropertyActionListener
+								target="#{mainMenuControler.nextMenu}"
+								value="/faces/employee/employeeInfo.jsf" />
+						</p:commandLink>
+					</p:column>
+
+					<p:column sortBy="#{employee.jobTitle.name}" style="width:8%">
+						<f:facet name="header">
+							<h:outputText value="Job Title" />
+						</f:facet>
+						<h:outputText value="#{employee.jobTitle.name}" />
+					</p:column>
+
+					<p:column sortBy="#{employee.status.name}" style="width:10%">
+						<f:facet name="header">
+							<h:outputText value="Employment Status" />
+						</f:facet>
+						<h:outputText value="#{employee.status.name}" />
+					</p:column>
+
+					<p:column sortBy="#{employee.department.name}" style="width:10%">
+						<f:facet name="header">
+							<h:outputText value="Sub Unit" />
+						</f:facet>
+						<h:outputText value="#{employee.department.name}" />
+					</p:column>
+
+					<p:column sortBy="#{employee.supervisor.name}" style="width:10%">
+						<f:facet name="header">
+							<h:outputText value="Supervisor" />
+						</f:facet>
+						<h:outputText value="#{employee.supervisor.name}" />
+					</p:column>
+					<f:facet name="footer">
+						<h:outputText id="footer"
+							value="Total : #{workInfoControler.employeeListLength} Employees." />
+					</f:facet>
+				</p:dataTable>
+			</p:panel>
+		</p:panel>
+				<p:confirmDialog id="deleteConfirm" widgetVar="deleteConfirm_w"
+			message="Are you sure to delete these employee?"
+			visible="#{workInfoControler.deleteMode}"
+			header="NP Pillar - Confirm Required" severity="alert">
+			<p:focus context="deleteConfirm" for="cancelBtn" />
+			<p:commandButton id="confirmBtn" value="OK" update="mainForm"
+				onclick="PF('deleteConfirm_w').hide();"
+				actionListener="#{workInfoControler.delete}" />
+			<p:commandButton id="cancelBtn" value="Cancel" actionListener="#{workInfoControler.endDelete}"
+				onclick="PF('deleteConfirm_w').hide();" />
+		</p:confirmDialog>
+	</h:form>
+</h:body>
+</html>

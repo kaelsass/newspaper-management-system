@@ -1,0 +1,131 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<link rel="stylesheet" href="../../css/noborder.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="Newspaper" toggleable="true">
+			<p:panelGrid id="searchOptions"
+				style="border:none;margin:0;width:900px;">
+				<p:row>
+					<p:column style="width:33%">
+						<p:outputLabel style="display:block" value="Newspaper" />
+						<p:selectCheckboxMenu label="-- Select --"
+							value="#{newspaperControler.condition.newspaperSeqs}"
+							filter="true" filterMatchMode="contains" panelStyle="width:280px">
+							<f:selectItems value="#{newspaperControler.allList}"
+								var="newspaper" itemLabel="#{newspaper.name}"
+								itemValue="#{newspaper.seq}" />
+						</p:selectCheckboxMenu>
+					</p:column>
+					<p:column style="width:33%">
+						<p:outputLabel style="display:block" value="ISSN" />
+						<p:autoComplete value="#{newspaperControler.condition.issn}" size="38"
+							placeholder="Type for hint..."
+							completeMethod="#{newspaperControler.completeISSN}" />
+					</p:column>
+					<p:column style="width:33%">
+						<p:outputLabel style="display:block" value="Publication Cycle" />
+						<p:selectCheckboxMenu label="-- Select --" panelStyle="width:280px"
+							value="#{newspaperControler.condition.ptypes}">
+							<f:selectItem itemLabel="Every month" itemValue="1" />
+							<f:selectItem itemLabel="Every week" itemValue="2" />
+							<f:selectItem itemLabel="Every day" itemValue="3" />
+						</p:selectCheckboxMenu>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+			<p:separator />
+			<p:commandButton value="Search" update="newspaperTable"
+				actionListener="#{newspaperControler.search}" />
+			<p:commandButton value="Reset" update="searchOptions"
+				actionListener="#{newspaperControler.condition.clear}" />
+		</p:panel>
+		<p:panel>
+			<p:commandButton value="Add"
+				actionListener="#{newspaperControler.startAdd}"
+				action="#{mainMenuControler.transfer}">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/newspaper/editNewspaper.jsf" />
+			</p:commandButton>
+			<p:commandButton value="Delete"
+				actionListener="#{newspaperControler.startDelete}"
+				onclick="PF('deleteConfirm_w').show();" update="deleteConfirm" />
+
+			<p:dataTable id="newspaperTable"
+				value="#{newspaperControler.listModel}" var="newspaper"
+				selection="#{newspaperControler.selecteds}" rows="10"
+				first="#{newspaperControler.first}">
+				<p:column style="width:1%" selectionMode="multiple">
+				</p:column>
+				<p:column style="width:10%" sortBy="#{newspaper.name}"
+					headerText="Name">
+					<p:commandLink value="#{newspaper.name}"
+						actionListener="#{newspaperControler.startEdit}"
+						action="#{mainMenuControler.transfer}" ajax="false">
+						<f:attribute name="newspaper" value="#{newspaper}" />
+						<f:setPropertyActionListener
+							target="#{mainMenuControler.nextMenu}"
+							value="/faces/newspaper/editNewspaper.jsf" />
+					</p:commandLink>
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{newspaper.issn}"
+					headerText="ISSN">
+					<h:outputText value="#{newspaper.issn}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{newspaper.ptype}"
+					headerText="Publication Cycle">
+					<h:outputText value="#{newspaper.pdate.ptypeName}" />
+				</p:column>
+
+				<p:column style="width:10%" headerText="Publication Day">
+					<h:outputText value="#{newspaper.pdate.formatPDay}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{newspaper.issuePrice}"
+					headerText="Unit Price">
+					<h:outputText value="#{newspaper.issuePrice}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{newspaper.issuePrice}"
+					headerText="Month Price">
+					<h:outputText value="#{newspaper.monthPrice}" />
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+		<p:confirmDialog id="deleteConfirm" widgetVar="deleteConfirm_w"
+			message="Are you sure to delete these newspapers?"
+			visible="#{newspaperControler.deleteMode}"
+			header="NP Pillar - Confirm Required" severity="alert">
+			<p:focus context="deleteConfirm" for="cancelBtn" />
+			<p:commandButton id="confirmBtn" value="OK" update="mainForm"
+				onclick="PF('deleteConfirm_w').hide();"
+				actionListener="#{newspaperControler.delete}" />
+			<p:commandButton id="cancelBtn" value="Cancel"
+				actionListener="#{newspaperControler.endDelete}"
+				onclick="PF('deleteConfirm_w').hide();" />
+		</p:confirmDialog>
+	</h:form>
+</h:body>
+</html>

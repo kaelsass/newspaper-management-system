@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="#{appraisalControler.employee.name} - Review">
+			<p:panelGrid style="width:100%">
+				<p:row>
+					<p:column colspan="3" style="text-align:center">
+						<p:toolbar>
+							<p:toolbarGroup align="center">
+								<p:outputLabel
+									value="#{appraisalControler.appraisal.template.name}" />
+							</p:toolbarGroup>
+						</p:toolbar>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:graphicImage
+							value="/photo/#{appraisalControler.appraisal.employee.photoName}"
+							width="200px" height="200px" />
+					</p:column>
+					<p:column>
+						<p:panelGrid columns="2">
+							<p:outputLabel value="Employee:" />
+							<h:outputText
+								value="#{appraisalControler.appraisal.employee.name}" />
+
+							<p:outputLabel value="Evaluator:" />
+							<p:selectOneMenu value="#{appraisalControler.employee.id}">
+								<f:selectItems
+									value="#{appraisalControler.appraisal.evaluators}"
+									var="employee" itemLabel="#{employee.name}"
+									itemValue="#{employee.id}" />
+								<p:ajax listener="#{appraisalControler.changeEvaluator}"
+								update=":mainForm" />
+							</p:selectOneMenu>
+						</p:panelGrid>
+					</p:column>
+					<p:column style="text-align:center;color:#008000; width:250px">
+						<p:outputLabel value="#{appraisalControler.currentFormatScore}"
+							style="font-size: 50px; height: 70%; display: block" />
+						<p:outputLabel value="Final Rating" style="height: 20%; float: bottom; display: block"/>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+			<p:panel header="Competencies">
+				<c:forEach items="#{appraisalControler.record.acLogs}" var="log">
+					<p:panelGrid style="width:100%">
+						<p:row>
+							<p:column colspan="2">
+								<p:outputLabel value="#{log.ac.competency.name}" />
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<h:outputText value="Rating:" />
+							</p:column>
+							<p:column>
+								<p:rating value="#{log.rate}" stars="10" />
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<h:outputText value="Comment:" />
+							</p:column>
+							<p:column>
+								<p:outputPanel>
+									<p:inputTextarea value="#{log.comment}" rows="5" cols="100"
+										counter="desDisplay_ac_#{log.ac.competency.seq}" maxlength="500"
+										counterTemplate="{0} characters remaining." autoResize="false"
+										style="display:block" />
+									<h:outputText id="desDisplay_ac_#{log.ac.competency.seq}" />
+								</p:outputPanel>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+				</c:forEach>
+			</p:panel>
+
+			<p:panel header="Goals">
+				<c:forEach items="#{appraisalControler.record.agLogs}" var="log">
+					<p:panelGrid style="width:100%">
+						<p:row>
+							<p:column colspan="2">
+								<p:outputLabel value="#{log.ag.goal.name}" />
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<h:outputText value="Rating:" />
+							</p:column>
+							<p:column>
+								<p:rating value="#{log.rate}" stars="10" />
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<h:outputText value="Comment:" />
+							</p:column>
+							<p:column>
+								<p:outputPanel>
+									<p:inputTextarea value="#{log.comment}" rows="5" cols="100"
+										counter="desDisplay_ag_#{log.ag.goal.seq}" maxlength="500"
+										counterTemplate="{0} characters remaining." autoResize="false"
+										style="display:block" />
+									<h:outputText id="desDisplay_ag_#{log.ag.goal.seq}" />
+								</p:outputPanel>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+				</c:forEach>
+			</p:panel>
+
+			<p:panel header="Question">
+				<c:forEach items="#{appraisalControler.record.aqLogs}" var="log">
+					<p:panelGrid style="width:100%">
+						<p:row>
+							<p:column colspan="2">
+								<p:outputLabel value="#{log.aq.question.name}" />
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<h:outputText value="Rating:" />
+							</p:column>
+							<p:column>
+								<p:rating value="#{log.rate}" stars="10" />
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<h:outputText value="Answers:" />
+							</p:column>
+							<p:column>
+								<p:outputPanel>
+									<p:inputTextarea value="#{log.comment}" rows="5" cols="100"
+										counter="desDisplay_aq_#{log.aq.question.seq}" maxlength="2000"
+										counterTemplate="{0} characters remaining." autoResize="false"
+										style="display:block" />
+									<h:outputText id="desDisplay_aq_#{log.aq.question.seq}" />
+								</p:outputPanel>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+				</c:forEach>
+			</p:panel>
+			<p:separator/>
+			<p:commandButton value="Save" actionListener="#{appraisalControler.applyRecords}" action="#{mainMenuControler.transfer}">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}" value="/faces/employee/appraisal.jsf"/>
+			</p:commandButton>
+			<p:commandButton value="Back" actionListener="#{appraisalControler.clearRecords}" action="#{mainMenuControler.transfer}">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}" value="/faces/employee/appraisal.jsf"/>
+			</p:commandButton>
+		</p:panel>
+	</h:form>
+</h:body>
+</html>

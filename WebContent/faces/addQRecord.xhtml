@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+<f:metadata>
+	<f:viewParam name="seq" value="#{questionnaireControler.questionnaireSeq}" />
+	<f:event type="preRenderView" listener="#{questionnaireControler.loadSeq}" />
+</f:metadata>
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../css/bootstrap.min.css" />
+	<link rel="stylesheet" href="../css/addQRecord.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+	<h:outputScript name="js/addQRecordExternal.js" target="head" />
+
+	<h:form id="mainForm">
+		<h:inputHidden id="ip" value="#{questionnaireControler.editRecord.ip}" />
+		<p:panel header="Questionnaire" style="margin:0px auto">
+			<p:messages id="messages" closable="true"/>
+
+			<p:outputPanel style="width:800px;margin:0 auto">
+				<p:outputLabel value="#{questionnaireControler.editDto.name}"
+							style="display:block;font-size: 20px;font-weight: bold;color: #f53d05; text-align:center" />
+						<p:outputLabel
+							value="#{questionnaireControler.editDto.description}"
+							style="display:block;color: #555555;line-height: 24px;text-align: center;font-size: 14px" />
+						<p:separator />
+			</p:outputPanel>
+			<p:outputPanel style="width:800px;margin:0 auto">
+				<c:forEach items="#{questionnaireControler.editRecord.questions}"
+					var="question">
+					<p:outputPanel>
+						<p:outputLabel value="#{question.index+1}.&nbsp;" />
+						<p:outputLabel value="#{question.name}" />
+
+						<h:panelGroup layout="block" styleClass="selection">
+							<p:selectOneRadio value="#{question.selectedItem}" layout="pageDirection" style="width:100%"
+								rendered="#{question.type.seq == 1}" required="true" requiredMessage="Please fill in the answer for Question #{question.index+1}" >
+								<f:selectItems value="#{question.items}" />
+							</p:selectOneRadio>
+						</h:panelGroup>
+
+						<h:panelGroup layout="block" styleClass="selection">
+							<p:selectManyCheckbox value="#{question.selectedItems}" layout="pageDirection" style="width:100%" required="true" requiredMessage="Please fill in the answer for Question #{question.index+1}"
+								rendered="#{question.type.seq == 2}">
+								<f:selectItems value="#{question.items}" />
+							</p:selectManyCheckbox>
+						</h:panelGroup>
+
+						<p:inputTextarea value="#{question.answer}" cols="80" rendered="#{question.type.seq == 3}"/>
+
+						<p:separator />
+					</p:outputPanel>
+				</c:forEach>
+			</p:outputPanel>
+			<p:outputPanel style="text-align:center">
+				<p:commandButton value="Submit"
+					actionListener="#{questionnaireControler.applyRecord}" update="messages"
+					action="thanks.jsf?faces-redirect=true">
+				</p:commandButton>
+			</p:outputPanel>
+		</p:panel>
+	</h:form>
+</h:body>
+</html>

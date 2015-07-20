@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="Add Task">
+			<p:messages autoUpdate="true" closable="true" />
+
+			<p:panelGrid columns="2">
+				<p:outputLabel value="Name" />
+				<p:inputText value="#{taskControler.editDto.name}" required="true"
+					requiredMessage="Name is required." />
+
+				<p:outputLabel value="Task Admin" />
+				<p:pickList value="#{taskControler.admins}" var="employee"
+					itemValue="#{employee}" itemLabel="#{employee.name}"
+					showCheckbox="true" showSourceFilter="true" showTargetFilter="true"
+					filterMatchMode="contains" converter="employeeConverter">
+					<f:facet name="sourceCaption">Available Admins</f:facet>
+					<f:facet name="targetCaption">Assigned Admins</f:facet>
+				</p:pickList>
+
+				<p:outputLabel value="Description" />
+				<p:outputPanel>
+					<p:inputTextarea value="#{taskControler.editDto.description}"
+						rows="5" cols="30" counter="noteDisplay" maxlength="1000"
+						counterTemplate="{0} characters remaining." autoResize="false"
+						style="display:block;width:100%" />
+					<h:outputText id="noteDisplay" />
+				</p:outputPanel>
+			</p:panelGrid>
+			<p:commandButton value="Save" actionListener="#{taskControler.apply}"
+				action="#{mainMenuControler.transfer}" onclick="blockui.show()" oncomplete="blockui.hide()">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/employee/editTask.jsf" />
+			</p:commandButton>
+			<p:commandButton value="Cancel"
+				actionListener="#{taskControler.clear}"
+				action="#{mainMenuControler.transfer}" onclick="blockui.show()">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/employee/task.jsf" />
+			</p:commandButton>
+		</p:panel>
+	</h:form>
+</h:body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="Questionnaire Infomation" toggleable="true">
+			<p:panelGrid columns="5" id="searchOptions"
+				style="border:none;margin:0 auto;width:100%">
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="&nbsp;" />
+					<p:outputLabel style="display:block" value="Form Name" />
+					<p:autoComplete value="#{questionnaireControler.condition.name}"
+						placeholder="Type for hint..."
+						completeMethod="#{questionnaireControler.completeName}" />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="&nbsp;" />
+					<p:outputLabel style="display:block" value="Promotion" />
+					<p:selectCheckboxMenu label="-- Select --"
+						value="#{questionnaireControler.condition.promotionSeqs}">
+						<f:selectItems var="promotion"
+							value="#{promotionControler.baseList}"
+							itemLabel="#{promotion.name}" itemValue="#{promotion.seq}" />
+					</p:selectCheckboxMenu>
+				</p:outputPanel>
+
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Modified Date" />
+					<p:outputLabel style="display:block" value="From" />
+					<p:calendar value="#{questionnaireControler.condition.from}"
+						pattern="yyyy-MM-dd" showOn="both" />
+				</p:outputPanel>
+
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="&nbsp;" />
+					<p:outputLabel style="display:block" value="To" />
+					<p:calendar value="#{questionnaireControler.condition.to}"
+						pattern="yyyy-MM-dd" showOn="both" />
+				</p:outputPanel>
+
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="&nbsp;" />
+					<p:outputLabel style="display:block" value="Published" />
+					<p:selectOneButton
+						value="#{questionnaireControler.condition.published}">
+						<f:selectItem itemLabel="All" itemValue="0" />
+						<f:selectItem itemLabel="Yes" itemValue="1" />
+						<f:selectItem itemLabel="No" itemValue="2" />
+					</p:selectOneButton>
+				</p:outputPanel>
+
+			</p:panelGrid>
+			<p:commandButton value="Search" update="questionnaireTable"
+				actionListener="#{questionnaireControler.search}" />
+			<p:commandButton value="Reset" update="searchOptions"
+				actionListener="#{questionnaireControler.condition.clear}" />
+		</p:panel>
+		<p:panel header="Questionnaire List">
+			<p:commandButton value="Add" update=":addForm"
+				actionListener="#{questionnaireControler.startAdd}"
+				onclick="addQuestionnaire_w.show()">
+			</p:commandButton>
+
+			<p:commandButton value="Delete"
+				onclick="PF('deleteConfirm_w').show();" />
+			<p:spacer />
+			<p:dataTable id="questionnaireTable"
+				value="#{questionnaireControler.listModel}" var="questionnaire"
+				selection="#{questionnaireControler.selecteds}" rows="10">
+				<p:column style="width:2%;text-align: center"
+					selectionMode="multiple">
+				</p:column>
+				<p:column headerText="Form"
+					sortBy="#{questionnaire.name}">
+					<h:outputText value="#{questionnaire.name}" />
+				</p:column>
+				<p:column headerText="For Promotion" style="text-align:center"
+					sortBy="#{questionnaire.promotion.name}">
+					<h:outputText value="#{questionnaire.promotion.name}" />
+				</p:column>
+				<p:column headerText="Added Date" style="text-align:center"
+					sortBy="#{questionnaire.formatAddDate}">
+					<h:outputText value="#{questionnaire.formatAddDate}" />
+				</p:column>
+				<p:column headerText="Modified Date" style="text-align:center"
+					sortBy="#{questionnaire.formatModDate}">
+					<h:outputText value="#{questionnaire.formatModDate}" />
+				</p:column>
+				<p:column headerText="Published" style="text-align:center">
+					<p:selectOneMenu value="#{questionnaire.published}">
+						<f:selectItem itemLabel="Yes" itemValue="true"/>
+						<f:selectItem itemLabel="No" itemValue="false"/>
+						<p:ajax listener="#{questionnaireControler.applyPublished(questionnaire)}"
+							update="questionnaireTable" />
+					</p:selectOneMenu>
+				</p:column>
+				<p:column headerText="Actions" style="text-align:center">
+					<p:selectOneMenu value="#{questionnaireControler.outcome}">
+						<f:selectItem itemValue="" itemLabel="-- Select --" />
+						<f:selectItem itemValue="/faces/sales/editQuestionnaire.jsf"
+							itemLabel="Manage" />
+						<f:selectItem itemValue="/faces/sales/addQRecord.jsf"
+							itemLabel="Add Record" />
+						<f:selectItem itemValue="/faces/sales/questionnaireSummary.jsf"
+							itemLabel="Statistics" />
+						<p:ajax listener="#{questionnaireControler.navigate}" />
+					</p:selectOneMenu>
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+		<p:confirmDialog id="deleteConfirm" widgetVar="deleteConfirm_w"
+			message="Are you sure to delete these questionnaires?"
+			header="NP Pillar - Confirm Required" severity="alert">
+			<p:focus context="deleteConfirm" for="cancelBtn" />
+			<p:commandButton id="confirmBtn" value="OK" update="mainForm"
+				onclick="PF('deleteConfirm_w').hide();"
+				actionListener="#{questionnaireControler.delete}" />
+			<p:commandButton id="cancelBtn" value="Cancel" immediate="true"
+				onclick="PF('deleteConfirm_w').hide();" />
+		</p:confirmDialog>
+	</h:form>
+
+	<p:dialog id="addQuestionnaire" header="Add Questionnaire"
+		widgetVar="addQuestionnaire_w" closable="true" modal="true">
+		<h:form id="addForm">
+			<p:messages id="messages" closable="true" />
+			<p:panelGrid columns="2">
+				<p:outputLabel value="Title:" for="title" />
+				<p:inputText id="title"
+					value="#{questionnaireControler.editDto.name}" required="true"
+					requiredMessage="Title is required" />
+
+				<p:outputLabel value="Description:" />
+				<p:inputTextarea
+					value="#{questionnaireControler.editDto.description}" />
+
+				<p:outputLabel value="For Promotion:" />
+				<p:selectOneMenu
+					value="#{questionnaireControler.editDto.promotion.seq}">
+					<f:selectItem itemLabel="-- Select --" itemValue="0" />
+					<f:selectItems value="#{promotionControler.baseList}"
+						var="promotion" itemLabel="#{promotion.name}"
+						itemValue="#{promotion.seq}" />
+				</p:selectOneMenu>
+			</p:panelGrid>
+			<p:commandButton value="OK"
+				actionListener="#{questionnaireControler.applyAddQuestionnaire}"
+				update=":mainForm messages" />
+			<p:commandButton value="Cancel" onclick="addQuestionnaire_w.hide()" />
+		</h:form>
+	</p:dialog>
+</h:body>
+</html>

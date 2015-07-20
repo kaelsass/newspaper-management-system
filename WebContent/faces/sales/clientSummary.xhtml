@@ -1,0 +1,121 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+	<link rel="stylesheet"
+		href="../../css/noborder.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel toggleable="true" header="Sales Summary Information based on Client">
+		<p:messages autoUpdate="true" closable="true"/>
+			<p:panelGrid columns="7" style="border:none;margin:0 auto;width:100%">
+				<p:outputPanel>
+					<p:outputLabel value="Age Range" style="display:block" />
+					<p:selectCheckboxMenu
+						value="#{clientSummaryControler.condition.ageRangeSeqs}"
+						label="-- Select --" filter="true" filterMatchMode="contains"
+						panelStyle="width:250px">
+						<f:selectItems var="ageRange"
+							value="#{ageRangeControler.baseList}"
+							itemLabel="#{ageRange.format}" itemValue="#{ageRange.seq}" />
+					</p:selectCheckboxMenu>
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel value="Gender" style="display:block" />
+					<p:selectCheckboxMenu
+						value="#{clientSummaryControler.condition.sexs}"
+						label="-- Select --" panelStyle="width:250px">
+						<f:selectItems var="sex" value="#{sexControler.baseList}"
+							itemLabel="#{sex.name}" itemValue="#{sex.name}" />
+					</p:selectCheckboxMenu>
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel value="Occupation" style="display:block" />
+					<p:selectCheckboxMenu
+						value="#{clientSummaryControler.condition.occupationSeqs}"
+						label="-- Select --" filter="true" filterMatchMode="contains"
+						panelStyle="width:250px">
+						<f:selectItems var="occupation"
+							value="#{occupationControler.baseList}"
+							itemLabel="#{occupation.name}" itemValue="#{occupation.seq}" />
+					</p:selectCheckboxMenu>
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel value="Education" style="display:block" />
+					<p:selectCheckboxMenu
+						value="#{clientSummaryControler.condition.educationSeqs}"
+						label="-- Select --" filter="true" filterMatchMode="contains"
+						panelStyle="width:250px">
+						<f:selectItems var="education"
+							value="#{educationControler.baseList}"
+							itemLabel="#{education.name}" itemValue="#{education.seq}" />
+					</p:selectCheckboxMenu>
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel value="Newspaper" style="display:block" />
+					<p:selectCheckboxMenu
+						value="#{clientSummaryControler.condition.newspaperSeqs}"
+						label="-- Select --" filter="true" filterMatchMode="contains"
+						panelStyle="width:250px">
+						<f:selectItems var="newspaper"
+							value="#{newspaperControler.baseList}"
+							itemLabel="#{newspaper.name}" itemValue="#{newspaper.seq}" />
+					</p:selectCheckboxMenu>
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel value="From" style="display:block" />
+					<p:calendar value="#{clientSummaryControler.condition.from}"
+						showButtonPanel="true" showOtherMonths="true" showOn="both"
+						navigator="true" pattern="yyyy-MM" required="true"
+						requiredMessage="From Date is required." />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel value="To" style="display:block" />
+					<p:calendar value="#{clientSummaryControler.condition.to}"
+						showButtonPanel="true" showOtherMonths="true" showOn="both"
+						navigator="true" pattern="yyyy-MM" required="true"
+						requiredMessage="To Date is required." />
+				</p:outputPanel>
+			</p:panelGrid>
+			<p:separator/>
+			<p:commandButton value="Search"
+				actionListener="#{clientSummaryControler.search}"
+				update="inventoryData" />
+		</p:panel>
+		<p:panel id="inventoryData">
+			<p:barChart title="Quantity Statistics for Age Range"
+				xaxisLabel="Age Range" yaxisLabel="Quantity"
+				legendPosition="ne" stacked="true"
+				value="#{clientSummaryControler.ageQuantityModel}" />
+			<p:barChart title="Quantity Statistics for Gender"
+				xaxisLabel="Gender" yaxisLabel="Quantity"
+				legendPosition="ne" stacked="true"
+				value="#{clientSummaryControler.sexQuantityModel}" />
+			<p:barChart title="Quantity Statistics for Occupation"
+				xaxisLabel="Occupation" yaxisLabel="Quantity"
+				legendPosition="ne" stacked="true"
+				value="#{clientSummaryControler.occupationQuantityModel}" />
+			<p:barChart title="Quantity Statistics for Education"
+				xaxisLabel="Education" yaxisLabel="Quantity"
+				legendPosition="ne" stacked="true"
+				value="#{clientSummaryControler.educationQuantityModel}" />
+		</p:panel>
+	</h:form>
+</h:body>
+</html>

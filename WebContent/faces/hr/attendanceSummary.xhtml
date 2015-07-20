@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="Attendance Total Summary Report">
+			<p:panelGrid columns="2">
+				<p:outputLabel value="Employee Name" />
+				<p:autoComplete value="#{attendanceSummaryControler.condition.employeeName}"
+						placeholder="Type for hint..."
+						completeMethod="#{userControler.completeEmployeeName}" />
+
+				<p:outputLabel value="Job Title" />
+				<p:selectOneMenu value="#{attendanceSummaryControler.condition.jobTitle.seq}">
+					<f:selectItem itemLabel="All" itemValue="-1"/>
+					<f:selectItems value="#{jobTitleControler.baseList}" var="jobTitle" itemLabel="#{jobTitle.name}" itemValue="#{jobTitle.seq}"/>
+				</p:selectOneMenu>
+
+				<p:outputLabel value="Sub Unit" />
+				<p:selectOneMenu value="#{attendanceSummaryControler.condition.department.seq}">
+					<f:selectItem itemLabel="All" itemValue="-1"/>
+					<f:selectItems value="#{departmentControler.baseList}" var="department" itemLabel="#{department.name}" itemValue="#{department.seq}"/>
+				</p:selectOneMenu>
+
+				<p:outputLabel value="Employment Status" />
+				<p:selectOneMenu value="#{attendanceSummaryControler.condition.status.seq}">
+					<f:selectItem itemLabel="All" itemValue="-1"/>
+					<f:selectItems value="#{statusControler.baseList}" var="status" itemLabel="#{status.name}" itemValue="#{status.seq}"/>
+				</p:selectOneMenu>
+
+				<p:outputLabel value="From" />
+				<p:calendar
+					value="#{attendanceSummaryControler.condition.from}" navigator="true" showOn="both"
+					pattern="yyyy-MM-dd" required="true" requiredMessage="From Date is Required."/>
+
+				<p:outputLabel value="To" />
+				<p:calendar
+					value="#{attendanceSummaryControler.condition.to}" navigator="true" showOn="both"
+					pattern="yyyy-MM-dd" required="true" requiredMessage="End Date is Required."/>
+			</p:panelGrid>
+			<p:commandButton value="View" ajax="false"
+				actionListener="#{attendanceSummaryControler.search}"
+				action="#{mainMenuControler.transfer}" onclick="blockui.show()">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}" value="/faces/hr/attendanceSummaryReport.jsf"/>
+				</p:commandButton>
+			<p:messages autoUpdate="true" closable="true"/>
+		</p:panel>
+
+	</h:form>
+</h:body>
+</html>

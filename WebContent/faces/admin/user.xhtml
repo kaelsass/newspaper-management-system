@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title></h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="System Users">
+			<p:panelGrid columns="3" id="searchOptions">
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="User Name" />
+					<p:autoComplete value="#{userControler.condition.userName}" placeholder="Type for hint..."  completeMethod="#{userControler.completeUserName}"/>
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="User Role" />
+					<p:selectOneMenu value="#{userControler.condition.role}">
+						<f:selectItem itemLabel="-- Select --" itemValue="" />
+						<f:selectItems value="#{roleControler.baseList}" var="role"
+							itemLabel="#{role.role}" itemValue="#{role.role}" />
+					</p:selectOneMenu>
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Employee Name" />
+					<p:autoComplete value="#{userControler.condition.employeeName}" placeholder="Type for hint..."  completeMethod="#{userControler.completeEmployeeName}"/>
+				</p:outputPanel>
+			</p:panelGrid>
+			<p:commandButton value="Search" update="userTable"
+				actionListener="#{userControler.search}" />
+			<p:commandButton value="Reset" update="searchOptions"
+				actionListener="#{userControler.condition.clear}" />
+		</p:panel>
+		<p:panel>
+			<p:commandButton value="Add"
+				actionListener="#{userControler.startAdd}"
+				action="#{mainMenuControler.transfer}">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/admin/addUser.jsf" />
+			</p:commandButton>
+			<p:commandButton value="Delete"
+						actionListener="#{userControler.startDelete}"
+						onclick="PF('deleteConfirm_w').show();"
+						update="deleteConfirm"/>
+
+			<p:dataTable id="userTable" value="#{userControler.listModel}"
+				var="user" selection="#{userControler.selecteds}" rows="10"
+				first="#{userControler.first}">
+				<p:column style="text-align:center" selectionMode="multiple" width="2%">
+				</p:column>
+				<p:column style="width:10%" sortBy="#{user.userName}">
+					<f:facet name="header">
+						<h:outputText value="User Name" />
+					</f:facet>
+					<p:commandLink value="#{user.userName}" actionListener="#{userControler.startEdit}"
+						action="#{mainMenuControler.transfer}" ajax="false">
+						<f:attribute name="user" value="#{user}" />
+						<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/admin/editUser.jsf" />
+					</p:commandLink>
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{user.role.role}">
+					<f:facet name="header">
+						<h:outputText value="User Role" />
+					</f:facet>
+					<h:outputText value="#{user.role.role}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{user.employee.name}">
+					<f:facet name="header">
+						<h:outputText value="Employee Name" />
+					</f:facet>
+					<h:outputText value="#{user.employee.name}" />
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+		<p:confirmDialog id="deleteConfirm" widgetVar="deleteConfirm_w"
+			message="Are you sure to delete this user?"
+			visible="#{userControler.deleteMode}"
+			header="NP Pillar - Confirm Required" severity="alert">
+			<p:focus context="deleteConfirm" for="cancelBtn" />
+			<p:commandButton id="confirmBtn" value="OK" update="mainForm"
+				onclick="PF('deleteConfirm_w').hide();"
+				actionListener="#{userControler.delete}" />
+			<p:commandButton id="cancelBtn" value="Cancel" actionListener="#{userControler.endDelete}"
+				onclick="PF('deleteConfirm_w').hide();" />
+		</p:confirmDialog>
+	</h:form>
+</h:body>
+</html>

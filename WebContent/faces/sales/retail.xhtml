@@ -1,0 +1,136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+		<link rel="stylesheet"
+		href="../../css/subscriber.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="Retail Orders" toggleable="true">
+			<p:panelGrid columns="4" id="searchOptions" style="border:none;margin:0 auto;width:100%">
+				<p:outputPanel style="width:100%">
+					<p:outputLabel  style="display:block" value="Newspaper" />
+					<p:selectCheckboxMenu label="-- Select --" value="#{retailControler.condition.newspaperSeqs}" filter="true" filterMatchMode="contains">
+						<f:selectItems var="newspaper"
+							value="#{newspaperControler.baseList}"
+							itemLabel="#{newspaper.name}" itemValue="#{newspaper.seq}" />
+					</p:selectCheckboxMenu>
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Order Quantity (min)" />
+					<p:spinner value="#{retailControler.condition.quantity}" min="0" />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Responsible Person" />
+					<p:autoComplete value="#{retailControler.condition.employeeName}"
+						placeholder="Type for hint..."
+						completeMethod="#{workInfoControler.completeEmployeeName}" />
+				</p:outputPanel>
+				<p:spacer/>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Issue Date From" />
+					<p:calendar value="#{retailControler.condition.dateFrom}" showOn="both"
+						navigator="true" pattern="yyyy-MM-dd" />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Issue Date To" />
+					<p:calendar value="#{retailControler.condition.dateTo}" showOn="both"
+						navigator="true" pattern="yyyy-MM-dd" />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Order Date From" />
+					<p:calendar value="#{retailControler.condition.orderDateFrom}" showOn="both"
+						navigator="true" pattern="yyyy-MM-dd" />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Order Date To" />
+					<p:calendar value="#{retailControler.condition.orderDateTo}" showOn="both"
+						navigator="true" pattern="yyyy-MM-dd" />
+				</p:outputPanel>
+			</p:panelGrid>
+			<p:commandButton value="Search" update="retailTable"
+				actionListener="#{retailControler.search}" />
+			<p:commandButton value="Reset" update="searchOptions"
+				actionListener="#{retailControler.condition.clear}" />
+		</p:panel>
+		<p:panel>
+			<p:commandButton value="Add"
+				actionListener="#{retailControler.startAdd}"
+				action="#{mainMenuControler.transfer}">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/sales/editRetail.jsf" />
+			</p:commandButton>
+			<p:commandButton value="Delete"
+				actionListener="#{retailControler.startDelete}"
+				onclick="PF('deleteConfirm_w').show();" update="deleteConfirm" />
+
+			<p:dataTable id="retailTable" value="#{retailControler.listModel}"
+				var="retail" selection="#{retailControler.selecteds}" rows="10">
+				<p:column width="2%" selectionMode="multiple" style="text-align:center">
+				</p:column>
+				<p:column width="10%" sortBy="#{retail.issue.newspaper.name}"
+					headerText="Newspaper">
+					<p:commandLink value="#{retail.issue.newspaper.name}"
+						actionListener="#{retailControler.startEdit}" action="#{mainMenuControler.transfer}">
+						<f:attribute name="retail" value="#{retail}" />
+						<f:setPropertyActionListener
+							target="#{mainMenuControler.nextMenu}"
+							value="/faces/sales/editRetail.jsf" />
+					</p:commandLink>
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{retail.issue.formatIssue}"
+					headerText="Issue Number">
+					<h:outputText value="#{retail.issue.formatIssue}" />
+				</p:column>
+
+				<p:column width="10%" sortBy="#{retail.quantity}" style="text-align:center"
+					headerText="Quantity">
+					<h:outputText value="#{retail.quantity}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{retail.employee.name}"
+					headerText="Responsible Person">
+					<h:outputText value="#{retail.employee.name}" />
+				</p:column>
+
+				<p:column width="10%" sortBy="#{retail.formatOrderDate}" style="text-align:center"
+					headerText="Order Date">
+					<h:outputText value="#{retail.formatOrderDate}" />
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+		<p:confirmDialog id="deleteConfirm" widgetVar="deleteConfirm_w"
+			message="Are you sure to delete these retail orders?"
+			visible="#{retailControler.deleteMode}"
+			header="NP Pillar - Confirm Required" severity="alert">
+			<p:focus context="deleteConfirm" for="cancelBtn" />
+			<p:commandButton id="confirmBtn" value="OK" update="mainForm"
+				onclick="PF('deleteConfirm_w').hide();"
+				actionListener="#{retailControler.delete}" />
+			<p:commandButton id="cancelBtn" value="Cancel"
+				actionListener="#{retailControler.endDelete}"
+				onclick="PF('deleteConfirm_w').hide();" />
+		</p:confirmDialog>
+	</h:form>
+</h:body>
+</html>

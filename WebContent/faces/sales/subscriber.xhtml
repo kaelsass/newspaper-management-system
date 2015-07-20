@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+	<link rel="stylesheet"
+		href="../../css/subscriber.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="Subscriber Orders" toggleable="true" style="border:none;margin:0 auto;width:100%">
+			<p:panelGrid columns="5" id="searchOptions" style="width:100%">
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Client Name" />
+					<p:autoComplete value="#{subscriberControler.condition.name}"
+						placeholder="Type for hint..."
+						completeMethod="#{subscriberControler.completeName}" />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Address" />
+					<p:autoComplete value="#{subscriberControler.condition.address}"
+						placeholder="Type for hint..."
+						completeMethod="#{subscriberControler.completeAddress}" />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Newspaper" />
+					<p:selectCheckboxMenu
+						value="#{subscriberControler.condition.newspaperSeqs}"
+						label="-- Select --" filter="true" filterMatchMode="contains">
+						<f:selectItems var="newspaper"
+							value="#{newspaperControler.baseList}"
+							itemLabel="#{newspaper.name}" itemValue="#{newspaper.seq}" />
+					</p:selectCheckboxMenu>
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Order Quantity (min)" />
+					<p:spinner value="#{subscriberControler.condition.quantity}"
+						min="0" stepFactor="200"/>
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Responsible Person" />
+					<p:selectCheckboxMenu
+						value="#{subscriberControler.condition.employeeIDs}"
+						label="-- Select --" filter="true" filterMatchMode="contains">
+						<f:selectItems var="employee"
+							value="#{workInfoControler.baseList}"
+							itemLabel="#{employee.name}" itemValue="#{employee.id}" />
+					</p:selectCheckboxMenu>
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Issue Date From" />
+					<p:calendar value="#{subscriberControler.condition.dateFrom}"
+						navigator="true" pattern="yyyy-MM-dd" showOn="both"/>
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Issue Date To" />
+					<p:calendar value="#{subscriberControler.condition.dateTo}"
+						navigator="true" pattern="yyyy-MM-dd" showOn="both"/>
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Order Date From" />
+					<p:calendar value="#{subscriberControler.condition.orderDateFrom}"
+						navigator="true" pattern="yyyy-MM-dd" showOn="both"/>
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Order Date To" />
+					<p:calendar value="#{subscriberControler.condition.orderDateTo}"
+						navigator="true" pattern="yyyy-MM-dd" showOn="both"/>
+				</p:outputPanel>
+				<p:spacer/>
+			</p:panelGrid>
+			<p:commandButton value="Search" update="subscriberTable"
+				actionListener="#{subscriberControler.search}" />
+			<p:commandButton value="Reset" update="searchOptions"
+				actionListener="#{subscriberControler.condition.clear}" />
+		</p:panel>
+		<p:panel>
+			<p:commandButton value="Add"
+				actionListener="#{subscriberControler.startAdd}"
+				action="#{mainMenuControler.transfer}">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/sales/editSubscriber.jsf" />
+			</p:commandButton>
+			<p:commandButton value="Delete"
+				actionListener="#{subscriberControler.startDelete}"
+				onclick="PF('deleteConfirm_w').show();" update="deleteConfirm" />
+
+			<p:dataTable id="subscriberTable"
+				value="#{subscriberControler.listModel}" var="subscriber"
+				selection="#{subscriberControler.selecteds}" rows="10"
+				first="#{subscriberControler.first}">
+				<p:column style="width:1%" selectionMode="multiple">
+				</p:column>
+				<p:column style="width:10%" sortBy="#{subscriber.name}"
+					headerText="Name">
+					<p:commandLink value="#{subscriber.name}"
+						actionListener="#{subscriberControler.startEdit}"
+						action="#{mainMenuControler.transfer}" ajax="false">
+						<f:attribute name="subscriber" value="#{subscriber}" />
+						<f:setPropertyActionListener
+							target="#{mainMenuControler.nextMenu}"
+							value="/faces/sales/editSubscriber.jsf" />
+					</p:commandLink>
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{subscriber.address}"
+					headerText="Address">
+					<h:outputText value="#{subscriber.address}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{subscriber.zipcode}"
+					headerText="Zip Code">
+					<h:outputText value="#{subscriber.zipcode}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{subscriber.newspaper.name}"
+					headerText="Newspaper">
+					<h:outputText value="#{subscriber.newspaper.name}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{subscriber.dateFrom}"
+					headerText="Date Subscirbed">
+					<h:outputText value="#{subscriber.formatDateFrom}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{subscriber.monthNumber}"
+					headerText="Number of Months">
+					<h:outputText value="#{subscriber.monthNumber}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{subscriber.quantity}"
+					headerText="Quantity per Month">
+					<h:outputText value="#{subscriber.quantity}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{subscriber.formatPayable}"
+					headerText="Money">
+					<h:outputText value="#{subscriber.formatPayable}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{subscriber.employee.name}"
+					headerText="Responsible Person">
+					<h:outputText value="#{subscriber.employee.name}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{subscriber.formatOrderDate}"
+					headerText="Order Date">
+					<h:outputText value="#{subscriber.formatOrderDate}" />
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+		<p:confirmDialog id="deleteConfirm" widgetVar="deleteConfirm_w"
+			message="Are you sure to delete these subscriber orders?"
+			visible="#{subscriberControler.deleteMode}"
+			header="NP Pillar - Confirm Required" severity="alert">
+			<p:focus context="deleteConfirm" for="cancelBtn" />
+			<p:commandButton id="confirmBtn" value="OK" update="mainForm"
+				onclick="PF('deleteConfirm_w').hide();"
+				actionListener="#{subscriberControler.delete}" />
+			<p:commandButton id="cancelBtn" value="Cancel"
+				actionListener="#{subscriberControler.endDelete}"
+				onclick="PF('deleteConfirm_w').hide();" />
+		</p:confirmDialog>
+	</h:form>
+</h:body>
+</html>

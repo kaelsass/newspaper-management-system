@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+
+		<p:panel header="Competency List">
+			<p:commandButton value="Add"
+				actionListener="#{competencyControler.startAdd}"
+				action="#{mainMenuControler.transfer}" onclick="blockui.show()">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/admin/editCompetency.jsf" />
+			</p:commandButton>
+			<p:commandButton value="Delete"
+						actionListener="#{competencyControler.startDelete}"
+						onclick="PF('deleteConfirm_w').show();"
+						update="deleteConfirm"/>
+
+			<p:spacer />
+			<p:dataTable id="competencyTable" value="#{competencyControler.listModel}"
+				var="competency" selection="#{competencyControler.selecteds}" rows="10">
+				<p:outputLabel value="#{competency.name}"/>
+				<p:column style="width:2%;text-align: center;" selectionMode="multiple">
+				</p:column>
+				<p:column style="width:10%" sortBy="#{competency.name}" headerText="Name">
+					<p:commandLink value="#{competency.name}" actionListener="#{competencyControler.startEdit}"
+						action="#{mainMenuControler.transfer}" onclick="blockui.show()" style="text-align: center">
+						<f:attribute name="competency" value="#{competency}" />
+						<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/admin/editCompetency.jsf" />
+					</p:commandLink>
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{competency.description}" headerText="Description">
+					<h:outputText value="#{competency.description}" />
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+		<p:confirmDialog id="deleteConfirm" widgetVar="deleteConfirm_w"
+			message="Are you sure to delete these Competencies?"
+			visible="#{competencyControler.deleteMode}"
+			header="NP Pillar - Confirm Required" severity="alert">
+			<p:focus context="deleteConfirm" for="cancelBtn" />
+			<p:commandButton id="confirmBtn" value="OK" update="mainForm"
+				onclick="PF('deleteConfirm_w').hide();"
+				actionListener="#{competencyControler.delete}" />
+			<p:commandButton id="cancelBtn" value="Cancel" actionListener="#{competencyControler.endDelete}" immediate="true"
+				onclick="PF('deleteConfirm_w').hide();"/>
+		</p:confirmDialog>
+	</h:form>
+</h:body>
+</html>

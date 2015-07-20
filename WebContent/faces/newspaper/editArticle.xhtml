@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel
+			header="#{articleControler.editMode? 'Edit News Article' : 'Add News Article'}">
+			<p:messages autoUpdate="true" closable="true"/>
+			<p:panelGrid columns="2">
+				<p:outputLabel value="News Title:" for="title"/>
+				<p:inputText id="title" value="#{articleControler.editDto.title}"
+					required="true" requiredMessage="News Title is Required." />
+
+				<p:outputLabel value="Belonged Section:" />
+				<p:outputPanel>
+					<p:selectOneMenu filter="true" filterMatchMode="contains"
+						value="#{articleControler.editDto.section.issue.newspaper.seq}">
+						<f:selectItem itemLabel="-- Select --" itemValue="0" />
+						<f:selectItems value="#{newspaperControler.baseList}"
+							var="newspaper" itemLabel="#{newspaper.name}"
+							itemValue="#{newspaper.seq}" />
+						<p:ajax listener="#{articleControler.clearIssueSection}"
+							update="issueList sectionList" />
+					</p:selectOneMenu>
+
+					<p:selectOneMenu id="issueList"
+						value="#{articleControler.editDto.section.issue.seq}">
+						<f:selectItem itemLabel="-- Select --" itemValue="0" />
+						<f:selectItems value="#{articleControler.issueList}" var="issue"
+							itemLabel="#{issue.formatIssue}" itemValue="#{issue.seq}" />
+						<p:ajax listener="#{articleControler.clearSection}"
+							update="sectionList" />
+					</p:selectOneMenu>
+
+					<p:selectOneMenu id="sectionList"
+						value="#{articleControler.editDto.section.seq}">
+						<f:selectItem itemLabel="Section" itemValue="0" />
+						<f:selectItems value="#{articleControler.sectionList}"
+							var="section" itemLabel="#{section.formatSection}"
+							itemValue="#{section.seq}" />
+					</p:selectOneMenu>
+				</p:outputPanel>
+
+				<p:outputLabel value="Upload Article:" />
+				<p:outputPanel>
+					<p:fileUpload fileUploadListener="#{articleControler.upload}"
+						mode="advanced" dragDropSupport="false" update="content" sizeLimit="2000000"
+						allowTypes="/(\.|\/)(txt|doc)$/" />
+					<h:outputText
+						value="Accepts .txt, .doc up to 2MB."
+						style="color:#A9A9A9" />
+				</p:outputPanel>
+
+				<p:outputLabel value="News Content:" />
+				<p:outputPanel id="content">
+					<ui:include src="../template/editor.xhtml">
+						<ui:param name="value" value="#{articleControler.editDto.html}" />
+						<ui:param name="id" value="documentationId" />
+						<ui:param name="height" value="260" />
+						<ui:param name="width" value="760" />
+					</ui:include>
+				</p:outputPanel>
+
+				<p:outputLabel value="Author:" for="author"/>
+				<p:outputPanel>
+					<p:autoComplete placeholder="Type for fint..." id="author"
+						value="#{articleControler.editDto.author.name}" required="true"
+						requiredMessage="Author is required."
+						completeMethod="#{authorControler.completeAuthorName}"
+						validator="#{authorControler.nameValidate}" />
+				</p:outputPanel>
+			</p:panelGrid>
+			<p:separator/>
+			<p:commandButton value="Save"
+				actionListener="#{articleControler.apply}"
+				action="#{mainMenuControler.transfer}" onclick="blockui.show();clearSection();"
+				oncomplete="blockui.hide()">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/newspaper/article.jsf" />
+			</p:commandButton>
+			<p:remoteCommand name="clearSection" actionListener="#{sectionControler.clearArticles}"/>
+			<p:commandButton value="Cancel"
+				actionListener="#{articleControler.clear}"
+				action="#{mainMenuControler.transfer}" onclick="blockui.show()"
+				oncomplete="blockui.hide()" immediate="true">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/newspaper/article.jsf" />
+			</p:commandButton>
+		</p:panel>
+	</h:form>
+</h:body>
+</html>

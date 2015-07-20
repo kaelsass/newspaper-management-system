@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+	<link rel="stylesheet" href="../../css/employeeInfo.css" />
+	<link rel="stylesheet" href="../../css/noborder.css" />
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:messages id="messages" closable="true" />
+		<p:panel header="Appraisal Configuration">
+			<p:tabView orientation="left" id="tabView">
+				<p:tab title="Evaluators">
+					<p:panel header="Evaluator Group">
+						<p:selectManyCheckbox value="#{evalGroupControler.seqs}">
+							<f:selectItems value="#{evalGroupControler.baseList}" var="eg"
+								itemLabel="#{eg.name}" itemValue="#{eg.seq}" />
+						</p:selectManyCheckbox>
+						<p:separator />
+						<p:commandButton value="Save"
+							actionListener="#{evalGroupControler.apply}"
+							update=":mainForm:messages" />
+					</p:panel>
+				</p:tab>
+				<p:tab title="Questions">
+					<p:panel id="editQuestion"
+						header="#{questionControler.addMode? 'Add Question' : 'Edit Question'}"
+						rendered="#{!questionControler.browseMode}">
+						<p:panelGrid columns="2">
+							<p:outputLabel value="Question" />
+							<p:outputPanel>
+								<p:inputTextarea value="#{questionControler.editDto.name}"
+									rows="5" cols="30" counter="desDisplay" maxlength="500"
+									counterTemplate="{0} characters remaining." autoResize="false"
+									style="display:block" />
+								<h:outputText id="desDisplay" />
+							</p:outputPanel>
+						</p:panelGrid>
+						<p:commandButton value="Save"
+							actionListener="#{questionControler.apply}"
+							update=":mainForm:tabView:question" />
+						<p:commandButton value="Cancel" immediate="true"
+							actionListener="#{questionControler.clear}" />
+					</p:panel>
+					<p:panel header="Appraisal Questions" id="question">
+						<p:commandButton value="Add"
+							rendered="#{questionControler.browseMode}"
+							actionListener="#{questionControler.startAdd}"
+							update=":mainForm:tabView:editQuestion" />
+						<p:commandButton value="Delete"
+							rendered="#{questionControler.browseMode}"
+							onclick="PF('deleteConfirm1_w').show();"
+							actionListener="#{questionControler.startDelete}" />
+						<p:dataTable value="#{questionControler.listModel}" var="question"
+							selection="#{questionControler.selecteds}" rows="10"
+							first="#{questionControler.first}">
+							<p:column style="width:2%;text-align: center"
+								selectionMode="multiple">
+							</p:column>
+							<p:column style="width:10%;text-align: center"
+								sortBy="#{question.name}" headerText="Question">
+								<p:commandLink value="#{question.name}"
+									actionListener="#{questionControler.startEdit}"
+									update=":mainForm:tabView:editQuestion">
+									<f:attribute name="question" value="#{question}" />
+								</p:commandLink>
+							</p:column>
+						</p:dataTable>
+					</p:panel>
+					<p:confirmDialog id="deleteConfirm1" widgetVar="deleteConfirm1_w"
+						message="Are you sure to delete these questions?"
+						visible="#{questionControler.deleteMode}"
+						header="NP Pillar - Confirm Required" severity="alert">
+						<p:focus context="deleteConfirm1" for="cancelBtn1" />
+						<p:commandButton value="OK" update=":mainForm:tabView:question"
+							onclick="PF('deleteConfirm1_w').hide();"
+							actionListener="#{questionControler.delete}" />
+						<p:commandButton id="cancelBtn1" value="Cancel"
+							actionListener="#{questionControler.endDelete}" immediate="true"
+							onclick="PF('deleteConfirm1_w').hide();" />
+					</p:confirmDialog>
+				</p:tab>
+				<p:tab title="Header Templates">
+					<p:panel id="editTemplate"
+						header="#{templateControler.addMode? 'Add Header Template' : 'Edit Header Template'}"
+						rendered="#{!templateControler.browseMode}">
+						<p:panelGrid columns="2">
+							<p:outputLabel value="Template" for="name" />
+							<p:inputText id="name" value="#{templateControler.editDto.name}"
+								required="true" requiredMessage="Template is required." />
+						</p:panelGrid>
+						<p:commandButton value="Save"
+							actionListener="#{templateControler.apply}"
+							update=":mainForm:tabView:template" />
+						<p:commandButton value="Cancel" immediate="true"
+							actionListener="#{templateControler.clear}" />
+					</p:panel>
+					<p:panel header="Appraisal Header Template List" id="template">
+						<p:commandButton value="Add"
+							rendered="#{templateControler.browseMode}"
+							actionListener="#{templateControler.startAdd}"
+							update=":mainForm:tabView:editTemplate" />
+						<p:commandButton value="Delete"
+							rendered="#{templateControler.browseMode}"
+							onclick="PF('deleteConfirm2_w').show();"
+							actionListener="#{templateControler.startDelete}" />
+						<p:dataTable value="#{templateControler.listModel}" var="template"
+							selection="#{templateControler.selecteds}" rows="10"
+							first="#{templateControler.first}">
+							<p:column style="width:2%;text-align: center"
+								selectionMode="multiple">
+							</p:column>
+							<p:column style="width:10%;text-align: center"
+								sortBy="#{template.name}" headerText="Template">
+								<p:commandLink value="#{template.name}"
+									actionListener="#{templateControler.startEdit}"
+									update=":mainForm:tabView:editTemplate">
+									<f:attribute name="template" value="#{template}" />
+								</p:commandLink>
+							</p:column>
+						</p:dataTable>
+					</p:panel>
+					<p:confirmDialog id="deleteConfirm2" widgetVar="deleteConfirm2_w"
+						message="Are you sure to delete these Templates?"
+						visible="#{templateControler.deleteMode}"
+						header="NP Pillar - Confirm Required" severity="alert">
+						<p:focus context="deleteConfirm2" for="cancelBtn2" />
+						<p:commandButton value="OK" update=":mainForm:tabView:template"
+							onclick="PF('deleteConfirm2_w').hide();"
+							actionListener="#{templateControler.delete}" />
+						<p:commandButton id="cancelBtn2" value="Cancel"
+							actionListener="#{templateControler.endDelete}" immediate="true"
+							onclick="PF('deleteConfirm2_w').hide();" />
+					</p:confirmDialog>
+				</p:tab>
+			</p:tabView>
+		</p:panel>
+	</h:form>
+</h:body>
+</html>

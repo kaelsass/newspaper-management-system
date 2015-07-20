@@ -1,0 +1,205 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<link rel="stylesheet" href="../../css/noborder.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel
+			header="#{subscriberControler.editMode? 'Edit Subscription Information' : 'Add Subscriber order'}">
+			<p:messages id="messages" closable="true" />
+
+			<p:panelGrid columns="9"
+				style="border:none;margin:0 auto;width:100% ">
+				<p:outputLabel value="Client Name" />
+				<p:inputText value="#{subscriberControler.editDto.name}"
+					required="true" requiredMessage="Client Name is Required." />
+				<p:spacer width="30" />
+				<p:outputLabel value="Address" />
+				<p:inputText value="#{subscriberControler.editDto.address}"
+					required="true" requiredMessage="Address is Required." />
+				<p:spacer width="30" />
+				<p:outputLabel value="Zip Code" />
+				<p:inputText value="#{subscriberControler.editDto.zipcode}"
+					required="true" requiredMessage="Zip Code is Required." />
+				<p:spacer width="30" />
+				<p:outputLabel value="Newspaper" />
+				<p:selectOneMenu
+					value="#{subscriberControler.editDto.newspaper.seq}"
+					validator="#{newspaperControler.seqValidate}">
+					<f:selectItem itemLabel="-- Select --" itemValue="0" />
+					<f:selectItems var="newspaper"
+						value="#{newspaperControler.baseList}"
+						itemLabel="#{newspaper.name}" itemValue="#{newspaper.seq}" />
+					<p:ajax listener="#{subscriberControler.changeNewspaper}"
+						update="monthPrice totalPrice payables" />
+				</p:selectOneMenu>
+				<p:spacer />
+				<p:outputLabel value="Date Subscribed" />
+				<p:calendar value="#{subscriberControler.editDto.dateFrom}"
+					showButtonPanel="true" navigator="true" pattern="yyyy-MM-dd"
+					showOn="both" required="true"
+					requiredMessage="Subscriber Date is Required." />
+				<p:spacer />
+				<p:outputLabel value="Number of Months" />
+				<p:spinner value="#{subscriberControler.editDto.monthNumber}"
+					min="1">
+					<p:ajax update="totalPrice payables" />
+				</p:spinner>
+				<p:spacer width="30" />
+				<p:outputLabel value="Quantity per Issue" />
+				<p:spinner value="#{subscriberControler.editDto.quantity}" min="1">
+					<p:ajax update="totalPrice payables" />
+				</p:spinner>
+
+				<p:spacer />
+				<p:outputLabel value="Discount" />
+				<p:spinner value="#{subscriberControler.editDto.discount}"
+					min="0.05" max="1.00" stepFactor="0.05">
+					<p:ajax update="payables" />
+				</p:spinner>
+
+				<p:spacer />
+
+				<p:outputLabel value="Money Paid" />
+				<p:inputText id="MoneyPaid" value="#{subscriberControler.editDto.moneyPay}"
+					required="true" requiredMessage="Money Paid is Required."
+					validator="#{subscriberControler.moneyPayValidate}">
+					<f:validateDoubleRange minimum="0.00" maximum="1000000000.00" />
+				</p:inputText>
+				<p:spacer width="30" />
+				<p:outputLabel value="Month Price" />
+				<p:outputLabel id="monthPrice"
+					value="#{subscriberControler.editDto.newspaper.monthPrice}" />
+
+				<p:spacer />
+				<p:outputLabel value="Total Price" />
+				<p:outputLabel id="totalPrice"
+					value="#{subscriberControler.editDto.money}" />
+
+				<p:spacer />
+
+				<p:outputLabel value="Payables" />
+				<p:outputLabel id="payables"
+					value="#{subscriberControler.editDto.payables}" />
+				<p:spacer width="30" />
+				<p:outputLabel value="Responsible Person" />
+				<p:autoComplete value="#{subscriberControler.editDto.employee.name}"
+					placeholder="Type for hint..."
+					completeMethod="#{workInfoControler.completeEmployeeName}"
+					required="true" requiredMessage="Responsible Person is required."
+					validator="#{workInfoControler.nameValidate}" />
+				<p:spacer />
+				<p:outputLabel value="Order Date" />
+				<p:calendar value="#{subscriberControler.editDto.orderDate}"
+					showButtonPanel="true" navigator="true" pattern="yyyy-MM-dd"
+					showOn="both" required="true"
+					requiredMessage="Order Date is required." />
+
+				<p:spacer />
+				<p:outputLabel value="Payment Method" />
+				<p:selectOneMenu value="#{subscriberControler.editDto.payType.seq}">
+					<f:selectItem itemLabel="-- Select --" itemValue="0" />
+					<f:selectItems var="payType" value="#{payTypeControler.baseList}"
+						itemLabel="#{payType.name}" itemValue="#{payType.seq}" />
+				</p:selectOneMenu>
+				<p:spacer/>
+				<p:outputLabel value="Information Source" />
+				<p:selectOneMenu filter="true" filterMatchMode="contains"
+					value="#{subscriberControler.editDto.promotion.seq}"
+					validator="#{promotionControler.seqValidate}">
+					<f:selectItem itemLabel="-- Select --" itemValue="0" />
+					<f:selectItems var="promotion"
+						value="#{promotionControler.allList}"
+						itemLabel="#{promotion.name}" itemValue="#{promotion.seq}" />
+				</p:selectOneMenu>
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+
+				<p:outputLabel value="Add Client Detail Info" />
+				<p:selectBooleanCheckbox
+					value="#{subscriberControler.addDetailMode}">
+					<p:ajax update="detailInfo" />
+				</p:selectBooleanCheckbox>
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+			</p:panelGrid>
+
+			<p:panelGrid id="detailInfo" columns="11"
+				style="border:none;margin:0 auto;width:100% ">
+				<p:outputLabel value="Age"
+					rendered="#{subscriberControler.addDetailMode}" />
+				<p:spinner value="#{subscriberControler.editDto.age}" min="0"
+					rendered="#{subscriberControler.addDetailMode}" stepFactor="5" />
+				<p:spacer width="50" rendered="#{subscriberControler.addDetailMode}" />
+				<p:outputLabel value="Gender"
+					rendered="#{subscriberControler.addDetailMode}" />
+				<p:selectOneRadio value="#{subscriberControler.editDto.sex}"
+					rendered="#{subscriberControler.addDetailMode}">
+					<f:selectItems value="#{sexControler.baseList}" var="sex"
+						itemLabel="#{sex.name}" itemValue="#{sex.name}" />
+				</p:selectOneRadio>
+				<p:spacer width="50" rendered="#{subscriberControler.addDetailMode}" />
+				<p:outputLabel value="Occupation"
+					rendered="#{subscriberControler.addDetailMode}" />
+				<p:selectOneMenu
+					value="#{subscriberControler.editDto.occupationSeq}"
+					rendered="#{subscriberControler.addDetailMode}">
+					<f:selectItems value="#{occupationControler.baseList}"
+						var="occupation" itemLabel="#{occupation.name}"
+						itemValue="#{occupation.seq}" />
+				</p:selectOneMenu>
+				<p:spacer width="50" rendered="#{subscriberControler.addDetailMode}" />
+				<p:outputLabel value="Education"
+					rendered="#{subscriberControler.addDetailMode}" />
+				<p:selectOneMenu value="#{subscriberControler.editDto.educationSeq}"
+					rendered="#{subscriberControler.addDetailMode}">
+					<f:selectItems value="#{educationControler.baseList}"
+						var="education" itemLabel="#{education.name}"
+						itemValue="#{education.seq}" />
+				</p:selectOneMenu>
+			</p:panelGrid>
+			<p:separator />
+			<p:commandButton value="Save"
+				actionListener="#{subscriberControler.apply}" update="mainForm"
+				action="#{mainMenuControler.transfer}" onclick="blockui.show()"
+				oncomplete="blockui.hide()">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/sales/subscriber.jsf" />
+			</p:commandButton>
+			<p:commandButton value="Cancel"
+				actionListener="#{subscriberControler.clear}"
+				action="#{mainMenuControler.transfer}" onclick="blockui.show()"
+				oncomplete="blockui.hide()" immediate="true">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/sales/subscriber.jsf" />
+			</p:commandButton>
+		</p:panel>
+	</h:form>
+</h:body>
+</html>

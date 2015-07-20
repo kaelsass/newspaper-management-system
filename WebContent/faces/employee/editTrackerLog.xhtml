@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="Manage Performance Tracker Log"
+			rendered="#{!trackerLogControler.browseMode}">
+			<p:messages autoUpdate="true" closable="true"/>
+			<p:panelGrid columns="2">
+				<p:outputLabel value="Log" />
+				<p:inputText value="#{trackerLogControler.editDto.log}" required="true" requiredMessage="Log Name is required." style="width:100%"/>
+				<p:outputLabel value="Performance" />
+				<p:selectOneMenu value="#{trackerLogControler.editDto.performance.seq}">
+					<f:selectItems value="#{trackerLogControler.performanceList}" var="performance" itemLabel="#{performance.name}" itemValue="#{performance.seq}"/>
+				</p:selectOneMenu>
+				<p:outputLabel value="Comment" />
+				<p:outputPanel>
+				<p:inputTextarea value="#{trackerLogControler.editDto.comments}"
+					rows="5" cols="30" counter="noteDisplay" maxlength="1000"
+					counterTemplate="{0} characters remaining." autoResize="false" style="display:block"/>
+				<h:outputText id="noteDisplay"/>
+				</p:outputPanel>
+			</p:panelGrid>
+			<p:commandButton value="Save"
+				actionListener="#{trackerLogControler.apply}" update="mainForm" />
+			<p:commandButton value="Cancel" immediate="true"
+				actionListener="#{trackerLogControler.clear}" update="mainForm" />
+		</p:panel>
+		<p:panel header="Performance Tracker Log List of #{trackerLogControler.tracker.employee.name}">
+			<p:commandButton value="Add"
+				rendered="#{trackerLogControler.browseMode}"
+				actionListener="#{trackerLogControler.startAdd}" update="mainForm" />
+
+			<p:commandButton value="Delete"
+				rendered="#{trackerLogControler.browseMode}"
+				onclick="PF('deleteConfirm_w').show();"
+				actionListener="#{trackerLogControler.startDelete}"
+				update="deleteConfirm" />
+			<p:spacer />
+			<p:dataTable value="#{trackerLogControler.listModel}"
+				var="trackerLog" selection="#{trackerLogControler.selecteds}" rows="10">
+				<p:column style="width:2%;text-align: center"
+					selectionMode="multiple">
+				</p:column>
+				<p:column style="width:10%" headerText="Reviewer"
+					sortBy="#{trackerLog.reviewer.name}">
+					<p:commandLink value="#{trackerLog.reviewer.name}" process="@this"
+						actionListener="#{trackerLogControler.startEdit}" update=":mainForm">
+						<f:attribute name="trackerLog" value="#{trackerLog}" />
+					</p:commandLink>
+				</p:column>
+				<p:column style="width:10%" headerText="Log">
+					<h:outputText value="#{trackerLog.log}" />
+				</p:column>
+				<p:column style="width:10%" headerText="Comments">
+					<h:outputText value="#{trackerLog.comments}" />
+				</p:column>
+				<p:column style="width:10%" headerText="Performance"
+					sortBy="#{trackerLog.performance.name}">
+					<h:outputText value="#{trackerLog.performance.name}" />
+				</p:column>
+				<p:column style="width:10%" headerText="Added Date"
+					sortBy="#{trackerLog.formatAddDate}">
+					<h:outputText value="#{trackerLog.formatAddDate}" />
+				</p:column>
+				<p:column style="width:10%" headerText="Modified Date"
+					sortBy="#{trackerLog.formatModDate}">
+					<h:outputText value="#{trackerLog.formatModDate}" />
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+		<p:confirmDialog id="deleteConfirm" widgetVar="deleteConfirm_w"
+			message="Are you sure to delete these tracker logs?"
+			visible="#{trackerLogControler.deleteMode}"
+			header="NP Pillar - Confirm Required" severity="alert">
+			<p:focus context="deleteConfirm" for="cancelBtn" />
+			<p:commandButton id="confirmBtn" value="OK" update="mainForm"
+				onclick="PF('deleteConfirm_w').hide();"
+				actionListener="#{trackerLogControler.delete}" />
+			<p:commandButton id="cancelBtn" value="Cancel"
+				actionListener="#{trackerLogControler.endDelete}" immediate="true"
+				onclick="PF('deleteConfirm_w').hide();" />
+		</p:confirmDialog>
+	</h:form>
+</h:body>
+</html>

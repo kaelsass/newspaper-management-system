@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+	<link rel="stylesheet"
+		href="../../css/section.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:growl autoUpdate="true" />
+		<p:panel
+			header="#{sectionControler.editMode? 'Edit Section' : 'Add Section'}">
+			<p:tabView id="tabView" orientation="left" >
+				<p:tab title="Section Image">
+					<p:fileUpload fileUploadListener="#{sectionControler.uploadPhoto}"
+						mode="advanced" dragDropSupport="false" style="width:378px;"
+						allowTypes="/(\.|\/)(gif|jpe?g|png)$/" update="thumbnail" />
+					<p:graphicImage id="thumbnail" cache="false"
+						value="/thumbnail/#{sectionControler.editDto.photoName}"
+						width="378" height="550" />
+				</p:tab>
+				<p:tab title="Section Info">
+					<p:panelGrid columns="2">
+						<p:outputLabel value="Newspaper:" />
+						<p:outputLabel
+							value="#{sectionControler.editDto.issue.newspaper.name}" />
+
+						<p:outputLabel value="Issue:" />
+						<p:outputLabel
+							value="#{sectionControler.editDto.issue.formatIssue}" />
+
+						<p:outputLabel value="Page Number:" />
+						<p:outputLabel value="#{sectionControler.editDto.number}"
+							rendered="#{sectionControler.editMode}" />
+						<p:inputText value="#{sectionControler.editDto.number}"
+							required="true" requiredMessage="Page Number is required"
+							rendered="#{!sectionControler.editMode}"
+							validator="#{sectionControler.sectionNumberValidate}" />
+
+						<p:outputLabel value="Subject:" />
+						<p:inputText value="#{sectionControler.editDto.name}" />
+
+					</p:panelGrid>
+					<p:remoteCommand name="clearIssue"
+						actionListener="#{issueControler.clear}" />
+					<p:commandButton value="Save"
+						actionListener="#{sectionControler.apply}"
+						action="#{mainMenuControler.transfer}"
+						onclick="blockui.show();clearIssue()" oncomplete="blockui.hide()">
+						<f:setPropertyActionListener
+							target="#{mainMenuControler.nextMenu}" value="/faces/newspaper/issue.jsf" />
+					</p:commandButton>
+					<p:commandButton value="Cancel"
+						actionListener="#{sectionControler.clear}"
+						action="#{mainMenuControler.transfer}" onclick="blockui.show()"
+						oncomplete="blockui.hide()" immediate="true">
+						<f:setPropertyActionListener
+							target="#{mainMenuControler.nextMenu}" value="/faces/newspaper/issue.jsf" />
+					</p:commandButton>
+				</p:tab>
+				<p:tab title="Contained Articles">
+					<p:dataTable id="articleTable"
+						selection="#{sectionControler.selectedArticles}"
+						value="#{sectionControler.articleListModel}" var="article">
+						<f:facet name="header">
+							<p:outputLabel value="News Articles" />
+						</f:facet>
+						<p:column selectionMode="multiple" width="2%">
+						</p:column>
+						<p:column headerText="Title" width="20%">
+							<h:outputText value="#{article.title}" />
+						</p:column>
+						<p:column headerText="Subject" width="20%">
+							<h:outputText value="#{article.subject.name}" />
+						</p:column>
+						<p:column headerText="Last Modified Time" width="20%">
+							<h:outputText value="#{article.formatTime}" />
+						</p:column>
+						<p:column headerText="Author" width="20%">
+							<h:outputText value="#{article.author.name}" />
+						</p:column>
+						<p:column style="width:32px">
+							<p:commandButton update=":mainForm:articleDetail"
+								actionListener="#{sectionControler.startBrowseArticle(article)}"
+								icon="ui-icon-search" onclick="PF('articleDialog_w').show()">
+							</p:commandButton>
+						</p:column>
+					</p:dataTable>
+					<p:commandButton value="Add" onclick="PF('availableList_w').show()" />
+					<p:commandButton value="Delete" onclick="deleteConfirm_w.show()" />
+				</p:tab>
+			</p:tabView>
+		</p:panel>
+		<p:dialog id="availableList" header="Available Articles" width="80%"
+			widgetVar="availableList_w" closable="true" modal="true">
+				<p:dataTable id="availableTable" widgetVar="availableTable_w" selection="#{sectionControler.addedArticles}" filteredValue="#{sectionControler.filteredArticles}"
+					value="#{sectionControler.availableArticleListModel}" var="article">
+					<f:facet name="header">
+						<p:outputLabel value="News Articles" />
+					</f:facet>
+					<p:column selectionMode="multiple" style="width:2%">
+					</p:column>
+					<p:column headerText="Title" width="10%" filterBy="#{article.title}" filterMatchMode="contains">
+						<h:outputText value="#{article.title}" />
+					</p:column>
+					<p:column headerText="Subject" width="10%" filterBy="#{article.subject.name}" filterMatchMode="contains">
+						<h:outputText value="#{article.subject.name}" />
+					</p:column>
+					<p:column headerText="Last Modified Time" width="10%" sortBy="#{article.formatTime}">
+						<h:outputText value="#{article.formatTime}" />
+					</p:column>
+					<p:column headerText="Author" width="10%" filterBy="#{article.author.name}" filterMatchMode="contains">
+						<h:outputText value="#{article.author.name}" />
+					</p:column>
+					<p:column width="2%">
+						<p:commandButton update=":mainForm:articleDetail"
+							oncomplete="PF('articleDialog_w').show()" icon="ui-icon-search">
+							<f:setPropertyActionListener value="#{article}"
+								target="#{sectionControler.editArticle}" />
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>
+				<p:commandButton value="OK" actionListener="#{sectionControler.addArticles}" update=":mainForm:tabView:articleTable" onclick="availableList_w.hide();availableTable_w.filter()"/>
+				<p:commandButton value="Cancel" onclick="availableList_w.hide()"/>
+		</p:dialog>
+		<p:confirmDialog id="deleteConfirm" widgetVar="deleteConfirm_w"
+			message="Are you sure to remove these articles?"
+			header="NP Pillar - Confirm Required" severity="alert">
+			<p:focus context="deleteConfirm" for="cancelBtn" />
+			<p:commandButton id="confirmBtn" value="OK"
+				update=":mainForm:tabView:articleTable availableTable"
+				onclick="PF('deleteConfirm_w').hide();"
+				actionListener="#{sectionControler.deleteArticle}" />
+			<p:commandButton id="cancelBtn" value="Cancel"
+				onclick="PF('deleteConfirm_w').hide();" />
+		</p:confirmDialog>
+		<p:dialog id="articleDialog" header="Article Detail"
+			widgetVar="articleDialog_w" closable="true" modal="true">
+			<p:outputPanel id="articleDetail">
+				<p:panelGrid columns="2" cellpadding="4">
+					<p:outputLabel value="Title:" />
+					<h:outputText value="#{sectionControler.editArticle.title}"
+						style="font-weight:bold" />
+
+					<p:outputLabel value="Subject:" />
+					<h:outputText value="#{sectionControler.editArticle.subject.name}"
+						style="font-weight:bold" />
+
+					<p:outputLabel value="Content:" />
+					<p:editor value="#{sectionControler.editArticle.html}"
+						style="font-weight:bold" disabled="true" />
+
+					<p:outputLabel value="Author:" />
+					<h:outputText value="#{sectionControler.editArticle.author.name}"
+						style="font-weight:bold" />
+				</p:panelGrid>
+			</p:outputPanel>
+		</p:dialog>
+	</h:form>
+</h:body>
+</html>

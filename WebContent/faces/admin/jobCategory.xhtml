@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+	</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="#{jobCategoryControler.addMode? 'Add Job Category' : 'Edit Job Category'}" rendered="#{!jobCategoryControler.browseMode}">
+		<p:panelGrid columns="2">
+			<p:outputLabel value="Name:"/>
+			<p:inputText value="#{jobCategoryControler.editDto.name}" validator="#{jobCategoryControler.nameValidate}"/>
+		</p:panelGrid>
+		<p:messages autoUpdate="true" closable="true"/>
+			<p:commandButton value="Save"
+				actionListener="#{jobCategoryControler.apply}"
+				update="mainForm"/>
+			<p:commandButton value="Cancel" immediate="true"
+				actionListener="#{jobCategoryControler.clear}" update="mainForm" />
+		</p:panel>
+		<p:panel header="Job Category">
+			<p:commandButton value="Add" rendered="#{jobCategoryControler.browseMode}"
+				actionListener="#{jobCategoryControler.startAdd}"
+				update="mainForm"/>
+			<p:commandButton value="Delete" rendered="#{jobCategoryControler.browseMode}" onclick="PF('deleteConfirm_w').show();"
+				actionListener="#{jobCategoryControler.startDelete}" update="deleteConfirm" />
+			<p:spacer />
+			<p:dataTable id="jobCategoryTable" value="#{jobCategoryControler.listModel}"
+				var="jc" selection="#{jobCategoryControler.selecteds}" rows="10"
+				first="#{jobCategoryControler.first}">
+				<p:column style="width:1%;text-align: center" selectionMode="multiple">
+				</p:column>
+				<p:column style="width:10%;text-align: center" sortBy="#{jc.name}">
+					<f:facet name="header">
+						<h:outputText value="Job Category" />
+					</f:facet>
+					<p:commandLink value="#{jc.name}" actionListener="#{jobCategoryControler.startEdit}"
+						update=":mainForm">
+						<f:attribute name="jobCategory" value="#{jc}" />
+					</p:commandLink>
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+		<p:confirmDialog id="deleteConfirm" widgetVar="deleteConfirm_w"
+			message="Are you sure to delete these job categories?"
+			visible="#{jobCategoryControler.deleteMode}"
+			header="NP Pillar - Confirm Required" severity="alert">
+			<p:focus context="deleteConfirm" for="cancelBtn" />
+			<p:commandButton id="confirmBtn" value="OK" update="mainForm"
+				onclick="PF('deleteConfirm_w').hide();"
+				actionListener="#{jobCategoryControler.delete}" />
+			<p:commandButton id="cancelBtn" value="Cancel" actionListener="#{jobCategoryControler.endDelete}" immediate="true"
+				onclick="PF('deleteConfirm_w').hide();"/>
+		</p:confirmDialog>
+	</h:form>
+</h:body>
+</html>

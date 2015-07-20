@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="Timesheet Report">
+			<p:messages id="messages" closable="true" />
+			<p:panelGrid columns="2" id="searchOptions">
+				<p:outputLabel value="Employee Name"/>
+				<p:autoComplete value="#{timesheetControler.condition.employeeName}"
+					placeholder="Type for hint..."
+					completeMethod="#{workInfoControler.completeEmployeeName}"/>
+			</p:panelGrid>
+			<p:separator />
+			<p:commandButton value="Search" update="timesheetTable"
+				actionListener="#{timesheetControler.search}" />
+			<p:commandButton value="Reset" update="searchOptions"
+				actionListener="#{timesheetControler.condition.clear}" />
+		</p:panel>
+		<p:panel>
+			<p:commandButton value="Add"
+				actionListener="#{timesheetControler.startAdd}"
+				onclick="addTimesheet_w.show()">
+			</p:commandButton>
+			<p:commandButton value="Delete"
+				actionListener="#{timesheetControler.startDelete}"
+				onclick="PF('deleteConfirm_w').show()" />
+
+			<p:dataTable id="timesheetTable"
+				value="#{timesheetControler.listModel}" var="timesheet"
+				selection="#{timesheetControler.selecteds}" rows="10">
+				<p:column width="2%" style="text-align:center"
+					selectionMode="multiple">
+				</p:column>
+				<p:column width="40%" sortBy="#{timesheet.employee.name}"
+					headerText="Employee Name">
+					<h:outputText value="#{timesheet.employee.name}" />
+				</p:column>
+				<p:column width="50%" headerText="Timesheet Period"
+					style="text-align:center">
+					<h:outputText value="#{timesheet.formatWeek}" />
+				</p:column>
+				<p:column width="8%" style="text-align:center">
+					<p:commandLink value="view"
+						actionListener="#{timesheetPerWeekControler.startEditTimesheet}"
+						action="#{mainMenuControler.transfer}" ajax="false"
+						immediate="true">
+						<f:attribute name="timesheet" value="#{timesheet}" />
+						<f:setPropertyActionListener
+							target="#{mainMenuControler.nextMenu}"
+							value="/faces/employee/timesheetPerWeek.jsf" />
+					</p:commandLink>
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+
+		<p:confirmDialog id="deleteConfirm" widgetVar="deleteConfirm_w"
+			message="Are you sure to delete these timesheets?"
+			header="NP Pillar - Confirm Required" severity="alert">
+			<p:focus context="deleteConfirm" for="cancelBtn" />
+			<p:commandButton id="confirmBtn" value="OK" update="mainForm"
+				onclick="PF('deleteConfirm_w').hide();"
+				actionListener="#{timesheetControler.delete}" />
+			<p:commandButton id="cancelBtn" value="Cancel"
+				actionListener="#{timesheetControler.endDelete}"
+				onclick="PF('deleteConfirm_w').hide();" />
+		</p:confirmDialog>
+	</h:form>
+	<p:dialog id="addTimesheet" widgetVar="addTimesheet_w" closable="false"
+		resizable="false" draggable="true" modal="true" header="Add Timesheet">
+		<h:form>
+			<p:panelGrid columns="2">
+				<h:outputText value="Employee Name" />
+				<p:autoComplete value="#{timesheetControler.editDto.employee.name}"
+					placeholder="Type for hint..." required="true"
+					requiredMessage="Employee Name is required."
+					completeMethod="#{workInfoControler.completeEmployeeName}"
+					validator="#{workInfoControler.nameValidate}" />
+				<h:outputText value="Select a Day to create Timesheet" />
+				<p:calendar value="#{timesheetControler.time}" navigator="true"
+					showOn="both" pattern="yyyy-MM-dd" required="true"
+					requiredMessage="Day is required." />
+			</p:panelGrid>
+			<p:separator />
+			<p:commandButton value="Add Timesheet"
+				actionListener="#{timesheetControler.apply}"
+				update=":mainForm:timesheetTable :mainForm:messages" />
+			<p:commandButton value="Cancel" immediate="true"
+				actionListener="#{timesheetControler.clear}"
+				onclick="addTimesheet_w.hide()" />
+		</h:form>
+	</p:dialog>
+	<p:dialog id="errorDialog" widgetVar="errorDialog_w"
+		closable="true" resizable="false" draggable="true" modal="true"
+		header="Validation Error">
+		<p:outputLabel value="The time sheet has existed." />
+		<p:separator />
+		<p:commandButton value="OK" onclick="errorDialog_w.hide()" />
+	</p:dialog>
+</h:body>
+</html>

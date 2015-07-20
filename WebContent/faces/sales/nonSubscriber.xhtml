@@ -1,0 +1,204 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<link rel="stylesheet" href="../../css/subscriber.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="Non-subscriber Orders" toggleable="true">
+			<p:panelGrid columns="6" id="searchOptions"
+				style="border:none;margin:0 auto;width:100%">
+				<p:outputPanel style="width:100%">
+					<p:outputLabel style="display:block" value="Client Name" />
+					<p:autoComplete value="#{nonSubscriberControler.condition.name}"
+						placeholder="Type for hint..."
+						completeMethod="#{nonSubscriberControler.completeName}" />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Address" />
+					<p:autoComplete value="#{nonSubscriberControler.condition.address}"
+						placeholder="Type for hint..."
+						completeMethod="#{nonSubscriberControler.completeAddress}" />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Work Unit" />
+					<p:autoComplete
+						value="#{nonSubscriberControler.condition.workunit}"
+						placeholder="Type for hint..."
+						completeMethod="#{nonSubscriberControler.completeWorkunit}" />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Newspaper" />
+					<p:selectCheckboxMenu
+						label="-- Select --"
+						value="#{nonSubscriberControler.condition.newspaperSeqs}"
+						filter="true" filterMatchMode="contains">
+						<f:selectItems var="newspaper"
+							value="#{newspaperControler.baseList}"
+							itemLabel="#{newspaper.name}" itemValue="#{newspaper.seq}" />
+					</p:selectCheckboxMenu>
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Order Quantity (min)" />
+					<p:spinner value="#{nonSubscriberControler.condition.quantity}"
+						min="0" />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Responsible Person" />
+					<p:selectCheckboxMenu
+						value="#{nonSubscriberControler.condition.employeeIDs}"
+						label="-- Select --" filter="true"
+						filterMatchMode="contains" panelStyle="width:250px">
+						<f:selectItems var="employee"
+							value="#{workInfoControler.baseList}"
+							itemLabel="#{employee.name}" itemValue="#{employee.id}" />
+					</p:selectCheckboxMenu>
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Issue Date From" />
+					<p:calendar value="#{nonSubscriberControler.condition.dateFrom}"
+						navigator="true" pattern="yyyy-MM-dd" showOn="both" />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Issue Date To" />
+					<p:calendar value="#{nonSubscriberControler.condition.dateTo}"
+						navigator="true" pattern="yyyy-MM-dd" showOn="both" />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Order Date From" />
+					<p:calendar
+						value="#{nonSubscriberControler.condition.orderDateFrom}"
+						navigator="true" pattern="yyyy-MM-dd" showOn="both" />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Order Date To" />
+					<p:calendar value="#{nonSubscriberControler.condition.orderDateTo}"
+						navigator="true" pattern="yyyy-MM-dd" showOn="both" />
+				</p:outputPanel>
+
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Purpose" />
+					<p:selectOneMenu
+						value="#{nonSubscriberControler.condition.purposeSeq}">
+						<f:selectItem itemLabel="-- Select --" itemValue="0" />
+						<f:selectItems var="purpose" value="#{purposeControler.baseList}"
+							itemLabel="#{purpose.name}" itemValue="#{purpose.seq}" />
+					</p:selectOneMenu>
+				</p:outputPanel>
+				<p:spacer/>
+			</p:panelGrid>
+			<p:separator/>
+			<p:commandButton value="Search" update="nonSubscriberTable"
+				actionListener="#{nonSubscriberControler.search}" />
+			<p:commandButton value="Reset" update="searchOptions"
+				actionListener="#{nonSubscriberControler.condition.clear}" />
+		</p:panel>
+		<p:panel>
+			<p:commandButton value="Add"
+				actionListener="#{nonSubscriberControler.startAdd}"
+				action="#{mainMenuControler.transfer}">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/sales/editNonSubscriber.jsf" />
+			</p:commandButton>
+			<p:commandButton value="Delete"
+				actionListener="#{nonSubscriberControler.startDelete}"
+				onclick="PF('deleteConfirm_w').show();" update="deleteConfirm" />
+
+			<p:dataTable id="nonSubscriberTable"
+				value="#{nonSubscriberControler.listModel}" var="nonSubscriber"
+				selection="#{nonSubscriberControler.selecteds}" rows="10"
+				first="#{nonSubscriberControler.first}">
+				<p:column style="width:1%" selectionMode="multiple">
+				</p:column>
+				<p:column style="width:10%" sortBy="#{nonSubscriber.name}"
+					headerText="Name">
+					<p:commandLink value="#{nonSubscriber.name}"
+						actionListener="#{nonSubscriberControler.startEdit}"
+						action="#{mainMenuControler.transfer}">
+						<f:attribute name="nonSubscriber" value="#{nonSubscriber}" />
+						<f:setPropertyActionListener
+							target="#{mainMenuControler.nextMenu}"
+							value="/faces/sales/editNonSubscriber.jsf" />
+					</p:commandLink>
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{nonSubscriber.address}"
+					headerText="Address">
+					<h:outputText value="#{nonSubscriber.address}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{nonSubscriber.zipcode}"
+					headerText="Zip Code">
+					<h:outputText value="#{nonSubscriber.zipcode}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{nonSubscriber.workunit}"
+					headerText="Work Unit">
+					<h:outputText value="#{nonSubscriber.workunit}" />
+				</p:column>
+
+				<p:column style="width:10%"
+					sortBy="#{nonSubscriber.issue.newspaper.name}"
+					headerText="Newspaper">
+					<h:outputText value="#{nonSubscriber.issue.newspaper.name}" />
+				</p:column>
+
+				<p:column style="width:10%"
+					sortBy="#{nonSubscriber.issue.formatIssue}"
+					headerText="Issue Number">
+					<h:outputText value="#{nonSubscriber.issue.formatIssue}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{nonSubscriber.quantity}"
+					headerText="Quantity">
+					<h:outputText value="#{nonSubscriber.quantity}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{nonSubscriber.purpose.name}"
+					headerText="Purpose">
+					<h:outputText value="#{nonSubscriber.purpose.name}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{nonSubscriber.employee.name}"
+					headerText="Responsible Person">
+					<h:outputText value="#{nonSubscriber.employee.name}" />
+				</p:column>
+
+				<p:column style="width:10%"
+					sortBy="#{nonSubscriber.formatOrderDate}" headerText="Order Date">
+					<h:outputText value="#{nonSubscriber.formatOrderDate}" />
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+		<p:confirmDialog id="deleteConfirm" widgetVar="deleteConfirm_w"
+			message="Are you sure to delete these non-subscriber orders?"
+			visible="#{nonSubscriberControler.deleteMode}"
+			header="NP Pillar - Confirm Required" severity="alert">
+			<p:focus context="deleteConfirm" for="cancelBtn" />
+			<p:commandButton id="confirmBtn" value="OK" update="mainForm"
+				onclick="PF('deleteConfirm_w').hide();"
+				actionListener="#{nonSubscriberControler.delete}" />
+			<p:commandButton id="cancelBtn" value="Cancel"
+				actionListener="#{nonSubscriberControler.endDelete}"
+				onclick="PF('deleteConfirm_w').hide();" />
+		</p:confirmDialog>
+	</h:form>
+</h:body>
+</html>

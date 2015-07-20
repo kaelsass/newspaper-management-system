@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title></h:head>
+<h:body>
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="Tasks">
+			<p:panelGrid columns="2" id="searchOptions">
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Task" />
+					<p:autoComplete value="#{taskControler.condition.name}" placeholder="Type for hint..."  completeMethod="#{taskControler.completeName}"/>
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Task Admin" />
+					<p:selectCheckboxMenu value="#{taskControler.condition.employeeIDs}" label="-- Select --" filter="true" filterMatchMode="contains">
+						<f:selectItems value="#{workInfoControler.baseList}" var="employee"
+							itemLabel="#{employee.name}" itemValue="#{employee.id}" />
+					</p:selectCheckboxMenu>
+				</p:outputPanel>
+			</p:panelGrid>
+			<p:separator/>
+			<p:commandButton value="Search" update="taskTable"
+				actionListener="#{taskControler.search}" />
+			<p:commandButton value="Reset" update="searchOptions"
+				actionListener="#{taskControler.condition.clear}" />
+		</p:panel>
+		<p:panel>
+			<p:commandButton value="Add"
+				actionListener="#{taskControler.startAdd}"
+				action="#{mainMenuControler.transfer}">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/employee/addTask.jsf" />
+			</p:commandButton>
+			<p:commandButton value="Delete"
+						actionListener="#{taskControler.startDelete}"
+						onclick="PF('deleteConfirm_w').show();"
+						update="deleteConfirm"/>
+
+			<p:dataTable id="taskTable" value="#{taskControler.listModel}"
+				var="task" selection="#{taskControler.selecteds}" rows="10">
+				<p:column width="2%" selectionMode="multiple" style="text-align:center">
+				</p:column>
+				<p:column width="40%" sortBy="#{task.name}" headerText="Task">
+					<p:commandLink value="#{task.name}" actionListener="#{taskControler.preEdit}"
+						action="#{mainMenuControler.transfer}" ajax="false">
+						<f:attribute name="task" value="#{task}" />
+						<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/employee/editTask.jsf" />
+					</p:commandLink>
+				</p:column>
+				<p:column width="40%" headerText="Task Admins">
+					<h:outputText value="#{task.formatAdmins}" />
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+		<p:confirmDialog id="deleteConfirm" widgetVar="deleteConfirm_w"
+			message="Are you sure to delete this user?"
+			visible="#{taskControler.deleteMode}"
+			header="NP Pillar - Confirm Required" severity="alert">
+			<p:focus context="deleteConfirm" for="cancelBtn" />
+			<p:commandButton id="confirmBtn" value="OK" update="mainForm"
+				onclick="PF('deleteConfirm_w').hide();"
+				actionListener="#{taskControler.delete}" />
+			<p:commandButton id="cancelBtn" value="Cancel" actionListener="#{taskControler.endDelete}"
+				onclick="PF('deleteConfirm_w').hide();" />
+		</p:confirmDialog>
+	</h:form>
+</h:body>
+</html>

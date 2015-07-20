@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<link rel="stylesheet" href="../../css/noborder.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:growl id="messages" showDetail="true" />
+		<p:panel header="Add Employee">
+			<p:panelGrid columns="2">
+				<p:outputLabel value="First Name: " />
+				<p:inputText value="#{workInfoControler.firstName}" required="true"
+					requiredMessage="First Name is required!" />
+				<p:outputLabel value="Last Name: " />
+				<p:inputText value="#{workInfoControler.lastName}" required="true"
+					requiredMessage="Last Name is required!" />
+
+				<p:outputLabel value="Employee ID:" />
+				<p:inputText value="#{workInfoControler.editWorkInfo.id}"
+					required="true" requiredMessage="Employee ID is required!"
+					validator="#{userControler.idValidate}" />
+
+				<p:outputLabel value="Photograph:" />
+				<p:fileUpload
+					fileUploadListener="#{workInfoControler.handleFileUpload}"
+					mode="advanced" dragDropSupport="false" update="messages"
+					sizeLimit="100000" allowTypes="/(\.|\/)(gif|jpe?g|png)$/" />
+
+				<p:outputLabel value="Create Login Details" />
+				<p:selectBooleanCheckbox value="#{workInfoControler.addLoginUser}">
+					<p:ajax update="login1 login2 login3 login4 login5 login6 login7 login8" />
+				</p:selectBooleanCheckbox>
+
+				<p:outputPanel id="login1">
+					<p:outputLabel value="User Name:"
+						rendered="#{workInfoControler.addLoginUser}" />
+				</p:outputPanel>
+				<p:outputPanel id="login2">
+					<p:inputText value="#{workInfoControler.editUser.userName}"
+						rendered="#{workInfoControler.addLoginUser}" required="true"
+						requiredMessage="User name is required!"
+						validator="#{userControler.userNameValidate}" />
+				</p:outputPanel>
+				<p:outputPanel id="login3">
+					<p:outputLabel value="User Role:" rendered="#{workInfoControler.addLoginUser}"
+						 />
+				</p:outputPanel>
+				<p:outputPanel id="login4">
+					<p:selectOneMenu value="#{workInfoControler.editUser.role.id}"
+						rendered="#{workInfoControler.addLoginUser}">
+						<f:selectItems value="#{roleControler.baseList}" var="role"
+							itemLabel="#{role.role}" itemValue="#{role.id}" />
+					</p:selectOneMenu>
+				</p:outputPanel>
+				<p:outputPanel id="login5">
+					<p:outputLabel value="Password:"
+						rendered="#{workInfoControler.addLoginUser}" />
+				</p:outputPanel>
+				<p:outputPanel id="login6">
+					<p:password value="#{workInfoControler.password}"
+						rendered="#{workInfoControler.addLoginUser}" required="true"
+						requiredMessage="Password is required!" />
+				</p:outputPanel>
+				<p:outputPanel id="login7">
+					<p:outputLabel value="Confirm Password:"
+						rendered="#{workInfoControler.addLoginUser}" />
+				</p:outputPanel>
+				<p:outputPanel id="login8">
+					<p:password value="#{workInfoControler.passwordConfirm}"
+						rendered="#{workInfoControler.addLoginUser}" />
+				</p:outputPanel>
+			</p:panelGrid>
+
+			<p:messages autoUpdate="true" closable="true" />
+			<p:commandButton value="Save"
+				actionListener="#{workInfoControler.apply}"
+				action="#{mainMenuControler.transfer}">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/employee/employee.jsf" />
+			</p:commandButton>
+			<p:commandButton value="Cancel"
+				actionListener="#{workInfoControler.clear}"
+				action="#{mainMenuControler.transfer}" onclick="blockui.show()"
+				immediate="true">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/employee/employee.jsf" />
+			</p:commandButton>
+		</p:panel>
+
+	</h:form>
+</h:body>
+</html>

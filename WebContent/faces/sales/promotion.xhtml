@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+	<link rel="stylesheet"
+		href="../../css/promotion.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="Promotion Information" toggleable="true">
+			<p:panelGrid columns="6" id="searchOptions"
+				style="border:none;margin:0 auto;width:100%">
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Activity Name" />
+					<p:autoComplete value="#{promotionControler.condition.name}"
+						placeholder="Type for hint..."
+						completeMethod="#{promotionControler.completeName}" />
+				</p:outputPanel>
+
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="For Newspaper(s)" />
+					<p:selectCheckboxMenu label="-- Select --" value="#{promotionControler.condition.newspaperSeqs}" filter="true" filterMatchMode="contains">
+						<f:selectItems value="#{newspaperControler.allList}" var="newspaper" itemLabel="#{newspaper.name}" itemValue="#{newspaper.seq}"/>
+					</p:selectCheckboxMenu>
+				</p:outputPanel>
+
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Activity Admin" />
+					<p:selectCheckboxMenu label="-- Select --" value="#{promotionControler.condition.employeeIDs}" filter="true" filterMatchMode="contains">
+						<f:selectItems value="#{workInfoControler.allList}" var="employee" itemLabel="#{employee.name}" itemValue="#{employee.id}"/>
+					</p:selectCheckboxMenu>
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Place" />
+					<p:autoComplete value="#{promotionControler.condition.place}"
+						placeholder="Type for hint..."
+						completeMethod="#{promotionControler.completePlace}" />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Start Date" />
+					<p:calendar value="#{promotionControler.condition.dateFrom}"
+						navigator="true" pattern="yyyy-MM-dd" showOn="both"/>
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="End Date" />
+					<p:calendar value="#{promotionControler.condition.dateTo}"
+						navigator="true" pattern="yyyy-MM-dd" showOn="both" />
+				</p:outputPanel>
+			</p:panelGrid>
+			<p:commandButton value="Search" update="promotionTable"
+				actionListener="#{promotionControler.search}" />
+			<p:commandButton value="Reset" update="searchOptions"
+				actionListener="#{promotionControler.condition.clear}" />
+		</p:panel>
+		<p:panel>
+			<p:commandButton value="Add" actionListener="#{promotionControler.startAdd}"
+				action="#{mainMenuControler.transfer}">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/sales/editPromotion.jsf" />
+			</p:commandButton>
+			<p:commandButton value="Delete"
+				actionListener="#{promotionControler.startDelete}"
+				onclick="PF('deleteConfirm_w').show();" update="deleteConfirm" />
+
+			<p:dataTable id="promotionTable" value="#{promotionControler.listModel}" var="promotion"
+				selection="#{promotionControler.selecteds}" rows="10">
+				<p:column style="width:1%" selectionMode="multiple">
+				</p:column>
+				<p:column style="width:10%" sortBy="#{promotion.name}"
+					headerText="Activity Name">
+					<p:commandLink value="#{promotion.name}"
+						actionListener="#{promotionControler.startEdit}"
+						action="#{mainMenuControler.transfer}" ajax="false">
+						<f:attribute name="promotion" value="#{promotion}" />
+						<f:setPropertyActionListener
+							target="#{mainMenuControler.nextMenu}" value="/faces/sales/editPromotion.jsf" />
+					</p:commandLink>
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{promotion.place}"
+					headerText="Place">
+					<h:outputText value="#{promotion.place}" />
+				</p:column>
+
+				<p:column style="width:10%"
+					headerText="For Newspaper">
+					<h:outputText value="#{promotion.formatNewspaperNames}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{promotion.formatDateFrom}"
+					headerText="Start Date">
+					<h:outputText value="#{promotion.formatDateFrom}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{promotion.formatDateTo}"
+					headerText="End Date">
+					<h:outputText value="#{promotion.formatDateTo}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{promotion.formatAdmins}"
+					headerText="Activity Admin">
+					<h:outputText value="#{promotion.formatAdmins}" />
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+		<p:confirmDialog id="deleteConfirm" widgetVar="deleteConfirm_w"
+			message="Are you sure to delete these promotion activities?"
+			visible="#{promotionControler.deleteMode}"
+			header="NP Pillar - Confirm Required" severity="alert">
+			<p:focus context="deleteConfirm" for="cancelBtn" />
+			<p:commandButton id="confirmBtn" value="OK" update="mainForm"
+				onclick="PF('deleteConfirm_w').hide();"
+				actionListener="#{promotionControler.delete}" />
+			<p:commandButton id="cancelBtn" value="Cancel"
+				actionListener="#{promotionControler.endDelete}"
+				onclick="PF('deleteConfirm_w').hide();" />
+		</p:confirmDialog>
+	</h:form>
+</h:body>
+</html>

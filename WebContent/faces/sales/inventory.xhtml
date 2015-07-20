@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+		<link rel="stylesheet"
+		href="../../css/inventory.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="Inventory Information" toggleable="true">
+			<p:panelGrid columns="3" id="searchOptions" style="border:none;margin:0;width:900px;">
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Newspaper" />
+					<p:selectCheckboxMenu
+						value="#{inventoryControler.condition.newspaperSeqs}"
+						label="-- Select --" filter="true" filterMatchMode="startsWith"
+						panelStyle="width:250px">
+						<f:selectItems var="newspaper"
+							value="#{newspaperControler.baseList}"
+							itemLabel="#{newspaper.name}" itemValue="#{newspaper.seq}" />
+					</p:selectCheckboxMenu>
+				</p:outputPanel>
+
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Issue Date From" />
+					<p:calendar value="#{inventoryControler.condition.from}" showOn="both"
+						navigator="true" pattern="yyyy-MM-dd" />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Issue Date To" />
+					<p:calendar value="#{inventoryControler.condition.to}" showOn="both"
+						navigator="true" pattern="yyyy-MM-dd" />
+				</p:outputPanel>
+			</p:panelGrid>
+			<p:commandButton value="Search" update="inventoryTable"
+				actionListener="#{inventoryControler.search}" />
+			<p:commandButton value="Reset" update="searchOptions"
+				actionListener="#{inventoryControler.condition.clear}" />
+		</p:panel>
+		<p:panel>
+			<p:dataTable id="inventoryTable"
+				value="#{inventoryControler.listModel}" var="inventory" rows="10" rowStyleClass="#{inventory.remainQuantity >= 0 ? 'null' : 'red'}">
+				<p:column style="width:10%"
+					sortBy="#{inventory.issue.newspaper.name}" headerText="Newspaper">
+					<h:outputText value="#{inventory.issue.newspaper.name}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{inventory.issue.formatIssue}"
+					headerText="Issue Number">
+					<h:outputText value="#{inventory.issue.formatIssue}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{inventory.issue.quantity}"
+					headerText="Published Quantity">
+					<h:outputText value="#{inventory.issue.quantity}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{inventory.subscriberQuantity}"
+					headerText="Subscriber Quantity">
+					<h:outputText value="#{inventory.subscriberQuantity}" />
+				</p:column>
+
+				<p:column style="width:10%"
+					sortBy="#{inventory.nonSubscriberQuantity}"
+					headerText="Non-subscriber Quantity">
+					<h:outputText value="#{inventory.nonSubscriberQuantity}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{inventory.retailQuantity}"
+					headerText="Retail Quantity">
+					<h:outputText value="#{inventory.retailQuantity}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{inventory.adQuantity}"
+					headerText="Ad Quantity">
+					<h:outputText value="#{inventory.adQuantity}" />
+				</p:column>
+				<p:column style="width:10%" sortBy="#{inventory.remainQuantity}"
+					headerText="Remain Quantity">
+					<h:outputText value="#{inventory.remainQuantity}" />
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+	</h:form>
+</h:body>
+</html>

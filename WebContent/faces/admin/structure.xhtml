@@ -1,0 +1,109 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title></h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="Organization Structure">
+			<p:tree value="#{structureControler.root}" var="node"
+				rendered="#{!structureControler.editStructureMode}">
+				<p:treeNode>
+					<h:outputText value="#{node.name}" />
+				</p:treeNode>
+			</p:tree>
+			<p:tree value="#{structureControler.root}" var="node"
+				rendered="#{structureControler.editStructureMode}">
+				<p:treeNode>
+					<h:outputText value="#{node.name}" style="margin-right:10px"/>
+					<p:commandButton icon="ui-icon-pencil" style="width:30px;height:30px"
+						actionListener="#{structureControler.startEdit(node)}"
+						update=":mainForm" immediate="true"/>
+					<p:commandButton icon="ui-icon-plus" style="width:30px;height:30px"
+						actionListener="#{structureControler.startAdd(node)}"
+						update=":mainForm" immediate="true"/>
+
+					<p:commandButton icon="ui-icon-minus" style="width:30px;height:30px"
+						actionListener="#{structureControler.startDelete(node)}"
+						onclick="PF('deleteConfirm_w').show();"
+						update=":mainForm:deleteConfirm"/>
+				</p:treeNode>
+			</p:tree>
+			<p:commandButton value="Edit"
+				actionListener="#{structureControler.editStructure}"
+				update="mainForm"
+				rendered="#{!structureControler.editStructureMode and structureControler.browseMode}" />
+			<p:commandButton value="Done"
+				actionListener="#{structureControler.finishEditStructure}"
+				update="mainForm" rendered="#{structureControler.editStructureMode and structureControler.browseMode}" />
+		</p:panel>
+		<p:panel rendered="#{structureControler.editMode or structureControler.addMode}"
+			header="NP Pillar - #{structureControler.addMode? 'Add Unit' : 'Edit Unit'}">
+			<p:panelGrid columns="2">
+				<h:outputText value="Name" />
+				<p:inputText value="#{structureControler.editDepartment.name}"
+					rendered="#{structureControler.editMode}" required="true" size="20"
+					maxlength="20" requiredMessage="Name is required" />
+				<p:inputText value="#{structureControler.addDepartment.name}"
+					rendered="#{structureControler.addMode}" required="true" size="20"
+					maxlength="20" requiredMessage="Name is required" />
+
+				<h:outputText value="Description" />
+				<p:panel>
+					<p:inputTextarea
+						value="#{structureControler.editDepartment.description}" rows="5"
+						rendered="#{structureControler.editMode}" cols="30"
+						counter="desDisplay" maxlength="200"
+						counterTemplate="{0} characters remaining." autoResize="false"
+						style="display:block" />
+					<p:inputTextarea
+						value="#{structureControler.addDepartment.description}" rows="5"
+						rendered="#{structureControler.addMode}" cols="30"
+						counter="desDisplay" maxlength="200"
+						counterTemplate="{0} characters remaining." autoResize="false"
+						style="display:block" />
+					<h:outputText id="desDisplay" />
+				</p:panel>
+
+			</p:panelGrid>
+
+			<p:outputLabel style="display:block"
+				value="This unit will be added under #{structureControler.editDepartment.name}"
+				rendered="#{structureControler.addMode}" />
+			<p:commandButton value="Save"
+				actionListener="#{structureControler.apply}" update="mainForm" />
+			<p:commandButton value="Cancel" update="mainForm"
+				actionListener="#{structureControler.clearEditPart}" immediate="true"/>
+		</p:panel>
+		<p:confirmDialog id="deleteConfirm" widgetVar="deleteConfirm_w"
+			message="Units under selected unit will also be deleted Delete?"
+			visible="#{structureControler.deleteMode}"
+			header="NP Pillar - Confirm Required" severity="alert">
+			<p:focus context="deleteConfirm" for="cancelBtn" />
+			<p:commandButton id="confirmBtn" value="OK" update=":mainForm"
+				onclick="PF('deleteConfirm_w').hide();"
+				actionListener="#{structureControler.delete}" />
+			<p:commandButton id="cancelBtn" value="Cancel"
+				onclick="PF('deleteConfirm_w').hide();" type="button" />
+		</p:confirmDialog>
+	</h:form>
+
+</h:body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel toggleable="true" header="Sales Summary Information based on Promotion">
+		<p:messages autoUpdate="true" closable="true"/>
+			<p:panelGrid columns="4">
+				<p:outputPanel>
+					<p:outputLabel value="Promotion Method" style="display:block" />
+					<p:selectCheckboxMenu
+						value="#{promotionSummaryControler.condition.promotionSeqs}"
+						label="-- Select --" filter="true" filterMatchMode="contains">
+						<f:selectItems var="promotion"
+							value="#{promotionControler.allList}"
+							itemLabel="#{promotion.name}" itemValue="#{promotion.seq}" />
+					</p:selectCheckboxMenu>
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel value="Newspaper" style="display:block" />
+					<p:selectCheckboxMenu
+						value="#{promotionSummaryControler.condition.newspaperSeqs}"
+						label="-- Select --" filter="true" filterMatchMode="contains"
+						panelStyle="width:250px">
+						<f:selectItems var="newspaper"
+							value="#{newspaperControler.baseList}"
+							itemLabel="#{newspaper.name}" itemValue="#{newspaper.seq}" />
+					</p:selectCheckboxMenu>
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel value="From" style="display:block" />
+					<p:calendar value="#{promotionSummaryControler.condition.from}" showButtonPanel="true" showOtherMonths="true"
+						showOn="both" navigator="true" pattern="yyyy-MM" required="true"
+						requiredMessage="From Date is required." />
+				</p:outputPanel>
+				<p:outputPanel>
+
+					<p:outputLabel value="To" style="display:block" />
+					<p:calendar value="#{promotionSummaryControler.condition.to}" showButtonPanel="true" showOtherMonths="true"
+						showOn="both" navigator="true" pattern="yyyy-MM" required="true"
+						requiredMessage="To Date is required." />
+				</p:outputPanel>
+			</p:panelGrid>
+			<p:separator/>
+			<p:commandButton value="Search"
+				actionListener="#{promotionSummaryControler.search}"
+				update="inventoryData" />
+		</p:panel>
+		<p:panel id="inventoryData">
+			<p:tabView>
+				<p:tab title="Overall Statistics">
+					<p:barChart title="Quantity Statistics"
+						xaxisLabel="Promotion Methods" yaxisLabel="Quantity"
+						legendPosition="ne" stacked="true"
+						value="#{promotionSummaryControler.totalQuantityModel}" />
+					<p:barChart title="Money Statistics" xaxisLabel="Promotion Methods"
+						yaxisLabel="Money" legendPosition="ne" stacked="true"
+						value="#{promotionSummaryControler.totalMoneyModel}" />
+				</p:tab>
+				<p:tab title="Promotion Sales Trend">
+					<p:lineChart title="Quantity Trend" xaxisLabel="Time"
+						yaxisLabel="Quantity" legendPosition="e"
+						value="#{promotionSummaryControler.monthlyQuantityModel}" />
+					<p:lineChart title="Money Trend" xaxisLabel="Time"
+						yaxisLabel="Sales Money" legendPosition="e"
+						value="#{promotionSummaryControler.monthlyMoneyModel}" />
+				</p:tab>
+
+				<p:tab title="Overall Sales Proportion">
+					<p:panelGrid columns="2" style="width:100%">
+						<p:pieChart title="Quantity Proportion"
+							value="#{promotionSummaryControler.quantityProportionModel}"
+							legendPosition="e" showDataLabels="true" />
+						<p:pieChart title="Money Proportion"
+							value="#{promotionSummaryControler.moneyProportionModel}"
+							legendPosition="e" showDataLabels="true" />
+					</p:panelGrid>
+				</p:tab>
+				<p:tab title="Detail Sales Proportion">
+					<p:dataGrid value="#{promotionSummaryControler.baseList}"
+						paginator="true" rowsPerPageTemplate="1, 2, 4" var="inventory"
+						columns="1" rows="1">
+						<f:facet name="header">
+            				Promotion Sales Proportion
+        				</f:facet>
+
+						<p:panel header="#{inventory.promotion.name}"
+							style="text-align:center">
+							<h:panelGrid columns="2" style="width:100%">
+								<p:pieChart title="Quantity Proportion"
+									value="#{inventory.quantityProportionModel}" legendPosition="e"
+									showDataLabels="true" />
+								<p:pieChart title="Money Proportion"
+									value="#{inventory.moneyProportionModel}" legendPosition="e"
+									showDataLabels="true" />
+							</h:panelGrid>
+						</p:panel>
+					</p:dataGrid>
+				</p:tab>
+			</p:tabView>
+
+		</p:panel>
+	</h:form>
+</h:body>
+</html>

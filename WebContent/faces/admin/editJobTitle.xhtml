@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="Edit Job Title">
+			<p:messages id="messages" closable="true" />
+			<p:panelGrid columns="2">
+				<p:outputLabel value="Job Title" />
+				<p:inputText value="#{jobTitleControler.editDto.name}"
+					validator="#{jobTitleControler.nameValidate}" />
+
+				<p:outputLabel value="Job Description" />
+				<p:outputPanel>
+					<p:inputTextarea value="#{jobTitleControler.editDto.description}"
+						rows="5" cols="30" counter="desDisplay" maxlength="200"
+						counterTemplate="{0} characters remaining." autoResize="false"
+						style="display:block" />
+					<h:outputText id="desDisplay" />
+				</p:outputPanel>
+
+
+				<p:outputLabel value="Note" />
+				<p:outputPanel>
+					<p:inputTextarea value="#{jobTitleControler.editDto.note}" rows="5"
+						cols="30" counter="noteDisplay" maxlength="200"
+						counterTemplate="{0} characters remaining." autoResize="false"
+						style="display:block" />
+					<h:outputText id="noteDisplay" />
+				</p:outputPanel>
+
+			</p:panelGrid>
+			<p:commandButton value="Save"
+				actionListener="#{jobTitleControler.apply}" update="messages"
+				action="#{mainMenuControler.transfer}" onclick="blockui.show()">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/admin/jobTitle.jsf" />
+			</p:commandButton>
+			<p:commandButton value="Cancel"
+				actionListener="#{jobTitleControler.clear}"
+				action="#{mainMenuControler.transfer}" onclick="blockui.show()">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/admin/jobTitle.jsf" />
+			</p:commandButton>
+		</p:panel>
+	</h:form>
+</h:body>
+</html>

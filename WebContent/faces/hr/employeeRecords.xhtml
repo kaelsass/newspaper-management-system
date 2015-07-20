@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title></h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="View Attendance Record" toggleable="true">
+			<p:panelGrid columns="2">
+				<p:outputLabel value="Employee Name" />
+				<p:autoComplete value="#{employeeRecordControler.condition.employeeName}" placeholder="Type for hint..."  completeMethod="#{workInfoControler.completeEmployeeName}" validator="#{workInfoControler.nameValidate}"/>
+
+				<p:outputLabel value="Date" />
+				<p:calendar id="date" showOn="both"
+					value="#{employeeRecordControler.condition.date}" navigator="true"
+					pattern="yyyy-MM-dd" />
+			</p:panelGrid>
+			<p:messages autoUpdate="true" closable="true"/>
+			<p:commandButton value="View" ajax="true"
+				actionListener="#{employeeRecordControler.search}"
+				update="attendTable" />
+		</p:panel>
+		<p:panel>
+			<p:dataTable id="attendTable" paginator="true"
+				value="#{employeeRecordControler.listModel}" var="record"
+				selection="#{employeeRecordControler.selecteds}" rows="6"
+				sortBy="employee.name">
+
+				<p:column style="width:10%" sortBy="#{record.employee.name}">
+					<f:facet name="header">
+						<h:outputText value="Employ Name" />
+					</f:facet>
+					<h:outputText value="#{record.employee.name}" />
+				</p:column>
+				<p:column style="width:10%">
+					<f:facet name="header">
+						<h:outputText value="Punch In" />
+					</f:facet>
+					<h:outputText value="#{record.punchInTime}" />
+				</p:column>
+				<p:column style="width:10%">
+					<f:facet name="header">
+						<h:outputText value="Punch In Note" />
+					</f:facet>
+					<h:outputText value="#{record.punchInNote}" />
+				</p:column>
+
+				<p:column style="width:10%">
+					<f:facet name="header">
+						<h:outputText value="Punch Out" />
+					</f:facet>
+					<h:outputText value="#{record.punchOutTime}" />
+				</p:column>
+				<p:column style="width:10%">
+					<f:facet name="header">
+						<h:outputText value="Punch Out Note" />
+					</f:facet>
+					<h:outputText value="#{record.punchOutNote}" />
+				</p:column>
+
+				<p:column style="width:10%">
+					<f:facet name="header">
+						<h:outputText value="Duration(Hours)" />
+					</f:facet>
+					<h:outputText value="#{record.duration}" />
+				</p:column>
+
+				<p:summaryRow listener="#{employeeRecordControler.calculateTotal(record.employee)}">
+					<p:column colspan="5" style="text-align:right">
+						<p:outputLabel value="Total:" />
+					</p:column>
+
+					<p:column>
+						<p:outputLabel value="#{employeeRecordControler.total}" />
+					</p:column>
+				</p:summaryRow>
+			</p:dataTable>
+		</p:panel>
+	</h:form>
+</h:body>
+</html>

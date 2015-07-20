@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel
+			header="#{appraisalControler.appraisal.description} - #{appraisalControler.appraisal.employee.name}">
+			<p:panelGrid >
+				<p:row>
+					<p:column style="text-align:center;color:#008000; width:250px">
+						<p:outputLabel value="#{appraisalControler.appraisal.formatScore}"
+							style="font-size: 50px; height: 70%; display: block" />
+						<p:outputLabel value="Final Rating"
+							style="height: 20%; float: bottom; display: block" />
+					</p:column>
+					<c:forEach items="#{appraisalControler.appraisal.records}"
+						var="record">
+						<p:column style="width:200px">
+							<p:panel header="#{record.employee.name}"
+								style="text-align:center">
+								<p:graphicImage value="/photo/#{record.employee.photoName}"
+									width="200px" height="200px" />
+							</p:panel>
+						</p:column>
+					</c:forEach>
+				</p:row>
+
+				<p:row>
+					<p:column colspan="#{appraisalControler.appraisal.recordsSize + 1}"
+						headerText="Competencies" style="text-align:center">
+						<p:toolbar>
+							<p:toolbarGroup align="center">
+								<p:outputLabel value="Competencies" />
+							</p:toolbarGroup>
+						</p:toolbar>
+					</p:column>
+				</p:row>
+				<c:forEach items="#{appraisalControler.appraisal.acEmployees}"
+					var="ace">
+					<p:row>
+						<p:column>
+							<h:outputText value="#{ace.competency.name}" />
+						</p:column>
+						<c:forEach items="#{ace.logs}" var="log">
+							<p:column>
+								<p:rating value="#{log.rate}" readonly="true" stars="10" />
+<!-- 								<h:outputText value="#{log.rate}" style="margin-left:15px;font-size: 15px;color: #646464"/> -->
+							</p:column>
+						</c:forEach>
+					</p:row>
+				</c:forEach>
+
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Summary" style="font-size:18px" />
+					</p:column>
+					<c:forEach items="#{appraisalControler.appraisal.records}"
+						var="record">
+						<p:column style="text-align:center">
+							<p:outputLabel value="#{record.formatAcScore}" />
+						</p:column>
+					</c:forEach>
+				</p:row>
+
+
+				<p:row>
+					<p:column colspan="#{appraisalControler.appraisal.recordsSize + 1}"
+						headerText="Goals" style="text-align:center">
+						<p:toolbar>
+							<p:toolbarGroup align="center">
+								<p:outputLabel value="Goals" />
+							</p:toolbarGroup>
+						</p:toolbar>
+					</p:column>
+				</p:row>
+				<c:forEach items="#{appraisalControler.appraisal.agEmployees}"
+					var="ace">
+					<p:row>
+						<p:column>
+							<h:outputText value="#{ace.goal.name}" />
+						</p:column>
+						<c:forEach items="#{ace.logs}" var="log">
+							<p:column>
+								<p:rating value="#{log.rate}" readonly="true" stars="10" />
+							</p:column>
+						</c:forEach>
+					</p:row>
+				</c:forEach>
+
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Summary" style="font-size:18px" />
+					</p:column>
+					<c:forEach items="#{appraisalControler.appraisal.records}"
+						var="record">
+						<p:column style="text-align:center">
+							<p:outputLabel value="#{record.formatAgScore}" />
+						</p:column>
+					</c:forEach>
+				</p:row>
+
+				<p:row>
+					<p:column colspan="#{appraisalControler.appraisal.recordsSize + 1}"
+						headerText="Questions" style="text-align:center">
+						<p:toolbar>
+							<p:toolbarGroup align="center">
+								<p:outputLabel value="Questions" />
+							</p:toolbarGroup>
+						</p:toolbar>
+					</p:column>
+				</p:row>
+				<c:forEach items="#{appraisalControler.appraisal.aqEmployees}"
+					var="ace">
+					<p:row>
+						<p:column>
+							<h:outputText value="#{ace.question.formatName}" style="white-space: pre-wrap;"/>
+						</p:column>
+						<c:forEach items="#{ace.logs}" var="log">
+							<p:column>
+								<h:outputText value="#{log.formatComment}" style="white-space: pre-wrap;"/>
+							</p:column>
+						</c:forEach>
+					</p:row>
+				</c:forEach>
+
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Summary" style="font-size:18px" />
+					</p:column>
+					<c:forEach items="#{appraisalControler.appraisal.records}"
+						var="record">
+						<p:column style="text-align:center">
+							<p:outputLabel value="#{record.formatAqScore}" />
+						</p:column>
+					</c:forEach>
+				</p:row>
+			</p:panelGrid>
+			<p:separator/>
+			<p:commandButton value="Back" action="#{mainMenuControler.transfer}">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}" value="/faces/employee/appraisal.jsf"/>
+			</p:commandButton>
+		</p:panel>
+	</h:form>
+</h:body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<link rel="stylesheet" href="../../css/noborder.css" />
+	<link rel="stylesheet" href="../../css/issue.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel>
+			<f:facet name="header">
+				<h:outputText value="News Issues" style="float:left" />
+
+			</f:facet>
+			<p:panelGrid id="searchOptions"
+				style="border:none;margin:0;width:100%;">
+				<p:row>
+					<p:column style="width:25%">
+						<p:outputLabel style="display:block" value="Newspaper" />
+						<p:selectCheckboxMenu
+							value="#{issueControler.condition.newspaperSeqs}"
+							label="-- Select --" filter="true" filterMatchMode="contains">
+							<f:selectItems var="newspaper"
+								value="#{newspaperControler.baseList}"
+								itemLabel="#{newspaper.name}" itemValue="#{newspaper.seq}" />
+						</p:selectCheckboxMenu>
+					</p:column>
+
+					<p:column style="width:25%">
+						<p:outputLabel style="display:block" value="Quantity (min):" />
+						<p:spinner value="#{issueControler.condition.quantity}" min="0"
+							style="width:100%" stepFactor="200" />
+					</p:column>
+
+					<p:column style="width:25%">
+						<p:outputLabel style="display:block" value="Date From:" />
+						<p:calendar value="#{issueControler.condition.from}"
+							navigator="true" pattern="yyyy-MM-dd" />
+					</p:column>
+					<p:column style="width:25%">
+						<p:outputLabel style="display:block" value="Date To" />
+						<p:calendar value="#{issueControler.condition.to}"
+							navigator="true" pattern="yyyy-MM-dd" />
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+			<p:separator />
+			<p:commandButton value="Search" update=":mainForm"
+				actionListener="#{issueControler.search}" />
+			<p:commandButton value="Reset" update=":mainForm"
+				actionListener="#{issueControler.condition.clear}" />
+		</p:panel>
+		<p:panel id="issueData">
+			<p:commandButton value="Add Issue"
+				actionListener="#{issueControler.startAdd}"
+				action="#{mainMenuControler.transfer}">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/newspaper/addIssue.jsf" />
+			</p:commandButton>
+			<p:panel>
+				<p:dataTable id="issueTable" var="issueSection" paginator="true"
+					rows="8" value="#{issueControler.issueSectionList}">
+					<f:facet name="header">
+						<p:outputLabel value="Issue Information" />
+					</f:facet>
+					<p:column width="1%">
+						<p:rowToggler />
+					</p:column>
+					<p:column width="25%" headerText="Newspaper">
+						<h:outputText value="#{issueSection.issue.newspaper.name}" />
+					</p:column>
+					<p:column width="20%" headerText="Issue Number">
+						<h:outputText value="Issue #{issueSection.issue.number}" />
+					</p:column>
+					<p:column width="20%" headerText="Publish Time">
+						<h:outputText value="#{issueSection.issue.formatTime}" />
+					</p:column>
+					<p:column width="20%" headerText="Publish Quantity">
+						<h:outputText value="#{issueSection.issue.quantity}" />
+					</p:column>
+					<p:column width="14%" headerText="Operations">
+						<p:commandButton icon="ui-icon-pencil" id="addIssue"
+							actionListener="#{issueControler.startEdit(issueSection.issue)}"
+							onclick="editIssue_w.show()" update=":editIssue" />
+						<p:tooltip for="addIssue" value="Edit Issue Info" />
+						<p:commandButton icon="ui-icon-plus" id="addSection"
+							actionListener="#{issueControler.startAddSection(issueSection.issue)}"
+							onclick="addSectionDialog_w.show()" update=":addSectionForm">
+						</p:commandButton>
+						<p:tooltip for="addSection" value="Add section for this issue" />
+						<p:commandButton icon="ui-icon-minus" id="deleteIssue"
+							actionListener="#{issueControler.startDelete(issueSection.issue)}"
+							onclick="PF('deleteIssueConfirm_w').show();"
+							update=":deleteIssueConfirm" />
+						<p:tooltip for="deleteIssue" value="Delete this issue" />
+					</p:column>
+
+					<p:rowExpansion>
+						<p:dataTable var="section" value="#{issueSection.sections}">
+							<p:column headerText="Section Number" width="46%">
+								<h:outputText value="Page #{section.number}" />
+							</p:column>
+							<p:column headerText="Section Subject" width="40%">
+								<h:outputText value="#{section.subject.name}" />
+							</p:column>
+							<p:column headerText="Operation" width="14%">
+								<p:commandButton icon="ui-icon-pencil"
+									actionListener="#{sectionControler.startEdit(section)}"
+									action="#{mainMenuControler.transfer}">
+									<f:setPropertyActionListener
+										target="#{mainMenuControler.nextMenu}"
+										value="/faces/newspaper/editSection.jsf" />
+								</p:commandButton>
+								<p:commandButton icon="ui-icon-minus"
+									actionListener="#{issueControler.startDeleteSection(section)}"
+									onclick="PF('deleteSectionConfirm_w').show();"
+									update=":deleteSectionConfirm" />
+							</p:column>
+						</p:dataTable>
+					</p:rowExpansion>
+				</p:dataTable>
+			</p:panel>
+		</p:panel>
+	</h:form>
+	<p:dialog id="editIssue" widgetVar="editIssue_w" closable="false"
+		resizable="false" draggable="true" modal="true"
+		header="#{issueControler.editMode ? 'Edit Issue Information' : 'Add Issue Information'}"
+		visible="#{issueControler.editMode or issueControler.addMode}">
+		<h:form>
+			<p:messages id="messages" closable="true" />
+			<p:panelGrid columns="2">
+				<h:outputText value="Issue Number:" />
+				<p:outputLabel value="#{issueControler.editDto.number}"
+					rendered="#{issueControler.editMode}" />
+				<p:outputPanel rendered="#{issueControler.addMode}">
+					<p:spinner value="#{issueControler.editDto.number}" required="true"
+						requiredMessage="Issue number is required."
+						validator="#{issueControler.numberValidate}" />
+					<p:outputLabel
+						value="You have been added #{issueControler.issueCount} issues." />
+				</p:outputPanel>
+				<h:outputText value="Issue Date" />
+				<p:outputPanel>
+					<p:calendar value="#{issueControler.editDto.time}" navigator="true"
+						pattern="yyyy-MM-dd" required="true"
+						requiredMessage="Issue Date is required." />
+					<p:outputLabel rendered="#{issueControler.addMode}"
+						value="Next Issue Date is #{issueControler.editDto.formatTime}" />
+				</p:outputPanel>
+				<h:outputText value="Quantity" />
+				<p:spinner value="#{issueControler.editDto.quantity}" min="1"
+					stepFactor="200" />
+			</p:panelGrid>
+			<p:panelGrid columns="2">
+				<p:commandButton value="OK" actionListener="#{issueControler.apply}"
+					update=":mainForm :editIssue" />
+				<p:commandButton value="Cancel" immediate="true"
+					actionListener="#{issueControler.clear}"
+					oncomplete="editIssue_w.hide()" />
+			</p:panelGrid>
+		</h:form>
+	</p:dialog>
+
+	<p:dialog id="addSectionDialog" widgetVar="addSectionDialog_w"
+		closable="false" resizable="false" draggable="true" modal="true"
+		header="Add Section">
+		<h:form id="addSectionForm">
+			<p:messages id="messages" closable="true" />
+			<p:panelGrid columns="2">
+				<p:outputLabel value="Page Number" />
+				<p:spinner value="#{issueControler.addSection.number}"
+					required="true" requiredMessage="Section number is required."
+					validator="#{issueControler.sectionNumberValidate}" />
+
+				<p:outputLabel value="Subject" />
+				<p:selectOneMenu value="#{issueControler.addSection.subject.seq}" style="width:100%">
+					<f:selectItems value="#{subjectControler.baseList}" var="subject"
+						itemLabel="#{subject.name}" itemValue="#{subject.seq}" />
+				</p:selectOneMenu>
+			</p:panelGrid>
+			<p:remoteCommand name="clearIssue"
+				actionListener="#{issueControler.clear}" />
+			<p:separator />
+			<p:commandButton value="OK"
+				actionListener="#{issueControler.applyAddSection}"
+				update=":mainForm messages" onclick="clearIssue()" />
+			<p:commandButton value="Cancel" immediate="true"
+				onclick="addSectionDialog_w.hide()" />
+		</h:form>
+	</p:dialog>
+
+	<p:dialog id="sectionGalleria" widgetVar="sectionGalleria_w"
+		closable="true" resizable="false" draggable="true" modal="true"
+		header="Section Images">
+		<p:ajax event="close" listener="#{sectionControler.endBrowse}" />
+		<h:form>
+			<p:dataGrid var="section" value="#{sectionControler.baseList}"
+				columns="4" rows="8" paginator="true">
+				<p:panel header="#{section.formatSection}" style="text-align:center">
+					<p:panelGrid columns="1">
+						<p:commandLink
+							actionListener="#{sectionControler.startEdit(section)}"
+							action="#{mainMenuControler.transfer}">
+							<f:setPropertyActionListener
+								target="#{mainMenuControler.nextMenu}"
+								value="/faces/newspaper/editSection.jsf" />
+							<p:graphicImage value="/thumbnail/#{section.photoName}"
+								width="123" height="198" />
+						</p:commandLink>
+					</p:panelGrid>
+				</p:panel>
+			</p:dataGrid>
+		</h:form>
+	</p:dialog>
+
+	<p:confirmDialog id="deleteSectionConfirm"
+		widgetVar="deleteSectionConfirm_w"
+		message="Are you sure to delete this section?"
+		visible="#{issueControler.deleteSectionMode}"
+		header="NP Pillar - Confirm Required" severity="alert">
+		<p:focus context="deleteSectionConfirm" for="cancelSectionBtn" />
+		<p:commandButton id="confirmSectionBtn" value="OK" update=":mainForm"
+			onclick="PF('deleteSectionConfirm_w').hide();"
+			actionListener="#{issueControler.deleteSection}" />
+		<p:commandButton id="cancelSectionBtn" value="Cancel"
+			actionListener="#{issueControler.endDeleteSection}"
+			onclick="PF('deleteSectionConfirm_w').hide();" />
+	</p:confirmDialog>
+	<p:confirmDialog id="deleteIssueConfirm"
+		widgetVar="deleteIssueConfirm_w"
+		message="Are you sure to delete this issue?"
+		visible="#{issueControler.deleteMode}"
+		header="NP Pillar - Confirm Required" severity="alert">
+		<p:focus context="deleteIssueConfirm" for="cancelIssueBtn" />
+		<p:commandButton id="confirmIssueBtn" value="OK" update=":mainForm"
+			onclick="PF('deleteIssueConfirm_w').hide();"
+			actionListener="#{issueControler.delete}" />
+		<p:commandButton id="cancelIssueBtn" value="Cancel"
+			actionListener="#{issueControler.endDelete}"
+			onclick="PF('deleteIssueConfirm_w').hide();" immediate="true" />
+	</p:confirmDialog>
+</h:body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel>
+
+			<f:facet name="header">
+				<p:outputLabel
+					value="Timesheet for #{timesheetPerWeekControler.timesheet.employee.name} for Week "
+					style="margin-right:15px" />
+				<p:selectOneMenu value="#{timesheetPerWeekControler.timesheet.seq}"
+					style="margin-right:15px">
+					<f:selectItems value="#{timesheetPerWeekControler.timesheetList}"
+						var="timesheet" itemLabel="#{timesheet.formatWeek}"
+						itemValue="#{timesheet.seq}" />
+					<p:ajax listener="#{timesheetPerWeekControler.changeTimesheet}"
+						update="mainForm">
+					</p:ajax>
+				</p:selectOneMenu>
+				<p:commandLink value="Add Timesheet"
+					actionListener="#{timesheetPerWeekControler.startAddTimeSheet}"
+					onclick="addTimesheet_w.show()" />
+			</f:facet>
+			<p:messages id="messages" closable="true" />
+			<p:commandButton value="Add"
+				actionListener="#{timesheetPerWeekControler.startAdd}"
+				update=":recordForm" onclick="editRecord_w.show()">
+			</p:commandButton>
+			<p:commandButton value="Delete"
+				actionListener="#{timesheetPerWeekControler.startDelete}"
+				onclick="PF('deleteConfirm_w').show();" update="deleteConfirm" />
+			<p:dataTable id="recordTable"
+				value="#{timesheetPerWeekControler.listModel}" var="record"
+				selection="#{timesheetPerWeekControler.selecteds}" rows="10">
+				<p:column width="2%" selectionMode="multiple"
+					style="text-align:center">
+				</p:column>
+				<p:column width="15%" sortBy="#{record.task.name}"
+					headerText="Task Name">
+					<p:commandLink value="#{record.task.name}"
+						actionListener="#{timesheetPerWeekControler.startEdit}"
+						update=":recordForm" onclick="editRecord_w.show()">
+						<f:attribute name="record" value="#{record}" />
+					</p:commandLink>
+				</p:column>
+				<p:column width="15%" headerText="Activity Name">
+					<p:commandLink value="#{record.activity.name}"
+						actionListener="#{timesheetPerWeekControler.startEdit}"
+						update=":recordForm" onclick="editRecord_w.show()">
+						<f:attribute name="record" value="#{record}" />
+					</p:commandLink>
+				</p:column>
+				<p:column width="8%"
+					headerText="Mon #{timesheetPerWeekControler.timesheet.date1}">
+					<h:outputText value="#{record.formatTime1}" />
+				</p:column>
+				<p:column width="8%"
+					headerText="Tue #{timesheetPerWeekControler.timesheet.date2}">
+					<h:outputText value="#{record.formatTime2}" />
+				</p:column>
+				<p:column width="8%"
+					headerText="Wed #{timesheetPerWeekControler.timesheet.date3}">
+					<h:outputText value="#{record.formatTime3}" />
+				</p:column>
+				<p:column width="8%"
+					headerText="Thu #{timesheetPerWeekControler.timesheet.date4}">
+					<h:outputText value="#{record.formatTime4}" />
+				</p:column>
+				<p:column width="8%"
+					headerText="Fri #{timesheetPerWeekControler.timesheet.date5}">
+					<h:outputText value="#{record.formatTime5}" />
+				</p:column>
+				<p:column width="8%"
+					headerText="Sat #{timesheetPerWeekControler.timesheet.date6}">
+					<h:outputText value="#{record.formatTime6}" />
+				</p:column>
+				<p:column width="8%"
+					headerText="Sun #{timesheetPerWeekControler.timesheet.date7}">
+					<h:outputText value="#{record.formatTime7}" />
+				</p:column>
+				<p:column width="8%" headerText="Total">
+					<p:outputLabel value="#{record.formatTotalTime}" />
+				</p:column>
+				<p:columnGroup type="footer">
+					<p:row>
+						<p:column style="text-align:right" colspan="3" footerText="Total:" />
+						<p:column style="text-align:left"
+							footerText="#{timesheetPerWeekControler.getTotalTime(1)}" />
+						<p:column style="text-align:left"
+							footerText="#{timesheetPerWeekControler.getTotalTime(2)}" />
+						<p:column style="text-align:left"
+							footerText="#{timesheetPerWeekControler.getTotalTime(3)}" />
+						<p:column style="text-align:left"
+							footerText="#{timesheetPerWeekControler.getTotalTime(4)}" />
+						<p:column style="text-align:left"
+							footerText="#{timesheetPerWeekControler.getTotalTime(5)}" />
+						<p:column style="text-align:left"
+							footerText="#{timesheetPerWeekControler.getTotalTime(6)}" />
+						<p:column style="text-align:left"
+							footerText="#{timesheetPerWeekControler.getTotalTime(7)}" />
+						<p:column style="text-align:left"
+							footerText="#{timesheetPerWeekControler.getTotalTime()}" />
+					</p:row>
+				</p:columnGroup>
+			</p:dataTable>
+		</p:panel>
+
+		<p:confirmDialog id="deleteConfirm" widgetVar="deleteConfirm_w"
+			message="Are you sure to delete this user?"
+			visible="#{timesheetPerWeekControler.deleteMode}"
+			header="NP Pillar - Confirm Required" severity="alert">
+			<p:focus context="deleteConfirm" for="cancelBtn" />
+			<p:commandButton id="confirmBtn" value="OK" update="mainForm"
+				onclick="PF('deleteConfirm_w').hide();"
+				actionListener="#{timesheetPerWeekControler.delete}" />
+			<p:commandButton id="cancelBtn" value="Cancel"
+				actionListener="#{timesheetPerWeekControler.endDelete}"
+				onclick="PF('deleteConfirm_w').hide();" />
+		</p:confirmDialog>
+	</h:form>
+	<p:dialog id="editRecord" widgetVar="editRecord_w" closable="false"
+		resizable="false" draggable="true" modal="true"
+		header="Add Timesheet Record">
+		<h:form id="recordForm">
+			<p:panelGrid columns="2">
+				<h:outputText value="Task Name" />
+				<p:selectOneMenu
+					value="#{timesheetPerWeekControler.editDto.task.seq}" filter="true"
+					filterMatchMode="contains">
+					<f:selectItem itemLabel="-- Select --" itemValue="0" />
+					<f:selectItems value="#{timesheetPerWeekControler.taskList}"
+						var="task" itemLabel="#{task.name}" itemValue="#{task.seq}" />
+					<p:ajax listener="#{timesheetPerWeekControler.changeTask}"
+						update="activityList" />
+				</p:selectOneMenu>
+				<h:outputText value="Activity Name" />
+				<p:selectOneMenu id="activityList" filter="true"
+					filterMatchMode="contains"
+					value="#{timesheetPerWeekControler.editDto.activity.seq}">
+					<f:selectItem itemLabel="-- Select --" itemValue="0" />
+					<f:selectItems value="#{timesheetPerWeekControler.activityList}"
+						var="activity" itemLabel="#{activity.name}"
+						itemValue="#{activity.seq}" />
+				</p:selectOneMenu>
+				<h:outputText
+					value="Mon #{timesheetPerWeekControler.timesheet.date1}" />
+				<p:calendar value="#{timesheetPerWeekControler.editDto.time1}"
+					showOn="both" pattern="HH:mm" timeOnly="true" />
+				<h:outputText
+					value="Tue #{timesheetPerWeekControler.timesheet.date2}" />
+				<p:calendar value="#{timesheetPerWeekControler.editDto.time2}"
+					showOn="both" pattern="HH:mm" timeOnly="true" />
+				<h:outputText
+					value="Wed #{timesheetPerWeekControler.timesheet.date3}" />
+				<p:calendar value="#{timesheetPerWeekControler.editDto.time3}"
+					showOn="both" pattern="HH:mm" timeOnly="true" />
+				<h:outputText
+					value="Thu #{timesheetPerWeekControler.timesheet.date4}" />
+				<p:calendar value="#{timesheetPerWeekControler.editDto.time4}"
+					showOn="both" pattern="HH:mm" timeOnly="true" />
+				<h:outputText
+					value="Fri #{timesheetPerWeekControler.timesheet.date5}" />
+				<p:calendar value="#{timesheetPerWeekControler.editDto.time5}"
+					showOn="both" pattern="HH:mm" timeOnly="true" />
+				<h:outputText
+					value="Sat #{timesheetPerWeekControler.timesheet.date6}" />
+				<p:calendar value="#{timesheetPerWeekControler.editDto.time6}"
+					showOn="both" pattern="HH:mm" timeOnly="true" />
+				<h:outputText
+					value="Sun #{timesheetPerWeekControler.timesheet.date7}" />
+				<p:calendar value="#{timesheetPerWeekControler.editDto.time7}"
+					showOn="both" pattern="HH:mm" timeOnly="true" />
+			</p:panelGrid>
+			<p:separator />
+			<p:commandButton value="OK"
+				actionListener="#{timesheetPerWeekControler.apply}"
+				update=":mainForm:recordTable :mainForm:messages" />
+			<p:commandButton value="Cancel" immediate="true"
+				actionListener="#{timesheetPerWeekControler.clear}"
+				onclick="addRecord_w.hide()" />
+		</h:form>
+	</p:dialog>
+	<p:dialog id="addTimesheet" widgetVar="addTimesheet_w" closable="false"
+		resizable="false" draggable="true" modal="true" header="Add Timesheet">
+		<h:form>
+			<p:panelGrid columns="2">
+				<h:outputText value="Select a Day to create Timesheet" />
+				<p:calendar value="#{timesheetPerWeekControler.time}"
+					navigator="true" pattern="yyyy-MM-dd" required="true"
+					requiredMessage="Day is required." />
+			</p:panelGrid>
+			<p:separator />
+			<p:commandButton value="Add Timesheet"
+				actionListener="#{timesheetPerWeekControler.applyTimeSheet}"
+				update=":mainForm" />
+			<p:commandButton value="Cancel" immediate="true"
+				actionListener="#{timesheetPerWeekControler.clear}"
+				onclick="addTimesheet_w.hide()" />
+		</h:form>
+	</p:dialog>
+	<p:dialog id="errorDialog" widgetVar="errorDialog_w" closable="true"
+		resizable="false" draggable="true" modal="true"
+		header="Validation Error">
+		<p:outputLabel value="The time sheet has existed." />
+		<p:separator />
+		<p:commandButton value="OK" onclick="errorDialog_w.hide()" />
+	</p:dialog>
+	<p:dialog id="errorDialog1" widgetVar="errorDialog1_w" closable="true"
+		resizable="false" draggable="true" modal="true"
+		header="Validation Error">
+		<p:outputLabel value="Task or Activity is required." />
+		<p:separator />
+		<p:commandButton value="OK" onclick="errorDialog1_w.hide()" />
+	</p:dialog>
+</h:body>
+</html>

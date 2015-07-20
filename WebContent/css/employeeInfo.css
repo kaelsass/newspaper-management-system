@@ -1,0 +1,16 @@
+@CHARSET "UTF-8";
+.ui-tabs-left > .ui-tabs-nav {
+width: 24%;
+height: 100%;
+
+}
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected a, .ui-tabs .ui-tabs-nav li.ui-state-disabled a, .ui-tabs .ui-tabs-nav li.ui-state-processing a
+{
+	margin: 0 auto;
+	padding: 5px;
+}
+.ui-tabs .ui-tabs-panel
+{
+	margin:0 auto;
+	padding: 5px;
+}

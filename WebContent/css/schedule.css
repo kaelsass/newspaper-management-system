@@ -1,0 +1,12 @@
+@CHARSET "UTF-8";
+
+.red {
+background-color: red !important;
+background-image: none !important;
+color: #000000 !important;
+}
+.orange {
+background-color: #fca752 !important;
+background-image: none !important;
+color: #000000 !important;
+}

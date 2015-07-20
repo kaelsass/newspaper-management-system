@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="Add User">
+			<p:panelGrid columns="2">
+				<p:outputLabel value="User Role:" />
+				<p:selectOneMenu value="#{userControler.editUser.role.id}">
+					<f:selectItems value="#{roleControler.baseList}" var="role" itemLabel="#{role.role}" itemValue="#{role.id}"/>
+				</p:selectOneMenu>
+				<p:outputLabel value="Employee Name:" />
+				<p:autoComplete value="#{userControler.editUser.employee.name}" placeholder="Type for hint..."  completeMethod="#{userControler.completeEmployeeName}" required="true" requiredMessage="Employee Name is required!" validator="#{workInfoControler.nameValidate}"/>
+
+				<p:outputLabel value="User Name:" />
+				<p:inputText value="#{userControler.editUser.userName}" required="true" requiredMessage="User Name is required!" validator="#{userControler.nameValidate}"/>
+				<p:outputLabel value="Password:" />
+				<p:password value="#{userControler.password}" required="true" requiredMessage="Password is required!"/>
+
+				<p:outputLabel value="Confirm Password:" />
+				<p:password id="confirmPassword" value="#{userControler.passwordConfirm}"/>
+
+			</p:panelGrid>
+			<p:separator/>
+			<p:commandButton value="Save" actionListener="#{userControler.apply}" action="#{mainMenuControler.transfer}" onclick="blockui.show()" oncomplete="blockui.hide()">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}" value="/faces/admin/user.jsf"/>
+			</p:commandButton>
+			<p:commandButton value="Cancel" actionListener="#{userControler.clear}" action="#{mainMenuControler.transfer}" immediate="true" onclick="blockui.show()" oncomplete="blockui.hide()">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}" value="/faces/admin/user.jsf"/>
+			</p:commandButton>
+		<p:messages id="messages" autoUpdate="true" closable="true" />
+		</p:panel>
+	</h:form>
+</h:body>
+</html>

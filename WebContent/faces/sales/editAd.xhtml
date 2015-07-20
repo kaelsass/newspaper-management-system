@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<link rel="stylesheet" href="../../css/noborder.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+
+		<p:panel
+			header="#{adControler.editMode? 'Edit Advertisement Information' : 'Add Advertisement Order'}">
+			<p:messages closable="true"/>
+
+			<p:panelGrid columns="8"
+				style="border:none;margin:0 auto;width:100%;">
+				<p:outputLabel value="Contract ID:" for="id"/>
+				<p:inputText id="id" value="#{adControler.editDto.ID}" required="true"
+					requiredMessage="Contract ID is required." />
+				<p:spacer width="30" />
+
+				<p:outputLabel value="Client Name:" for="name"/>
+				<p:inputText id="name" value="#{adControler.editDto.workUnit}" required="true"
+					requiredMessage="Client Name is required." />
+				<p:spacer width="30" />
+
+				<p:outputLabel value="Address:" />
+				<p:inputText value="#{adControler.editDto.address}" />
+
+				<p:outputLabel value="Newspaper:" for="newspaper"/>
+				<p:selectOneMenu id="newspaper" filter="true" filterMatchMode="contains"
+					value="#{adControler.editDto.newspaper.seq}"
+					validator="#{newspaperControler.seqValidate}">
+					<f:selectItem itemLabel="-- Select --" itemValue="0" />
+					<f:selectItems var="newspaper"
+						value="#{newspaperControler.baseList}"
+						itemLabel="#{newspaper.name}" itemValue="#{newspaper.seq}" />
+				</p:selectOneMenu>
+				<p:spacer />
+
+				<p:outputLabel value="Issue Date From:" for="from"/>
+				<p:calendar id="from" value="#{adControler.editDto.dateFrom}" navigator="true"
+					pattern="yyyy-MM-dd" showOn="both" required="true"
+					requiredMessage="Issue Date is required." />
+				<p:spacer />
+				<p:outputLabel value="Ad Count:"/>
+				<p:spinner value="#{adControler.editDto.count}" min="1">
+					<p:ajax update="payables change" />
+				</p:spinner>
+
+				<p:outputLabel value="Page Count:" />
+				<p:spinner value="#{adControler.editDto.pageCount}" min="1" />
+				<p:spacer />
+				<p:outputLabel value="Page Area:" />
+				<p:selectOneMenu value="#{adControler.editDto.pageArea}">
+					<f:selectItem itemLabel="-- Select --" itemValue="0" />
+					<f:selectItem itemLabel="Whole page" itemValue="1" />
+					<f:selectItem itemLabel="1/2 Page" itemValue="2" />
+					<f:selectItem itemLabel="1/4 Page" itemValue="3" />
+				</p:selectOneMenu>
+				<p:spacer />
+				<p:outputLabel value="Price Each Count:" />
+				<p:spinner value="#{adControler.editDto.unitPrice}" min="0"
+					stepFactor="200">
+					<p:ajax update="payables change" />
+				</p:spinner>
+
+				<p:outputLabel value="Discount:" />
+				<p:spinner value="#{adControler.editDto.discount}" min="0.00"
+					stepFactor="0.05">
+					<p:ajax update="payables change" />
+				</p:spinner>
+				<p:spacer />
+				<p:outputLabel value="Payables:" />
+				<p:outputLabel id="payables" value="#{adControler.editDto.payables}" />
+				<p:spacer />
+				<p:outputLabel value="Money Paid:" />
+				<p:spinner value="#{adControler.editDto.moneyPay}" min="0.00"
+					stepFactor="200">
+					<p:ajax update="change" />
+				</p:spinner>
+
+				<p:outputLabel value="Change:" />
+				<p:outputLabel id="change" value="#{adControler.editDto.change}" />
+				<p:spacer />
+				<p:outputLabel value="Order Date:" for="orderDate"/>
+				<p:calendar id="orderDate" value="#{adControler.editDto.orderDate}"
+					navigator="true" pattern="yyyy-MM-dd" showOn="both" required="true"
+					requiredMessage="Order Date is required." />
+				<p:spacer />
+				<p:outputLabel value="Responsible Person:" for="admin"/>
+				<p:autoComplete id="admin" value="#{adControler.editDto.employee.name}"
+					placeholder="Type for hint..."
+					completeMethod="#{workInfoControler.completeEmployeeName}"
+					required="true" requiredMessage="Responsible Person is required."
+					validator="#{workInfoControler.nameValidate}" />
+
+				<p:outputLabel value="Information Source:" for="infoSource"/>
+				<p:selectOneMenu id="infoSource" filter="true" filterMatchMode="contains"
+					value="#{adControler.editDto.promotion.seq}"
+					validator="#{promotionControler.seqValidate}">
+					<f:selectItem itemLabel="-- Select --" itemValue="0" />
+					<f:selectItems var="promotion"
+						value="#{promotionControler.allList}"
+						itemLabel="#{promotion.name}" itemValue="#{promotion.seq}" />
+				</p:selectOneMenu>
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+			</p:panelGrid>
+			<p:separator />
+			<p:commandButton value="Save" actionListener="#{adControler.apply}" update="mainForm"
+				action="#{mainMenuControler.transfer}" onclick="blockui.show()"
+				oncomplete="blockui.hide()">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/sales/ad.jsf" />
+			</p:commandButton>
+			<p:commandButton value="Cancel" actionListener="#{adControler.clear}"
+				action="#{mainMenuControler.transfer}" onclick="blockui.show()"
+				oncomplete="blockui.hide()" immediate="true">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/sales/ad.jsf" />
+			</p:commandButton>
+		</p:panel>
+	</h:form>
+</h:body>
+</html>

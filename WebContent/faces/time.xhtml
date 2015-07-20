@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title></h:head>
+<h:body>
+	<p:layout fullPage="true">
+		<p:layoutUnit position="north" size="20%">
+			<ui:insert name="header">
+				<ui:include src="template/header.xhtml" />
+			</ui:insert>
+		</p:layoutUnit>
+		<p:layoutUnit position="center">
+			<p:tabView orientation="left">
+				<p:tab title="Personnal Information">
+					<p:panelGrid columns="2">
+						<h:outputText value="ID" />
+						<h:outputText value="id" />
+						<p:inputText value="id" rendered="false" />
+
+						<h:outputText value="First Name" />
+						<h:outputText value="First Name" />
+						<p:inputText value="First Name" rendered="false" />
+
+						<h:outputText value="Last Name" />
+						<h:outputText value="Last Name" />
+						<p:inputText value="Last Name" rendered="false" />
+
+						<h:outputText value="Sex" />
+						<h:outputText value="Last Name" rendered="false"/>
+						<p:selectOneRadio>
+							<f:selectItem itemLabel="M" itemValue="0"/>
+							<f:selectItem itemLabel="F" itemValue="1"/>
+						</p:selectOneRadio>
+
+						<h:outputText value="Birthday" />
+						<h:outputText value="Last Name" rendered="false"/>
+						<p:calendar id="birthday" navigator="true" pattern="yyyy-MMM-dd" showOn="both"/>
+
+						<h:outputText value="Age" />
+						<h:outputText value="Last Name" />
+						<p:inputText value="Last Name" rendered="false" />
+
+						<h:outputText value="Phone" />
+						<h:outputText value="Phone" />
+						<p:inputText value="Phone" rendered="false" />
+
+						<h:outputText value="Email" />
+						<h:outputText value="First Name" />
+						<p:inputText value="First Name" rendered="false" />
+
+						<p:commandButton value="Save"/>
+						<p:messages/>
+					</p:panelGrid>
+				</p:tab>
+				<p:tab title="Work Information">
+					<p:panelGrid columns="2">
+						<h:outputText value="ID"/>
+						<h:outputText value=""/>
+
+						<h:outputText value="Office"/>
+						<h:outputText value="" rendered="false"/>
+						<p:selectOneMenu>
+							<f:selectItem itemLabel="" itemValue=""/>
+						</p:selectOneMenu>
+
+												<h:outputText value="Department"/>
+						<h:outputText value="" rendered="false"/>
+						<p:selectOneMenu>
+							<f:selectItem itemLabel="" itemValue=""/>
+						</p:selectOneMenu>
+
+						<h:outputText value="Position"/>
+						<h:outputText value="" rendered="false"/>
+						<p:selectOneMenu>
+							<f:selectItem itemLabel="" itemValue=""/>
+						</p:selectOneMenu>
+
+						<h:outputText value="Employee Type"/>
+						<h:outputText value="" rendered="false"/>
+						<p:selectOneMenu>
+							<f:selectItem itemLabel="" itemValue=""/>
+						</p:selectOneMenu>
+					</p:panelGrid>
+				</p:tab>
+			</p:tabView>
+		</p:layoutUnit>
+	</p:layout>
+</h:body>
+</html>

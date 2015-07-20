@@ -1,0 +1,268 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<link rel="stylesheet" href="../../css/noborder.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel
+			header="#{nonSubscriberControler.editMode? 'Edit Non-subscription Information' : 'Add Non-subscriber order'}">
+			<p:messages id="messages" closable="true" />
+			<p:panelGrid columns="12" style="border:none;margin:0;width:100%;">
+				<p:outputLabel value="Client Name:" for="name" />
+				<p:inputText id="name"
+					value="#{nonSubscriberControler.editDto.name}" required="true"
+					requiredMessage="Client Name is Required." />
+
+				<p:spacer width="30" />
+
+				<p:outputLabel value="Address:" for="address" />
+				<p:inputText id="address"
+					value="#{nonSubscriberControler.editDto.address}" required="true"
+					requiredMessage="Address is Required." />
+
+				<p:spacer width="30" />
+
+				<p:outputLabel value="Zip Code:" for="zipCode" />
+				<p:inputText id="zipCode"
+					value="#{nonSubscriberControler.editDto.zipcode}" required="true"
+					requiredMessage="Zip Code is Required." />
+				<p:spacer width="30" />
+
+				<p:outputLabel value="Work Unit:" for="workUnit" />
+				<p:inputText id="workUnit"
+					value="#{nonSubscriberControler.editDto.workunit}" required="true"
+					requiredMessage="Work Unit is Required." />
+				<p:spacer />
+
+
+				<p:outputLabel value="Add Client Detail Info" />
+				<p:selectBooleanCheckbox
+					value="#{nonSubscriberControler.addDetailMode}">
+					<p:ajax update="detailInfo" />
+				</p:selectBooleanCheckbox>
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+			</p:panelGrid>
+
+			<p:panelGrid id="detailInfo" columns="11"
+				style="border:none;margin:0;width:100%;">
+				<p:outputLabel value="Age"
+					rendered="#{nonSubscriberControler.addDetailMode}" />
+				<p:spinner value="#{nonSubscriberControler.editDto.age}" min="0"
+					rendered="#{nonSubscriberControler.addDetailMode}" stepFactor="5" />
+				<p:spacer width="30"
+					rendered="#{nonSubscriberControler.addDetailMode}" />
+				<p:outputLabel value="Gender"
+					rendered="#{nonSubscriberControler.addDetailMode}" />
+				<p:selectOneRadio value="#{nonSubscriberControler.editDto.sex}"
+					rendered="#{nonSubscriberControler.addDetailMode}">
+					<f:selectItems value="#{sexControler.baseList}" var="sex"
+						itemLabel="#{sex.name}" itemValue="#{sex.name}" />
+				</p:selectOneRadio>
+				<p:spacer width="30"
+					rendered="#{nonSubscriberControler.addDetailMode}" />
+				<p:outputLabel value="Occupation"
+					rendered="#{nonSubscriberControler.addDetailMode}" />
+				<p:selectOneMenu
+					value="#{nonSubscriberControler.editDto.occupationSeq}"
+					rendered="#{nonSubscriberControler.addDetailMode}">
+					<f:selectItems value="#{occupationControler.baseList}"
+						var="occupation" itemLabel="#{occupation.name}"
+						itemValue="#{occupation.seq}" />
+				</p:selectOneMenu>
+				<p:spacer width="30"
+					rendered="#{nonSubscriberControler.addDetailMode}" />
+				<p:outputLabel value="Education"
+					rendered="#{nonSubscriberControler.addDetailMode}" />
+				<p:selectOneMenu
+					value="#{nonSubscriberControler.editDto.educationSeq}"
+					rendered="#{nonSubscriberControler.addDetailMode}">
+					<f:selectItems value="#{educationControler.baseList}"
+						var="education" itemLabel="#{education.name}"
+						itemValue="#{education.seq}" />
+				</p:selectOneMenu>
+			</p:panelGrid>
+			<p:separator />
+
+			<p:panel header="Order List" id="orderList">
+				<p:commandButton value="Add"
+					actionListener="#{nonSubscriberControler.startAddOrder}"
+					immediate="true" update=":addOrderForm" onclick="addOrder_w.show()" />
+				<p:commandButton value="Delete" onclick="deleteConfirm_w.show()" immediate="true"/>
+				<p:dataTable value="#{nonSubscriberControler.orderListModel}" rowIndexVar="index"
+					var="order" selection="#{nonSubscriberControler.selectedOrders}">
+					<p:column width="2%" selectionMode="multiple"></p:column>
+					<p:column headerText="Newspaper">
+						<p:commandLink value="#{order.issue.newspaper.name}" immediate="true"
+							actionListener="#{nonSubscriberControler.startEditOrder(order, index)}"
+							onclick="addOrder_w.show()" update=":addOrderForm">
+						</p:commandLink>
+					</p:column>
+					<p:column sortBy="#{order.issue.formatIssue}"
+						headerText="Issue Number">
+						<h:outputText value="#{order.issue.formatIssue}" />
+					</p:column>
+
+					<p:column sortBy="#{order.quantity}"
+						headerText="Quantity">
+						<h:outputText value="#{order.quantity}" />
+					</p:column>
+
+					<p:column sortBy="#{order.employee.name}"
+						headerText="Responsible Person">
+						<h:outputText value="#{order.employee.name}" />
+					</p:column>
+
+					<p:column sortBy="#{order.purpose.name}"
+						headerText="Purpose">
+						<h:outputText value="#{order.purpose.name}" />
+					</p:column>
+				</p:dataTable>
+			</p:panel>
+			<p:commandButton value="Save"
+				actionListener="#{nonSubscriberControler.apply}" update="mainForm"
+				action="#{mainMenuControler.transfer}" onclick="blockui.show()"
+				oncomplete="blockui.hide()">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/sales/nonSubscriber.jsf" />
+			</p:commandButton>
+			<p:commandButton value="Cancel"
+				actionListener="#{nonSubscriberControler.clear}"
+				action="#{mainMenuControler.transfer}" onclick="blockui.show()"
+				oncomplete="blockui.hide()" immediate="true">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/sales/nonSubscriber.jsf" />
+			</p:commandButton>
+		</p:panel>
+		<p:confirmDialog id="deleteConfirm" widgetVar="deleteConfirm_w"
+			message="Are you sure to delete these orders?"
+			header="NP Pillar - Confirm Required" severity="alert">
+			<p:focus context="deleteConfirm" for="cancelBtn" />
+			<p:commandButton id="confirmBtn" value="OK" update="mainForm"
+				onclick="PF('deleteConfirm_w').hide();" process="@this, orderList"
+				actionListener="#{nonSubscriberControler.deleteOrders}" />
+			<p:commandButton id="cancelBtn" value="Cancel" immediate="true"
+				onclick="PF('deleteConfirm_w').hide();" />
+		</p:confirmDialog>
+	</h:form>
+
+	<p:dialog widgetVar="addOrder_w" closable="true" modal="true"
+		header="Order Info">
+		<h:form id="addOrderForm">
+			<p:messages id="messages" closable="true" />
+			<p:panelGrid columns="12"
+				style="border:none;margin:0 auto;width:100% ">
+				<p:outputLabel value="Newspaper:" for="newspaper" />
+				<p:selectOneMenu id="newspaper" filter="true"
+					filterMatchMode="contains" required="true"
+					validator="#{newspaperControler.seqValidate}"
+					value="#{nonSubscriberControler.editDto.issue.newspaper.seq}">
+					<f:selectItem itemLabel="-- Select --" itemValue="0" />
+					<f:selectItems var="newspaper"
+						value="#{newspaperControler.baseList}"
+						itemLabel="#{newspaper.name}" itemValue="#{newspaper.seq}" />
+					<p:ajax listener="#{nonSubscriberControler.clearIssue}"
+						update="issueList" />
+				</p:selectOneMenu>
+				<p:spacer />
+				<p:outputLabel value="Issue:" for="issueList" />
+				<p:selectOneMenu id="issueList" filter="true"
+					filterMatchMode="contains" required="true"
+					validator="#{issueControler.seqValidate}"
+					value="#{nonSubscriberControler.editDto.issue.seq}">
+					<f:selectItem itemLabel="-- Select --" itemValue="0" />
+					<f:selectItems value="#{nonSubscriberControler.issueList}"
+						var="issue" itemLabel="#{issue.formatIssue}"
+						itemValue="#{issue.seq}" />
+				</p:selectOneMenu>
+				<p:spacer />
+				<p:outputLabel value="Quantity:" />
+				<p:spinner value="#{nonSubscriberControler.editDto.quantity}"
+					min="1" stepFactor="200" />
+				<p:spacer />
+				<p:outputLabel value="Purpose:" />
+				<p:selectOneMenu
+					value="#{nonSubscriberControler.editDto.purpose.seq}">
+					<f:selectItem itemLabel="-- Select --" itemValue="0" />
+					<f:selectItems value="#{purposeControler.baseList}" var="purpose"
+						itemLabel="#{purpose.name}" itemValue="#{purpose.seq}" />
+				</p:selectOneMenu>
+				<p:spacer />
+				<p:outputLabel value="Client Phone:" for="phone" />
+				<p:inputText id="phone"
+					value="#{nonSubscriberControler.editDto.phone}" required="true"
+					requiredMessage="Phone is required." />
+				<p:spacer />
+				<p:outputLabel value="Client Email:" for="email"/>
+				<p:inputText id="email" value="#{nonSubscriberControler.editDto.email}" required="true"
+					validator="#{workInfoControler.emailValidate}" />
+				<p:spacer />
+				<p:outputLabel value="Responsible Person:" for="admin" />
+				<p:autoComplete id="admin"
+					value="#{nonSubscriberControler.editDto.employee.name}"
+					placeholder="Type for hint..."
+					completeMethod="#{workInfoControler.completeEmployeeName}"
+					required="true" requiredMessage="Responsible Person is required."
+					validator="#{workInfoControler.nameValidate}" />
+				<p:spacer />
+
+				<p:outputLabel value="Order Date:" for="orderDate" />
+				<p:calendar id="orderDate"
+					value="#{nonSubscriberControler.editDto.orderDate}"
+					navigator="true" pattern="yyyy-MM-dd" showOn="both" required="true"
+					requiredMessage="Order Date is required." />
+				<p:spacer />
+
+				<p:outputLabel value="Information Source:" for="infoSource"/>
+				<p:selectOneMenu id="infoSource" filter="true" filterMatchMode="contains" required="true"
+					value="#{nonSubscriberControler.editDto.promotion.seq}"
+					validator="#{promotionControler.seqValidate}">
+					<f:selectItem itemLabel="-- Select --" itemValue="0" />
+					<f:selectItems var="promotion"
+						value="#{promotionControler.allList}"
+						itemLabel="#{promotion.name}" itemValue="#{promotion.seq}" />
+				</p:selectOneMenu>
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+			</p:panelGrid>
+			<p:commandButton value="OK"
+				actionListener="#{nonSubscriberControler.applyOrder}"
+				process=":addOrderForm" update=":mainForm:orderList :addOrderForm" />
+			<p:commandButton value="Cancel" onclick="addOrder_w.hide()"
+				immediate="true" />
+		</h:form>
+	</p:dialog>
+</h:body>
+</html>

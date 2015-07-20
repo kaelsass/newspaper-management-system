@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="Add Appraisal">
+			<p:messages autoUpdate="true" closable="true" />
+
+			<p:panelGrid columns="2">
+				<p:outputLabel value="Name" for="employeeName" />
+				<p:autoComplete id="employeeName"
+					value="#{appraisalControler.editDto.employee.name}"
+					completeMethod="#{workInfoControler.completeEmployeeName}"
+					required="true" requiredMessage="Name is required."
+					validator="#{workInfoControler.nameValidate}" />
+
+				<p:outputLabel value="Description" for="description" />
+				<p:inputText id="description"
+					value="#{appraisalControler.editDto.description}" required="true"
+					requiredMessage="Description is required." />
+
+				<p:outputLabel value="Header Template" for="template" />
+				<p:selectOneMenu id="template"
+					value="#{appraisalControler.editDto.template.seq}" required="true"
+					requiredMessage="Template is required.">
+					<f:selectItem itemLabel="-- Select --" itemValue="0" />
+					<f:selectItems value="#{templateControler.baseList}" var="template"
+						itemLabel="#{template.name}" itemValue="#{template.seq}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel value="From" for="from" />
+				<p:calendar id="from" value="#{appraisalControler.editDto.from}"
+					pattern="yyyy-MM-dd" showOn="both" required="true"
+					requiredMessage="From Date is required." />
+
+				<p:outputLabel value="To" for="to" />
+				<p:calendar id="to" value="#{appraisalControler.editDto.to}"
+					pattern="yyyy-MM-dd" showOn="both" required="true"
+					requiredMessage="To Date is required." />
+
+				<p:outputLabel value="Due" for="due" />
+				<p:calendar id="due" value="#{appraisalControler.editDto.due}"
+					pattern="yyyy-MM-dd" showOn="both" required="true"
+					requiredMessage="Due Date is required."
+					validator="#{appraisalControler.dateValidate}" />
+
+				<p:outputLabel value="Evaluators" for="evaluators"/>
+				<p:pickList id="evaluators" value="#{appraisalControler.evaluators}" var="employee"
+					itemValue="#{employee}" itemLabel="#{employee.name}" required="true" requiredMessage="Evaluators are required."
+					showCheckbox="true" showSourceFilter="true" showTargetFilter="true"
+					filterMatchMode="contains" converter="employeeConverter">
+					<f:facet name="sourceCaption">Available Evaluators</f:facet>
+					<f:facet name="targetCaption">Assigned Evaluators</f:facet>
+				</p:pickList>
+			</p:panelGrid>
+			<p:separator />
+			<p:commandButton value="Save"
+				actionListener="#{appraisalControler.addAppraisal}"
+				action="#{mainMenuControler.transfer}" onclick="blockui.show()"
+				oncomplete="blockui.hide()">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/employee/appraisal.jsf" />
+			</p:commandButton>
+			<p:spacer />
+			<p:commandButton value="Back" action="#{mainMenuControler.transfer}" immediate="true"
+				onclick="blockui.show()" oncomplete="blockui.hide()">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/employee/appraisal.jsf" />
+			</p:commandButton>
+
+
+		</p:panel>
+	</h:form>
+</h:body>
+</html>

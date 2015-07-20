@@ -1,0 +1,120 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+	<link rel="stylesheet"
+		href="../../css/salesSummary.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel toggleable="true" header="Sales Summary Information based on Sales Source">
+			<p:messages autoUpdate="true" closable="true"/>
+			<p:panelGrid columns="3" style="border:none;margin:0;width:900px;">
+				<p:outputPanel>
+					<p:outputLabel value="Newspaper" style="display:block" />
+					<p:selectCheckboxMenu
+						value="#{inventorySummaryControler.condition.newspaperSeqs}"
+						label="-- Select --" filter="true" filterMatchMode="startsWith">
+						<f:selectItems var="newspaper"
+							value="#{newspaperControler.baseList}"
+							itemLabel="#{newspaper.name}" itemValue="#{newspaper.seq}" />
+					</p:selectCheckboxMenu>
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel value="From" style="display:block" />
+					<p:calendar value="#{inventorySummaryControler.condition.from}"
+						showOn="both" showButtonPanel="true" showOtherMonths="true"
+						navigator="true" pattern="yyyy-MM" required="true"
+						requiredMessage="From Date is required." />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel value="To" style="display:block" />
+					<p:calendar value="#{inventorySummaryControler.condition.to}"
+						showOn="both" showButtonPanel="true" showOtherMonths="true"
+						navigator="true" pattern="yyyy-MM" required="true"
+						requiredMessage="To Date is required." />
+				</p:outputPanel>
+			</p:panelGrid>
+			<p:separator/>
+			<p:commandButton value="Search"
+				actionListener="#{inventorySummaryControler.search}"
+				update="inventoryData" />
+		</p:panel>
+		<p:panel id="inventoryData">
+			<p:tabView>
+				<p:tab title="Overall Statistics">
+					<p:barChart title="Quantity Statistics" xaxisLabel="Newspaper"
+						yaxisLabel="Quantity" legendPosition="ne" stacked="true"
+						value="#{inventorySummaryControler.totalQuantityModel}" />
+					<p:barChart title="Money Statistics" xaxisLabel="Newspaper"
+						yaxisLabel="Money" legendPosition="ne" stacked="true"
+						value="#{inventorySummaryControler.totalMoneyModel}" />
+				</p:tab>
+				<p:tab title="Newspaper Sales Trend">
+					<p:lineChart title="Quantity Trend" xaxisLabel="Time"
+						yaxisLabel="Quantity" legendPosition="e"
+						value="#{inventorySummaryControler.monthlyQuantityModel}" />
+					<p:lineChart title="Money Trend" xaxisLabel="Time"
+						yaxisLabel="Sales Money" legendPosition="e"
+						value="#{inventorySummaryControler.monthlyMoneyModel}" />
+				</p:tab>
+				<p:tab title="Sales Source Trend">
+					<p:lineChart title="Quantity Trend" xaxisLabel="Time"
+						yaxisLabel="Quantity" legendPosition="e"
+						value="#{inventorySummaryControler.detailQuantityTrendModel}" />
+					<p:lineChart title="Money Trend" xaxisLabel="Newspaper"
+						yaxisLabel="Sales Money" legendPosition="e"
+						value="#{inventorySummaryControler.detailMoneyTrendModel}" />
+				</p:tab>
+				<p:tab title="Overall Sales Proportion">
+					<p:panelGrid columns="2" style="width:100%">
+						<p:pieChart title="Quantity Proportion"
+							value="#{inventorySummaryControler.quantityProportionModel}"
+							legendPosition="e" showDataLabels="true" />
+						<p:pieChart title="Money Proportion"
+							value="#{inventorySummaryControler.moneyProportionModel}"
+							legendPosition="e" showDataLabels="true" />
+					</p:panelGrid>
+				</p:tab>
+				<p:tab title="Detail Sales Proportion">
+					<p:dataGrid value="#{inventorySummaryControler.baseList}"
+						paginator="true" rowsPerPageTemplate="1, 2, 4" var="inventory"
+						columns="1" rows="1">
+						<f:facet name="header">
+            				Newspaper Sales Proportion
+        				</f:facet>
+
+						<p:panel header="#{inventory.newspaper.name}"
+							style="text-align:center">
+							<h:panelGrid columns="2" style="width:100%">
+								<p:pieChart title="Quantity Proportion"
+									value="#{inventory.quantityProportionModel}" legendPosition="e"
+									showDataLabels="true" />
+								<p:pieChart title="Money Proportion"
+									value="#{inventory.moneyProportionModel}" legendPosition="e"
+									showDataLabels="true" />
+							</h:panelGrid>
+						</p:panel>
+					</p:dataGrid>
+				</p:tab>
+			</p:tabView>
+
+		</p:panel>
+	</h:form>
+</h:body>
+</html>

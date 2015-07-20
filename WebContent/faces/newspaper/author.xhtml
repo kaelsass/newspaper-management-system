@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+	<link rel="stylesheet"
+		href="../../css/noborder.css" />
+	<title><h:outputText value="NP Pillar" /></title></h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="Author Information" toggleable="true">
+			<p:panelGrid columns="3" id="searchOptions" style="border:none;margin:0;width:900px">
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Name" />
+					<p:autoComplete value="#{authorControler.condition.name}" placeholder="Type for hint..." completeMethod="#{authorControler.completeAuthorName}"/>
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Work Unit" />
+					<p:autoComplete value="#{authorControler.condition.workUnit}" placeholder="Type for hint..." completeMethod="#{authorControler.completeWorkUnit}"/>
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Address" />
+					<p:autoComplete value="#{authorControler.condition.address}" placeholder="Type for hint..." completeMethod="#{authorControler.completeAddress}"/>
+				</p:outputPanel>
+			</p:panelGrid>
+			<p:separator/>
+			<p:commandButton value="Search" update="authorTable"
+				actionListener="#{authorControler.search}" />
+			<p:commandButton value="Reset" update="searchOptions"
+				actionListener="#{authorControler.condition.clear}" />
+		</p:panel>
+		<p:panel>
+			<p:commandButton value="Add"
+				actionListener="#{authorControler.startAdd}"
+				action="#{mainMenuControler.transfer}">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/newspaper/editAuthor.jsf" />
+			</p:commandButton>
+			<p:commandButton value="Delete"
+						actionListener="#{authorControler.startDelete}"
+						onclick="PF('deleteConfirm_w').show();"
+						update="deleteConfirm"/>
+
+			<p:dataTable id="authorTable" value="#{authorControler.listModel}"
+				var="author" selection="#{authorControler.selecteds}" rows="10">
+				<p:column width="2%" selectionMode="multiple" style="text-align:center">
+				</p:column>
+				<p:column width="10%" sortBy="#{author.name}" headerText="Name" >
+					<p:commandLink value="#{author.name}" actionListener="#{authorControler.startEdit}"
+						action="#{mainMenuControler.transfer}" ajax="false">
+						<f:attribute name="author" value="#{author}" />
+						<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/newspaper/editAuthor.jsf" />
+					</p:commandLink>
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{author.workUnit}" headerText="Work Unit">
+					<h:outputText value="#{author.workUnit}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{author.Address}" headerText="Address">
+					<h:outputText value="#{author.address}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{author.phone}" headerText="Phone">
+					<h:outputText value="#{author.phone}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{author.email}" headerText="Email">
+					<h:outputText value="#{author.email}" />
+				</p:column>
+
+			</p:dataTable>
+		</p:panel>
+		<p:confirmDialog id="deleteConfirm" widgetVar="deleteConfirm_w"
+			message="Are you sure to delete these authors?"
+			visible="#{authorControler.deleteMode}"
+			header="NP Pillar - Confirm Required" severity="alert">
+			<p:focus context="deleteConfirm" for="cancelBtn" />
+			<p:commandButton id="confirmBtn" value="OK" update="mainForm"
+				onclick="PF('deleteConfirm_w').hide();"
+				actionListener="#{authorControler.delete}" />
+			<p:commandButton id="cancelBtn" value="Cancel" actionListener="#{authorControler.endDelete}"
+				onclick="PF('deleteConfirm_w').hide();" />
+		</p:confirmDialog>
+	</h:form>
+</h:body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm" enctype="multipart/form-data">
+<!-- 		<p:messages id="messages" closable="true" /> -->
+
+		<p:panel header="XLS Data Import">
+			<p:panelGrid columns="2">
+				<p:outputLabel value="Select File: " />
+				<p:fileUpload value="#{workInfoControler.uploadFile}" mode="simple"
+					allowTypes="/(\.|\/)(xls)$/" />
+			</p:panelGrid>
+			<ul>
+				<li>File Type: .xls</li>
+				<li>File Format:</li>
+				<li>&nbsp;&nbsp;1. First line must be fields.</li>
+				<li>&nbsp;&nbsp;2. Fields should contain "ID", "First Name",
+					"Last Name", "Sex", "Age", "Department", "Employee Type".</li>
+				<li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Missing fields will be
+					remain blank on the table.</li>
+				<li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other fields not
+					included in these will not be displayed on the screen.</li>
+				<li>Example:</li>
+				<p:dataTable value="#{workInfoControler.exampleList}" var="employee">
+					<p:column headerText="ID">
+						<p:outputLabel value="#{employee.id}" />
+					</p:column>
+					<p:column headerText="Name">
+						<p:outputLabel value="#{employee.name}" />
+					</p:column>
+					<p:column headerText="Job Title">
+						<p:outputLabel value="#{employee.jobTitle.name}" />
+					</p:column>
+					<p:column headerText="Status">
+						<p:outputLabel value="#{employee.status.name}" />
+					</p:column>
+					<p:column headerText="Job Category">
+						<p:outputLabel value="#{employee.jobCategory.name}" />
+					</p:column>
+					<p:column headerText="Sub Unit">
+						<p:outputLabel value="#{employee.department.name}" />
+					</p:column>
+					<p:column headerText="Phone">
+						<p:outputLabel value="#{employee.phone}" />
+					</p:column>
+					<p:column headerText="Email">
+						<p:outputLabel value="#{employee.email}" />
+					</p:column>
+				</p:dataTable>
+			</ul>
+			<p:commandButton value="Upload"
+				actionListener="#{workInfoControler.upload}" ajax="false"
+				onclick="blockui.show()">
+			</p:commandButton>
+			<p:commandButton value="Back" action="#{mainMenuControler.transfer}"
+				ajax="false" onclick="blockui.show()">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/employee/employee.jsf" />
+			</p:commandButton>
+		</p:panel>
+
+	</h:form>
+</h:body>
+</html>

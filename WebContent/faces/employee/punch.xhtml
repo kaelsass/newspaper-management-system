@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+	</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="#{punchControler.in ? 'Punch In' : 'Punch Out'}">
+			<p:panelGrid columns="2">
+				<p:outputLabel value="Punched In Time" rendered="#{!punchControler.in}"/>
+				<p:outputLabel value="#{punchControler.editDto.punchInTime}" rendered="#{!punchControler.in}"/>
+
+				<p:outputLabel value="Punched In Note" rendered="#{!punchControler.in}"/>
+				<p:outputLabel value="#{punchControler.editDto.punchInNote}" rendered="#{!punchControler.in}"/>
+
+				<p:outputLabel value="Date" />
+				<p:outputLabel value="#{punchControler.currentDate}"/>
+
+				<p:outputLabel value="Time" />
+				<p:outputLabel value="#{punchControler.currentTime}"/>
+
+				<p:outputLabel value="Note" />
+				<p:inputTextarea value="#{punchControler.note}"/>
+			</p:panelGrid>
+			<p:commandButton value="#{punchControler.in ? 'In' : 'Out'}" actionListener="#{punchControler.apply}" action="#{mainMenuControler.transfer}" onclick="blockui.show()">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}" value="/faces/employee/punch.jsf"/>
+			</p:commandButton>
+		</p:panel>
+	</h:form>
+</h:body>
+</html>

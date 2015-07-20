@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title><h:outputText
+			value="#{dictionaryControler.dictionary['NP Pillar']}" /></title>
+</h:head>
+<h:body>
+	<ui:composition>
+		<h:outputScript name="js/header.js" target="head"></h:outputScript>
+		<h:form id="headForm">
+			<p:growl id="growl" widgetVar="g" sticky="true" />
+			<p:toolbar>
+				<p:toolbarGroup align="left">
+					<p:graphicImage value="/images/login/logo.png" height="25" />
+				</p:toolbarGroup>
+				<p:toolbarGroup align="right">
+					<p:commandLink id="userName"
+						value="Welcome: #{mainMenuControler.userName}" />
+					<p:menu overlay="true" trigger="userName" my="left top"
+						at="left bottom">
+						<p:menuitem value="Logout" update="messages"
+							url="../../invalidateServlet" icon="ui-icon-extlink" />
+					</p:menu>
+				</p:toolbarGroup>
+			</p:toolbar>
+			<p:menubar>
+				<p:submenu label="Newspaper" icon="ui-icon-document">
+					<p:menuitem value="Newspaper Info" icon="ui-icon-calculator"
+						style="width:100%" url="/faces/newspaper/newspaper.jsf"
+						actionListener="#{newspaperControler.clear}"
+						onclick="blockui.show()" />
+					<p:menuitem value="Issue Info" icon="ui-icon-comment"
+						style="width:100%" url="/faces/newspaper/issue.jsf"
+						onclick="blockui.show()" />
+					<p:menuitem value="Article Info" url="/faces/newspaper/article.jsf"
+						icon="ui-icon-copy" onclick="blockui.show()" />
+
+					<p:menuitem value="Author Info" icon="ui-icon-person"
+						style="width:100%" url="/faces/newspaper/author.jsf"
+						onclick="blockui.show()" />
+					<p:menuitem value="Subject" icon="ui-icon-lightbulb"
+						url="/faces/newspaper/subject.jsf" onclick="blockui.show()" />
+				</p:submenu>
+
+				<p:submenu label="Sales" icon="ui-icon-cart">
+					<p:menuitem value="Subscriber Info" icon="ui-icon-mail-closed"
+						style="width:100%" url="/faces/sales/subscriber.jsf"
+						onclick="blockui.show()" />
+
+					<p:menuitem value="Non-Sub Info" icon="ui-icon-arrow-4-diag"
+						style="width:100%" url="/faces/sales/nonSubscriber.jsf"
+						onclick="blockui.show()" />
+
+					<p:menuitem value="Retail Info" url="/faces/sales/retail.jsf"
+						icon="ui-icon-suitcase" style="width:100%"
+						onclick="blockui.show()" />
+
+					<p:menuitem value="Ad Info" url="/faces/sales/ad.jsf"
+						icon="ui-icon-image" style="width:100%" onclick="blockui.show()" />
+
+					<p:menuitem value="Promotion Info" url="/faces/sales/promotion.jsf"
+						icon="ui-icon-image" style="width:100%" onclick="blockui.show()" />
+					<p:submenu label="Questionnaire" icon="ui-icon-search">
+						<p:menuitem value="Questions" url="/faces/sales/question.jsf"
+							icon="ui-icon-notice" style="width:100%" onclick="blockui.show()" />
+						<p:menuitem value="Questionnaires"
+							url="/faces/sales/questionnaire.jsf" icon="ui-icon-document"
+							style="width:100%" onclick="blockui.show()" />
+					</p:submenu>
+					<p:menuitem value="Inventory Info" url="/faces/sales/inventory.jsf"
+						icon="ui-icon-clipboard" style="width:100%"
+						onclick="blockui.show()" />
+					<p:submenu label="Sales Summary" icon="ui-icon-signal-diag">
+						<p:menuitem value="Sales Source based"
+							url="/faces/sales/salesSummary.jsf" icon="ui-icon-signal-diag"
+							style="width:100%" onclick="blockui.show()" />
+						<p:menuitem value="Client based"
+							url="/faces/sales/clientSummary.jsf" icon="ui-icon-signal-diag"
+							style="width:100%" onclick="blockui.show()" />
+						<p:menuitem value="Promotion based"
+							url="/faces/sales/promotionSummary.jsf"
+							icon="ui-icon-signal-diag" style="width:100%"
+							onclick="blockui.show()" />
+					</p:submenu>
+				</p:submenu>
+
+				<p:submenu label="Admin" icon="ui-icon-home">
+					<p:menuitem value="User Management"
+						icon="ui-icon-grip-solid-horizontal" style="width:100%"
+						url="/faces/admin/user.jsf" onclick="blockui.show()" />
+
+					<p:submenu label="Jobs" icon="ui-icon-bookmark">
+						<p:menuitem value="Job Titles" url="/faces/admin/jobTitle.jsf"
+							icon="ui-icon-bookmark" onclick="blockui.show()" />
+						<p:menuitem value="Employee Status" url="/faces/admin/status.jsf"
+							icon="ui-icon-bookmark" onclick="blockui.show()" />
+						<p:menuitem value="Job Categories" icon="ui-icon-bookmark"
+							url="/faces/admin/jobCategory.jsf" onclick="blockui.show()" />
+					</p:submenu>
+
+					<p:submenu label="Client" icon="ui-icon-person">
+						<p:menuitem value="Occupation List"
+							url="/faces/admin/occupation.jsf" onclick="blockui.show()"
+							icon="ui-icon-person" />
+						<p:menuitem value="Education List"
+							url="/faces/admin/education.jsf" onclick="blockui.show()"
+							icon="ui-icon-person" />
+					</p:submenu>
+
+					<p:menuitem value="Structure" icon="ui-icon-arrow-4-diag"
+						url="/faces/admin/structure.jsf" onclick="blockui.show()" />
+
+				</p:submenu>
+
+				<p:submenu label="PIM" icon="ui-icon-person">
+					<p:menuitem value="Employee List"
+						url="/faces/employee/employee.jsf" icon="ui-icon-calculator"
+						onclick="blockui.show()" />
+					<p:submenu label="Add Employee" icon="ui-icon-plusthick">
+						<p:menuitem value="Add One" url="/faces/hr/addEmployee.jsf"
+							icon="ui-icon-plus" onclick="blockui.show()" />
+						<p:menuitem value="Data import" url="/faces/hr/dataImport.jsf"
+							icon="ui-icon-arrowreturnthick-1-s" onclick="blockui.show()" />
+					</p:submenu>
+				</p:submenu>
+				<p:submenu label="Time" icon="ui-icon-clock">
+					<p:submenu label="Attendance" icon="ui-icon-clock">
+						<p:menuitem value="My Records" url="/faces/employee/myRecord.jsf"
+							icon="ui-icon-check" onclick="blockui.show()" />
+						<p:menuitem value="Punch In/Out" url="/faces/employee/punch.jsf"
+							icon="ui-icon-transferthick-e-w" onclick="blockui.show()" />
+						<p:menuitem value="Employee Records"
+							url="/faces/hr/employeeRecords.jsf" icon="ui-icon-cicle-check"
+							onclick="blockui.show()" />
+						<p:menuitem value="Attendance Summary" style="width:100%"
+							url="/faces/hr/attendanceSummary.jsf" icon="ui-icon-document"
+							onclick="blockui.show()" />
+					</p:submenu>
+					<p:menuitem value="Timesheet" style="width:100%"
+						url="/faces/employee/timesheet.jsf" icon="ui-icon-document"
+						onclick="blockui.show()" />
+					<p:menuitem value="Task Info" style="width:100%"
+						url="/faces/employee/task.jsf" icon="ui-icon-pencil"
+						onclick="blockui.show()" />
+				</p:submenu>
+				<p:submenu label="Performance" icon="ui-icon-cart">
+					<p:menuitem value="Manage Trackers" style="width:100%"
+						url="/faces/employee/manageTrackers.jsf" icon="ui-icon-gear"
+						onclick="blockui.show()" />
+					<p:menuitem value="Employee Trackers" style="width:100%"
+						url="/faces/employee/employeeTrackers.jsf"
+						icon="ui-icon-arrowstop-1-s" onclick="blockui.show()" />
+					<p:menuitem value="Competencies" style="width:100%"
+						url="/faces/admin/competency.jsf" icon="ui-icon-lightbulb"
+						onclick="blockui.show()" />
+					<p:menuitem value="Goals" style="width:100%"
+						url="/faces/employee/goal.jsf" icon="ui-icon-star"
+						onclick="blockui.show()" />
+					<p:menuitem value="Appraisals" style="width:100%"
+						url="/faces/employee/appraisal.jsf" icon="ui-icon-check"
+						onclick="blockui.show()" />
+					<p:submenu label="Configuration" icon="ui-icon-gear">
+						<p:menuitem value="Appraisal" style="width:100%"
+							url="/faces/hr/appraisalConfiguration.jsf" icon="ui-icon-heart"
+							onclick="blockui.show()" />
+					</p:submenu>
+				</p:submenu>
+
+				<p:menuitem id="schedule"
+					value="My Schedule #{scheduleControler.formatNotification}"
+					url="/faces/employee/mySchedule.jsf" icon="ui-icon-calendar"
+					onclick="blockui.show()" />
+
+				<p:menuitem value="My Info"
+					actionListener="#{personInfoControler.clearAllAndRedirect}"
+					url="/faces/employee/employeeInfo.jsf" icon="ui-icon-document-b"
+					onclick="blockui.show()" />
+			</p:menubar>
+		</h:form>
+		<p:ajaxStatus onstart="statusDialog.show()"
+			onsuccess="statusDialog.hide()" />
+		<p:dialog widgetVar="statusDialog" modal="true" draggable="false"
+			closable="false" resizable="false" showHeader="false">
+			<p:graphicImage value="/images/loading.gif" />
+		</p:dialog>
+		<p:blockUI block="headForm mainForm" widgetVar="blockui">
+			<p:graphicImage value="/images/loading.gif" />
+		</p:blockUI>
+	</ui:composition>
+</h:body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="Questions Infomation" toggleable="true">
+			<p:panelGrid columns="4" id="searchOptions"
+				style="border:none;margin:0 auto;width:100%">
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="&nbsp;" />
+					<p:outputLabel style="display:block" value="Question" />
+					<p:autoComplete value="#{nquestionControler.condition.name}"
+						placeholder="Type for hint..."
+						completeMethod="#{nquestionControler.completeName}" />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="&nbsp;" />
+					<p:outputLabel style="display:block" value="Type" />
+					<p:selectCheckboxMenu label="-- Select --"
+						value="#{nquestionControler.condition.typeSeqs}">
+						<f:selectItems var="type" value="#{typeControler.baseList}"
+							itemLabel="#{type.name}" itemValue="#{type.seq}" />
+					</p:selectCheckboxMenu>
+				</p:outputPanel>
+
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Modified Date" />
+					<p:outputLabel style="display:block" value="From" />
+					<p:calendar value="#{nquestionControler.condition.from}"
+						pattern="yyyy-MM-dd" showOn="both" />
+				</p:outputPanel>
+
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="&nbsp;" />
+					<p:outputLabel style="display:block" value="To" />
+					<p:calendar value="#{nquestionControler.condition.to}"
+						pattern="yyyy-MM-dd" showOn="both" />
+				</p:outputPanel>
+
+			</p:panelGrid>
+			<p:commandButton value="Search" update="questionTable"
+				actionListener="#{nquestionControler.search}" />
+			<p:commandButton value="Reset" update="searchOptions"
+				actionListener="#{nquestionControler.condition.clear}" />
+		</p:panel>
+		<p:panel header="Questions List">
+			<p:commandButton value="Add"
+				actionListener="#{nquestionControler.startAdd}" update=":editForm"
+				onclick="editDialog_w.show()" />
+
+			<p:commandButton value="Delete"
+				onclick="PF('deleteConfirm_w').show();" />
+			<p:spacer />
+			<p:dataTable id="questionTable"
+				value="#{nquestionControler.listModel}" var="question"
+				selection="#{nquestionControler.selecteds}" rows="10">
+				<p:column style="width:2%;text-align: center"
+					selectionMode="multiple">
+				</p:column>
+				<p:column style="width:10%" headerText="Question"
+					sortBy="#{question.name}">
+					<p:commandLink value="#{question.name}"
+						actionListener="#{nquestionControler.startEdit}"
+						update=":editForm" onclick="editDialog_w.show()">
+						<f:attribute name="question" value="#{question}" />
+					</p:commandLink>
+				</p:column>
+				<p:column style="width:10%" headerText="Question Type"
+					sortBy="#{question.type.name}">
+					<h:outputText value="#{question.type.name}" />
+				</p:column>
+				<p:column style="width:10%" headerText="Added Date"
+					sortBy="#{question.formatAddDate}">
+					<h:outputText value="#{question.formatAddDate}" />
+				</p:column>
+				<p:column style="width:10%" headerText="Modified Date"
+					sortBy="#{question.formatModDate}">
+					<h:outputText value="#{question.formatModDate}" />
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+		<p:confirmDialog id="deleteConfirm" widgetVar="deleteConfirm_w"
+			message="Are you sure to delete these questions?"
+			header="NP Pillar - Confirm Required" severity="alert">
+			<p:focus context="deleteConfirm" for="cancelBtn" />
+			<p:commandButton id="confirmBtn" value="OK" update="mainForm"
+				onclick="PF('deleteConfirm_w').hide();"
+				actionListener="#{nquestionControler.delete}" />
+			<p:commandButton id="cancelBtn" value="Cancel" immediate="true"
+				onclick="PF('deleteConfirm_w').hide();" />
+		</p:confirmDialog>
+	</h:form>
+	<p:dialog id="editDialog" widgetVar="editDialog_w"
+		header="#{nquestionControler.editMode? 'Edit Question Infomation' : 'Add Question'}"
+		closable="true" modal="true">
+		<h:form id="editForm">
+			<p:messages id="messages" closable="true" />
+			<p:panelGrid>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Question" for="name" />
+					</p:column>
+					<p:column>
+						<p:inputText id="name" value="#{nquestionControler.editDto.name}"
+							required="true" requiredMessage="Question is required." />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Type" />
+					</p:column>
+					<p:column>
+						<p:selectOneMenu value="#{nquestionControler.editDto.type.seq}">
+							<f:selectItems value="#{typeControler.baseList}" var="type"
+								itemLabel="#{type.name}" itemValue="#{type.seq}" />
+							<p:ajax update="options" />
+						</p:selectOneMenu>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column colspan="2">
+						<p:outputPanel id="options">
+							<p:panel header="Options"
+								rendered="#{nquestionControler.editDto.type.seq != 3}">
+								<p:commandButton value="Add Option" onclick="addItem_w.show()"
+									update=":addItemForm" />
+								<p:commandButton value="Delete"
+									onclick="deleteItemConfirm_w.show()" />
+								<p:dataTable value="#{nquestionControler.editDto.itemListModel}"
+									selection="#{nquestionControler.selectedItems}" var="item">
+									<p:column selectionMode="multiple" width="2%"
+										style="text-align:center">
+									</p:column>
+									<p:column headerText="Option">
+										<h:outputText value="#{item}" />
+									</p:column>
+								</p:dataTable>
+							</p:panel>
+						</p:outputPanel>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+			<p:separator />
+			<p:commandButton value="Save"
+				actionListener="#{nquestionControler.apply}"
+				update=":mainForm messages" />
+			<p:commandButton value="Cancel" onclick="editDialog_w.hide()"
+				immediate="true" />
+		</h:form>
+	</p:dialog>
+
+	<p:confirmDialog id="deleteItemConfirm" widgetVar="deleteItemConfirm_w"
+		message="Are you sure to delete these options?"
+		header="NP Pillar - Confirm Required" severity="alert">
+		<h:form>
+			<p:focus context="deleteItemConfirm" for="cancelBtn" />
+			<p:commandButton id="confirmBtn" value="OK" update=":editForm"
+				actionListener="#{nquestionControler.deleteItem}" />
+			<p:commandButton id="cancelBtn" value="Cancel"
+				onclick="PF('deleteItemConfirm_w').hide();" />
+		</h:form>
+	</p:confirmDialog>
+
+	<p:dialog id="addItem" widgetVar="addItem_w"
+		header="Add Option for Question" closable="true" modal="true">
+		<h:form id="addItemForm">
+			<p:messages id="messages" closable="true" />
+			<p:panelGrid columns="2">
+				<p:outputLabel value="Option" for="name" />
+				<p:inputText id="name" value="#{nquestionControler.editItem}"
+					required="true" requiredMessage="Option is required."
+					validator="#{nquestionControler.itemValidate}" />
+			</p:panelGrid>
+			<p:separator />
+			<p:commandButton value="OK"
+				actionListener="#{nquestionControler.applyItem}"
+				update=":editForm messages" />
+			<p:commandButton value="Cancel" onclick="addItem_w.hide()" />
+		</h:form>
+	</p:dialog>
+</h:body>
+</html>

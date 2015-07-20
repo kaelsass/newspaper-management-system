@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="Performance Trackers"
+			rendered="#{!trackerControler.browseMode}">
+			<p:messages autoUpdate="true" closable="true" />
+
+			<p:panelGrid columns="2">
+				<p:outputLabel value="Tracker Name" />
+				<p:inputText value="#{trackerControler.editDto.name}"
+					required="true" requiredMessage="Tracker Name is required." />
+				<p:outputLabel value="Employee Name" />
+				<p:autoComplete value="#{trackerControler.editDto.employee.name}"
+					placeholder="Type for hint..." required="true"
+					requiredMessage="Employee is required."
+					validator="#{workInfoControler.nameValidate}"
+					completeMethod="#{workInfoControler.completeEmployeeName}" />
+				<p:outputLabel value="Reviewers" />
+				<p:pickList value="#{trackerControler.reviewers}" var="employee"
+					itemValue="#{employee}" itemLabel="#{employee.name}"
+					showCheckbox="true" showSourceFilter="true" showTargetFilter="true"
+					filterMatchMode="contains" converter="employeeConverter">
+					<f:facet name="sourceCaption">Available Reviewers</f:facet>
+					<f:facet name="targetCaption">Assigned Reviewers</f:facet>
+				</p:pickList>
+			</p:panelGrid>
+			<p:commandButton value="Save"
+				actionListener="#{trackerControler.apply}" update="mainForm" />
+			<p:commandButton value="Cancel" immediate="true"
+				actionListener="#{trackerControler.clear}" update="mainForm" />
+		</p:panel>
+		<p:panel header="Manage Performance Trackers">
+			<p:commandButton value="Add"
+				rendered="#{trackerControler.browseMode}"
+				actionListener="#{trackerControler.startAdd}" update="mainForm" />
+
+			<p:commandButton value="Delete"
+				rendered="#{trackerControler.browseMode}"
+				onclick="PF('deleteConfirm_w').show();"
+				actionListener="#{trackerControler.startDelete}"
+				update="deleteConfirm" />
+			<p:spacer />
+			<p:dataTable id="trackerTable" value="#{trackerControler.listModel}"
+				var="tracker" selection="#{trackerControler.selecteds}" rows="10">
+				<p:column style="width:2%;text-align: center"
+					selectionMode="multiple">
+				</p:column>
+				<p:column style="width:10%" headerText="Tracker Name"
+					sortBy="#{tracker.name}">
+					<p:commandLink value="#{tracker.name}"
+						actionListener="#{trackerControler.startEdit}" update=":mainForm">
+						<f:attribute name="tracker" value="#{tracker}" />
+					</p:commandLink>
+				</p:column>
+				<p:column style="width:10%" headerText="Employee Name"
+					sortBy="#{tracker.employee.name}">
+					<h:outputText value="#{tracker.employee.name}" />
+				</p:column>
+				<p:column style="width:10%" headerText="Added Date"
+					sortBy="#{tracker.formatAddDate}">
+					<h:outputText value="#{tracker.formatAddDate}" />
+				</p:column>
+				<p:column style="width:10%" headerText="Modified Date"
+					sortBy="#{tracker.formatModDate}">
+					<h:outputText value="#{tracker.formatModDate}" />
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+		<p:confirmDialog id="deleteConfirm" widgetVar="deleteConfirm_w"
+			message="Are you sure to delete these trackers?"
+			visible="#{trackerControler.deleteMode}"
+			header="NP Pillar - Confirm Required" severity="alert">
+			<p:focus context="deleteConfirm" for="cancelBtn" />
+			<p:commandButton id="confirmBtn" value="OK" update="mainForm"
+				onclick="PF('deleteConfirm_w').hide();"
+				actionListener="#{trackerControler.delete}" />
+			<p:commandButton id="cancelBtn" value="Cancel"
+				actionListener="#{trackerControler.endDelete}" immediate="true"
+				onclick="PF('deleteConfirm_w').hide();" />
+		</p:confirmDialog>
+	</h:form>
+</h:body>
+</html>

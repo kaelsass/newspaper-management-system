@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="#{taskControler.editMode ? 'Edit Task' : 'Task'}">
+			<p:messages autoUpdate="true" closable="true" />
+			<p:panelGrid columns="2">
+				<p:outputLabel value="Name" />
+				<h:outputText value="#{taskControler.editDto.name}"
+					rendered="#{!taskControler.editMode}" />
+				<p:inputText value="#{taskControler.editDto.name}" required="true"
+					requiredMessage="Name is required."
+					rendered="#{taskControler.editMode}" />
+
+				<p:outputLabel value="Task Admin" />
+				<p:dataList value="#{taskControler.editDto.admins}" var="employee"
+					rendered="#{!taskControler.editMode}">
+					<h:outputText value="#{employee.name}" />
+				</p:dataList>
+				<p:pickList value="#{taskControler.admins}" var="employee"
+					rendered="#{taskControler.editMode}" itemValue="#{employee}"
+					itemLabel="#{employee.name}" showCheckbox="true"
+					showSourceFilter="true" showTargetFilter="true"
+					filterMatchMode="contains" converter="employeeConverter">
+					<f:facet name="sourceCaption">Available Admins</f:facet>
+					<f:facet name="targetCaption">Assigned Admins</f:facet>
+				</p:pickList>
+
+				<p:outputLabel value="Description" />
+				<p:outputPanel>
+					<p:inputTextarea value="#{taskControler.editDto.description}"
+						disabled="#{!taskControler.editMode}" rows="5" cols="30"
+						counter="noteDisplay" maxlength="1000"
+						counterTemplate="{0} characters remaining." autoResize="false"
+						style="display:block;width:100%" />
+					<h:outputText id="noteDisplay" rendered="#{taskControler.editMode}" />
+				</p:outputPanel>
+			</p:panelGrid>
+			<p:commandButton value="Edit" rendered="#{!taskControler.editMode}"
+				actionListener="#{taskControler.startEdit}" update="mainForm" />
+			<p:commandButton value="Save" rendered="#{taskControler.editMode}"
+				actionListener="#{taskControler.apply}" update="mainForm" />
+			<p:commandButton value="Cancel"
+				actionListener="#{taskControler.clear}"
+				action="#{mainMenuControler.transfer}" onclick="blockui.show()">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/employee/task.jsf" />
+			</p:commandButton>
+		</p:panel>
+		<p:panel
+			header="#{taskControler.addActivityMode? 'Add Task Activity' : 'Edit Task Activity'}"
+			rendered="#{!taskControler.browseActivityMode}">
+			<p:panelGrid columns="2">
+				<p:outputLabel value="Name:" />
+				<p:inputText value="#{taskControler.editActivityDto.name}" required="true" requiredMessage="Activity Name is required."
+					validator="#{taskControler.activityNameValidate}" />
+			</p:panelGrid>
+			<p:commandButton value="Save"
+				actionListener="#{taskControler.applyActivity}" update="mainForm" />
+			<p:commandButton value="Cancel" immediate="true"
+				actionListener="#{taskControler.clear}" update="mainForm" />
+		</p:panel>
+		<p:panel header="Activities">
+			<p:commandButton value="Add"
+				rendered="#{taskControler.browseActivityMode}"
+				actionListener="#{taskControler.startAddActivity}" update="mainForm" />
+			<p:commandButton value="Delete"
+				rendered="#{taskControler.browseActivityMode}"
+				actionListener="#{taskControler.startDeleteActivity}"
+				onclick="deleteConfirm_w.show()" />
+			<p:spacer />
+			<p:dataTable id="activityTable"
+				value="#{taskControler.activityListModel}" var="activity"
+				selection="#{taskControler.selectedActivities}" rows="10">
+				<p:column style="width:1%;text-align: center"
+					selectionMode="multiple">
+				</p:column>
+				<p:column style="width:10%;text-align: center"
+					sortBy="#{activity.name}" headerText="Activity Name">
+					<p:commandLink value="#{activity.name}"
+						actionListener="#{taskControler.startEditActivity}"
+						update=":mainForm">
+						<f:attribute name="activity" value="#{activity}" />
+					</p:commandLink>
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+		<p:confirmDialog id="deleteConfirm" widgetVar="deleteConfirm_w"
+			message="Are you sure to delete these task activities?"
+			visible="#{taskControler.deleteActivityMode}"
+			header="NP Pillar - Confirm Required" severity="alert">
+			<p:focus context="deleteConfirm" for="cancelBtn" />
+			<p:commandButton id="confirmBtn" value="OK" update="mainForm"
+				onclick="PF('deleteConfirm_w').hide();"
+				actionListener="#{taskControler.deleteActivity}" />
+			<p:commandButton id="cancelBtn" value="Cancel"
+				actionListener="#{taskControler.endDeleteActivity}" immediate="true"
+				onclick="PF('deleteConfirm_w').hide();" />
+		</p:confirmDialog>
+	</h:form>
+</h:body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<link rel="stylesheet" href="../../css/noborder.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="News Articles" toggleable="true">
+			<p:panelGrid columns="5" id="searchOptions"
+				style="border:none;margin:0 auto;width:100%">
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Title" />
+					<p:autoComplete value="#{articleControler.condition.title}"
+						placeholder="Type for hint..."
+						completeMethod="#{articleControler.completeTitle}" />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Subject" />
+					<p:selectOneMenu value="#{articleControler.condition.subjectSeq}">
+						<f:selectItem itemLabel="-- Select --" itemValue="0" />
+						<f:selectItems value="#{subjectControler.baseList}" var="subject"
+							itemLabel="#{subject.name}" itemValue="#{subject.seq}" />
+					</p:selectOneMenu>
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Author Name" />
+					<p:autoComplete value="#{articleControler.condition.authorName}"
+						placeholder="Type for hint..."
+						completeMethod="#{authorControler.completeAuthorName}" />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Content" />
+					<p:inputText value="#{articleControler.condition.html}"
+						placeholder="Keyworkds" />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Status" />
+					<p:selectManyCheckbox
+						value="#{articleControler.condition.statusSeqs}">
+						<f:selectItems value="#{NStatusControler.baseList}" var="status"
+							itemLabel="#{status.name}" itemValue="#{status.seq}" />
+					</p:selectManyCheckbox>
+				</p:outputPanel>
+			</p:panelGrid>
+			<p:separator />
+			<p:commandButton value="Search" update="articleTable"
+				actionListener="#{articleControler.search}" />
+			<p:commandButton value="Reset" update="searchOptions"
+				actionListener="#{articleControler.condition.clear}" />
+		</p:panel>
+		<p:panel>
+			<p:commandButton value="Add"
+				actionListener="#{articleControler.startAdd}"
+				action="#{mainMenuControler.transfer}">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/newspaper/editArticle.jsf" />
+			</p:commandButton>
+			<p:commandButton value="Delete"
+				actionListener="#{articleControler.startDelete}"
+				onclick="PF('deleteConfirm_w').show();" update="deleteConfirm" />
+
+			<p:dataTable id="articleTable" value="#{articleControler.listModel}"
+				var="article" selection="#{articleControler.selecteds}" rows="10">
+				<p:column width="2%" selectionMode="multiple" style="text-align:center">
+				</p:column>
+				<p:column style="width:10%" sortBy="#{article.title}">
+					<f:facet name="header">
+						<h:outputText value="Title" />
+					</f:facet>
+					<p:commandLink value="#{article.title}"
+						actionListener="#{articleControler.startEdit}"
+						action="#{mainMenuControler.transfer}">
+						<f:attribute name="article" value="#{article}" />
+						<f:setPropertyActionListener
+							target="#{mainMenuControler.nextMenu}"
+							value="/faces/newspaper/editArticle.jsf" />
+					</p:commandLink>
+				</p:column>
+
+				<p:column style="width:10%"
+					sortBy="#{article.section.issue.newspaper.name}">
+					<f:facet name="header">
+						<h:outputText value="Newspaper" />
+					</f:facet>
+					<h:outputText value="#{article.section.issue.newspaper.name}" />
+				</p:column>
+
+				<p:column style="width:10%"
+					sortBy="#{article.section.issue.formatIssue}">
+					<f:facet name="header">
+						<h:outputText value="Issue" />
+					</f:facet>
+					<h:outputText value="#{article.section.issue.formatIssue}" />
+				</p:column>
+
+				<p:column style="width:10%"
+					sortBy="#{article.section.formatSection}">
+					<f:facet name="header">
+						<h:outputText value="Section" />
+					</f:facet>
+					<h:outputText value="#{article.section.formatSection}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{article.formatTime}">
+					<f:facet name="header">
+						<h:outputText value="Last Modified Time" />
+					</f:facet>
+					<h:outputText value="#{article.formatTime}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{article.author.name}">
+					<f:facet name="header">
+						<h:outputText value="Author" />
+					</f:facet>
+					<h:outputText value="#{article.author.name}" />
+				</p:column>
+
+				<p:column style="width:10%" headerText="Status">
+					<p:selectOneMenu value="#{article.status.seq}">
+						<f:selectItems value="#{NStatusControler.baseList}" var="status"
+							itemLabel="#{status.name}" itemValue="#{status.seq}" />
+						<p:ajax listener="#{articleControler.applyStatus(article)}"
+							update="articleTable" />
+					</p:selectOneMenu>
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+		<p:confirmDialog id="deleteConfirm" widgetVar="deleteConfirm_w"
+			message="Are you sure to delete these articles?"
+			visible="#{articleControler.deleteMode}"
+			header="NP Pillar - Confirm Required" severity="alert">
+			<p:focus context="deleteConfirm" for="cancelBtn" />
+			<p:commandButton id="confirmBtn" value="OK" update="mainForm"
+				onclick="PF('deleteConfirm_w').hide();"
+				actionListener="#{articleControler.delete}" />
+			<p:commandButton id="cancelBtn" value="Cancel"
+				actionListener="#{articleControler.endDelete}"
+				onclick="PF('deleteConfirm_w').hide();" />
+		</p:confirmDialog>
+	</h:form>
+</h:body>
+</html>

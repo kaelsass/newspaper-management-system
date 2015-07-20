@@ -1,0 +1,169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+	<link rel="stylesheet"
+		href="../../css/noborder.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="Advertisement Information" toggleable="true">
+			<p:panelGrid columns="5" id="searchOptions"
+				style="border:none;margin:0 auto;width:100%">
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Contract ID" />
+					<p:autoComplete value="#{adControler.condition.ID}"
+						placeholder="Type for hint..."
+						completeMethod="#{adControler.completeID}" />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Client Name" />
+					<p:autoComplete value="#{adControler.condition.workUnit}"
+						placeholder="Type for hint..."
+						completeMethod="#{adControler.completeWorkUnit}" />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Address" />
+					<p:autoComplete value="#{adControler.condition.address}"
+						placeholder="Type for hint..."
+						completeMethod="#{adControler.completeAddress}" />
+				</p:outputPanel>
+				<p:outputPanel>
+
+					<p:outputLabel style="display:block" value="Newspaper" />
+					<p:selectOneMenu value="#{adControler.condition.newspaperSeq}">
+						<f:selectItem itemLabel="-- Select --" itemValue="0" />
+						<f:selectItems var="newspaper"
+							value="#{newspaperControler.baseList}"
+							itemLabel="#{newspaper.name}" itemValue="#{newspaper.seq}" />
+					</p:selectOneMenu>
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Responsible Person" />
+					<p:autoComplete value="#{adControler.condition.employeeName}"
+						placeholder="Type for hint..."
+						completeMethod="#{workInfoControler.completeEmployeeName}" />
+				</p:outputPanel>
+
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Issue Date From" />
+					<p:calendar value="#{adControler.condition.dateFrom}"
+						navigator="true" pattern="yyyy-MM-dd" showOn="both" />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Issue Date To" />
+					<p:calendar value="#{adControler.condition.dateTo}"
+						navigator="true" pattern="yyyy-MM-dd" showOn="both" />
+				</p:outputPanel>
+
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Order Date From" />
+					<p:calendar value="#{adControler.condition.orderDateFrom}"
+						navigator="true" pattern="yyyy-MM-dd" showOn="both" />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Order Date To" />
+					<p:calendar value="#{adControler.condition.orderDateTo}"
+						navigator="true" pattern="yyyy-MM-dd" showOn="both" />
+				</p:outputPanel>
+
+			</p:panelGrid>
+			<p:commandButton value="Search" update="adTable"
+				actionListener="#{adControler.search}" />
+			<p:commandButton value="Reset" update="searchOptions"
+				actionListener="#{adControler.condition.clear}" />
+		</p:panel>
+		<p:panel>
+			<p:commandButton value="Add" actionListener="#{adControler.startAdd}"
+				action="#{mainMenuControler.transfer}">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/sales/editAd.jsf" />
+			</p:commandButton>
+			<p:commandButton value="Delete"
+				actionListener="#{adControler.startDelete}"
+				onclick="PF('deleteConfirm_w').show();" update="deleteConfirm" />
+
+			<p:dataTable id="adTable" value="#{adControler.listModel}" var="ad"
+				selection="#{adControler.selecteds}" rows="10">
+				<p:column style="width:1%" selectionMode="multiple">
+				</p:column>
+				<p:column style="width:10%" sortBy="#{ad.ID}"
+					headerText="Contract ID">
+					<p:commandLink value="#{ad.ID}"
+						actionListener="#{adControler.startEdit}"
+						action="#{mainMenuControler.transfer}" ajax="false">
+						<f:attribute name="ad" value="#{ad}" />
+						<f:setPropertyActionListener
+							target="#{mainMenuControler.nextMenu}" value="/faces/sales/editAd.jsf" />
+					</p:commandLink>
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{ad.workUnit}"
+					headerText="Client Name">
+					<h:outputText value="#{ad.workUnit}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{ad.address}"
+					headerText="Address">
+					<h:outputText value="#{ad.address}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{ad.newspaper.name}"
+					headerText="Newspaper">
+					<h:outputText value="#{ad.newspaper.name}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{ad.formatDateFrom}"
+					headerText="Issue Date From">
+					<h:outputText value="#{ad.formatDateFrom}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{ad.count}"
+					headerText="Ad Number">
+					<h:outputText value="#{ad.count}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{ad.employee.name}"
+					headerText="Responsible Person">
+					<h:outputText value="#{ad.employee.name}" />
+				</p:column>
+
+				<p:column style="width:10%" sortBy="#{ad.formatOrderDate}"
+					headerText="Order Date">
+					<h:outputText value="#{ad.formatOrderDate}" />
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+		<p:confirmDialog id="deleteConfirm" widgetVar="deleteConfirm_w"
+			message="Are you sure to delete these advertisement orders?"
+			visible="#{adControler.deleteMode}"
+			header="NP Pillar - Confirm Required" severity="alert">
+			<p:focus context="deleteConfirm" for="cancelBtn" />
+			<p:commandButton id="confirmBtn" value="OK" update="mainForm"
+				onclick="PF('deleteConfirm_w').hide();"
+				actionListener="#{adControler.delete}" />
+			<p:commandButton id="cancelBtn" value="Cancel"
+				actionListener="#{adControler.endDelete}"
+				onclick="PF('deleteConfirm_w').hide();" />
+		</p:confirmDialog>
+	</h:form>
+</h:body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<link rel="stylesheet" href="../../css/noborder.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="Search appraisals">
+			<p:panelGrid columns="4" id="searchOptions" style="margin:0;width:100%;">
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="&nbsp;" />
+					<p:outputLabel style="display:block" value="Employee Name" />
+					<p:autoComplete
+						value="#{appraisalControler.condition.employeeName}"
+						placeholder="Type for hint..."
+						completeMethod="#{workInfoControler.completeEmployeeName}"
+						validator="#{workInfoControler.nameValidate}" />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="&nbsp;" />
+					<p:outputLabel style="display:block" value="Evaluator Name" />
+					<p:autoComplete
+						value="#{appraisalControler.condition.evaluatorName}"
+						placeholder="Type for hint..."
+						completeMethod="#{workInfoControler.completeEmployeeName}"
+						validator="#{workInfoControler.nameValidate}" />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="Due Date" />
+					<p:outputLabel style="display:block" value="From" />
+					<p:calendar label="From"
+						value="#{appraisalControler.condition.from}" showOn="both"
+						pattern="yyyy-MM-dd" />
+				</p:outputPanel>
+				<p:outputPanel>
+					<p:outputLabel style="display:block" value="&nbsp;" />
+					<p:outputLabel style="display:block" value="To" />
+					<p:calendar label="To" value="#{appraisalControler.condition.to}"
+						showOn="both" pattern="yyyy-MM-dd" />
+				</p:outputPanel>
+			</p:panelGrid>
+			<p:separator/>
+			<p:commandButton value="Search" update="appraisalTable"
+				actionListener="#{appraisalControler.search}" />
+			<p:commandButton value="Reset" update="searchOptions"
+				actionListener="#{appraisalControler.condition.clear}" />
+		</p:panel>
+		<p:panel header="Appraisal List">
+			<p:commandButton value="Add"
+				actionListener="#{appraisalControler.startAdd}"
+				action="#{mainMenuControler.transfer}">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/employee/addAppraisal.jsf" />
+			</p:commandButton>
+			<p:commandButton value="Delete"
+				actionListener="#{appraisalControler.startDelete}"
+				onclick="PF('deleteConfirm_w').show();" update="deleteConfirm" />
+
+			<p:dataTable id="appraisalTable"
+				value="#{appraisalControler.listModel}" var="appraisal"
+				selection="#{appraisalControler.selecteds}" rows="10">
+				<p:column style="width:2%" selectionMode="multiple">
+				</p:column>
+				<p:column style="width:10%" sortBy="#{appraisal.employee.name}"
+					headerText="Employee Name">
+					<h:outputText value="#{appraisal.employee.name}" />
+				</p:column>
+
+				<p:column style="width:10%" headerText="Evaluators">
+					<h:outputText value="#{appraisal.formatEvaluators}" />
+				</p:column>
+				<p:column style="width:10%" sortBy="#{appraisal.formatFrom}"
+					headerText="From">
+					<h:outputText value="#{appraisal.formatFrom}" />
+				</p:column>
+				<p:column style="width:10%" sortBy="#{appraisal.formatTo}"
+					headerText="To">
+					<h:outputText value="#{appraisal.formatTo}" />
+				</p:column>
+				<p:column style="width:10%" sortBy="#{appraisal.formatDue}"
+					headerText="Due Date">
+					<h:outputText value="#{appraisal.formatDue}" />
+				</p:column>
+				<p:column style="width:10%" headerText="Description">
+					<h:outputText value="#{appraisal.description}" />
+				</p:column>
+				<p:column style="width:10%" headerText="Final Rating">
+					<h:outputText value="#{appraisal.formatScore}" />
+				</p:column>
+				<p:column style="width:10%" headerText="Actions">
+					<p:selectOneMenu value="#{appraisalControler.outcome}">
+						<f:selectItem itemValue="" itemLabel="-- Select --"/>
+						<f:selectItem itemValue="/faces/employee/viewAppraisal.jsf" itemLabel="View"/>
+						<f:selectItem itemValue="/faces/employee/manageAppraisal.jsf" itemLabel="Manage"/>
+						<f:selectItem itemValue="/faces/employee/evaluateAppraisal.jsf" itemLabel="Evaluate"/>
+						<p:ajax listener="#{appraisalControler.navigate}" />
+						<p:ajax listener="#{manageAppraisalControler.navigate}" />
+					</p:selectOneMenu>
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+		<p:confirmDialog id="deleteConfirm" widgetVar="deleteConfirm_w"
+			message="Are you sure to delete these appraisals?"
+			visible="#{appraisalControler.deleteMode}"
+			header="NP Pillar - Confirm Required" severity="alert">
+			<p:focus context="deleteConfirm" for="cancelBtn" />
+			<p:commandButton id="confirmBtn" value="OK" update="mainForm"
+				onclick="PF('deleteConfirm_w').hide();"
+				actionListener="#{appraisalControler.delete}" />
+			<p:commandButton id="cancelBtn" value="Cancel"
+				actionListener="#{appraisalControler.endDelete}"
+				onclick="PF('deleteConfirm_w').hide();" />
+		</p:confirmDialog>
+	</h:form>
+</h:body>
+</html>

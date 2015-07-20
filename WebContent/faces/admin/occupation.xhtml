@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title></h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="#{occupationControler.addMode? 'Add Occupation' : 'Edit Occupation'}" rendered="#{!occupationControler.browseMode}">
+		<p:panelGrid columns="2">
+			<p:outputLabel value="Name:"/>
+			<p:inputText value="#{occupationControler.editStatus.name}" validator="#{occupationControler.nameValidate}"/>
+		</p:panelGrid>
+			<p:messages autoUpdate="true" closable="true"/>
+			<p:commandButton value="Save"
+				actionListener="#{occupationControler.apply}"
+				update="mainForm"/>
+			<p:commandButton value="Cancel" immediate="true"
+				actionListener="#{occupationControler.clear}" update="mainForm" />
+		</p:panel>
+		<p:panel header="Occupations">
+			<p:commandButton value="Add" rendered="#{occupationControler.browseMode}"
+				actionListener="#{occupationControler.startAdd}"
+				update="mainForm"/>
+
+			<p:commandButton value="Delete" rendered="#{occupationControler.browseMode}" onclick="PF('deleteConfirm_w').show();"
+				actionListener="#{occupationControler.startDelete}" update="deleteConfirm" />
+			<p:spacer />
+			<p:dataTable id="occupationTable" value="#{occupationControler.listModel}"
+				var="occupation" selection="#{occupationControler.selecteds}" rows="10"
+				first="#{occupationControler.first}">
+				<p:column style="width:1%;text-align: center" selectionMode="multiple" >
+				</p:column>
+				<p:column style="width:10%;text-align: center" sortBy="#{occupation.name}" headerText="Occupation">
+					<p:commandLink value="#{occupation.name}" actionListener="#{occupationControler.startEdit}"
+						update=":mainForm">
+						<f:attribute name="occupation" value="#{occupation}" />
+					</p:commandLink>
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+				<p:confirmDialog id="deleteConfirm" widgetVar="deleteConfirm_w"
+			message="Are you sure to delete these occupations?"
+			visible="#{occupationControler.deleteMode}"
+			header="NP Pillar - Confirm Required" severity="alert">
+			<p:focus context="deleteConfirm" for="cancelBtn" />
+			<p:commandButton id="confirmBtn" value="OK" update="mainForm"
+				onclick="PF('deleteConfirm_w').hide();"
+				actionListener="#{occupationControler.delete}" />
+			<p:commandButton id="cancelBtn" value="Cancel" actionListener="#{occupationControler.endDelete}" immediate="true"
+				onclick="PF('deleteConfirm_w').hide();"/>
+		</p:confirmDialog>
+	</h:form>
+</h:body>
+</html>

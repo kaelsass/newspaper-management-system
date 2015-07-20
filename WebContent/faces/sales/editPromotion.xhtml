@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="#{promotionControler.editMode ? 'Edit Promotion Info' : 'Add Promotion Info'}">
+		<p:messages closable="true"/>
+			<p:panelGrid columns="2">
+				<p:outputLabel value="Activity Name:" for="activityName"/>
+				<p:inputText id="activityName" value="#{promotionControler.editDto.name}" required="true"
+					requiredMessage="Name is required."/>
+				<p:outputLabel value="Place:" />
+				<p:inputText value="#{promotionControler.editDto.place}" required="true"
+					requiredMessage="Place is required."/>
+
+				<p:outputLabel value="For Newspapers:" />
+				<p:pickList value="#{promotionControler.newspapers}" var="newspaper"
+					itemValue="#{newspaper}"
+					itemLabel="#{newspaper.name}" showCheckbox="true"
+					showSourceFilter="true" showTargetFilter="true"
+					filterMatchMode="contains" converter="newspaperConverter">
+					<f:facet name="sourceCaption">Available Newspapers</f:facet>
+					<f:facet name="targetCaption">Assigned Newspapers</f:facet>
+				</p:pickList>
+
+				<p:outputLabel value="Activity Admins:" />
+				<p:pickList value="#{promotionControler.admins}" var="employee"
+					itemValue="#{employee}"
+					itemLabel="#{employee.name}" showCheckbox="true"
+					showSourceFilter="true" showTargetFilter="true" required="true" requiredMessage="Activity Admin is required."
+					filterMatchMode="contains" converter="employeeConverter">
+					<f:facet name="sourceCaption">Available Admins</f:facet>
+					<f:facet name="targetCaption">Assigned Admins</f:facet>
+				</p:pickList>
+
+				<p:outputLabel value="Start Date:" for="from"/>
+				<p:calendar id="from" value="#{promotionControler.editDto.dateFrom}" pattern="yyyy-MM-dd" showOn="both" required="true" requiredMessage="Start Date is required."/>
+
+				<p:outputLabel value="End Date:" for="to"/>
+				<p:calendar id="to" value="#{promotionControler.editDto.dateTo}" pattern="yyyy-MM-dd" showOn="both" required="true" requiredMessage="End Date is required."/>
+			</p:panelGrid>
+			<p:separator/>
+			<p:commandButton value="Save"
+				actionListener="#{promotionControler.apply}" action="#{mainMenuControler.transfer}" update="mainForm" onclick="blockui.show()" oncomplete="blockui.hide()">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/sales/promotion.jsf" />
+			</p:commandButton>
+			<p:commandButton value="Cancel"
+				actionListener="#{promotionControler.clear}" immediate="true"
+				action="#{mainMenuControler.transfer}" onclick="blockui.show()">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/sales/promotion.jsf" />
+			</p:commandButton>
+		</p:panel>
+
+	</h:form>
+</h:body>
+</html>

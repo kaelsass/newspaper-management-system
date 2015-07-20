@@ -1,0 +1,303 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<link rel="stylesheet" href="../../css/questionnaire.css" />
+	<link rel="stylesheet" href="../../css/addQRecord.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+	<script type="text/javascript" src="ZeroClipboard.js"></script>
+	<script type="text/javascript">
+		var clip = null;
+		function $(id) {
+			return document.getElementById(id);
+		}
+		function init() {
+			clip = new ZeroClipboard.Client();
+			clip.setHandCursor(true);
+		}
+		function copy() {
+			clip.setText($('mainForm:tabView:url').value);
+			alert('The link has been copies in clipboard. Please press "Ctrl" + "v" to paste it.');
+		}
+	</script>
+</h:head>
+<h:body onload="init()">
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="Questionnaire Info">
+			<p:messages id="messages" closable="true" />
+			<p:tabView orientation="left" id="tabView"
+				activeIndex="#{questionnaireControler.activeIndex}">
+				<p:ajax event="tabChange" update="@form" />
+				<p:tab title="Questionnaire Info">
+					<p:panelGrid columns="2">
+						<p:outputLabel value="Title:" for="name" />
+						<p:inputText id="name"
+							value="#{questionnaireControler.editDto.name}" required="true"
+							requiredMessage="Questionnaire Title is Required." />
+						<p:outputLabel value="Description:" />
+						<p:outputPanel>
+							<p:inputTextarea
+								value="#{questionnaireControler.editDto.description}" rows="5"
+								cols="30" counter="desDisplay" maxlength="1000"
+								counterTemplate="{0} characters remaining." autoResize="false"
+								style="display:block" />
+							<h:outputText id="desDisplay" />
+						</p:outputPanel>
+
+						<p:outputLabel value="For Promotion:" />
+						<p:selectOneMenu
+							value="#{questionnaireControler.editDto.promotion.seq}">
+							<f:selectItem itemLabel="-- Select --" itemValue="0" />
+							<f:selectItems value="#{promotionControler.baseList}"
+								var="promotion" itemLabel="#{promotion.name}"
+								itemValue="#{promotion.seq}" />
+						</p:selectOneMenu>
+					</p:panelGrid>
+					<p:separator />
+					<p:panel header="Contained Questions" id="containedQuestions">
+						<p:commandButton value="Add"
+							actionListener="#{questionnaireControler.clearQuestions}"
+							onclick="availableList_w.show()"
+							update=":questionListForm:questionListPanel" />
+						<p:commandButton value="Reorder" onclick="reorder_w.show()"
+							update=":reorderForm" />
+						<p:commandButton value="Delete" onclick="deleteConfirm_w.show()" />
+						<p:dataTable draggableRows="true"
+							value="#{questionnaireControler.editDto.questionListModel}"
+							var="question"
+							selection="#{questionnaireControler.selectedQuestions}">
+							<p:column width="2%" selectionMode="multiple"></p:column>
+							<p:column headerText="Question">
+								<h:outputText value="#{question.name}" />
+							</p:column>
+							<p:column headerText="Question Type"
+								sortBy="#{question.type.name}">
+								<h:outputText value="#{question.type.name}" />
+							</p:column>
+							<p:column headerText="Added Date"
+								sortBy="#{question.formatAddDate}">
+								<h:outputText value="#{question.formatAddDate}" />
+							</p:column>
+							<p:column headerText="Modified Date"
+								sortBy="#{question.formatModDate}">
+								<h:outputText value="#{question.formatModDate}" />
+							</p:column>
+							<p:column style="text-align:center">
+								<p:commandButton update=":questionForm"
+									oncomplete="PF('editQuestion_w').show()" icon="ui-icon-search">
+									<f:setPropertyActionListener value="#{question}"
+										target="#{questionnaireControler.editQuestion}" />
+								</p:commandButton>
+							</p:column>
+						</p:dataTable>
+					</p:panel>
+					<p:separator />
+					<p:commandButton value="Save"
+						actionListener="#{questionnaireControler.apply}"
+						update=":mainForm:messages">
+					</p:commandButton>
+					<p:commandButton value="Back"
+						actionListener="#{questionnaireControler.clear}"
+						action="#{mainMenuControler.transfer}" onclick="blockui.show()"
+						oncomplete="blockui.hide()" immediate="true">
+						<f:setPropertyActionListener
+							target="#{mainMenuControler.nextMenu}"
+							value="/faces/sales/questionnaire.jsf" />
+					</p:commandButton>
+					<p:confirmDialog id="deleteConfirm" widgetVar="deleteConfirm_w"
+						message="Are you sure to delete these questions?"
+						header="NP Pillar - Confirm Required" severity="alert">
+						<p:focus context="deleteConfirm" for="cancelBtn" />
+						<p:commandButton id="confirmBtn" value="OK" update=":mainForm"
+							onclick="PF('deleteConfirm_w').hide();"
+							process="@this, containedQuestions"
+							actionListener="#{questionnaireControler.deleteQuestions}" />
+						<p:commandButton id="cancelBtn" value="Cancel"
+							onclick="PF('deleteConfirm_w').hide();" />
+					</p:confirmDialog>
+				</p:tab>
+				<p:tab title="Questionnaire Preview">
+					<p:commandButton value="DownLoad Form" ajax="false"
+						icon="ui-icon-arrowthick-1-s">
+						<p:fileDownload value="#{questionnaireControler.exportFile()}" />
+					</p:commandButton>
+					<p:separator />
+					<p:outputPanel>
+						<p:outputLabel value="Copy Questionnaire Link to Clipboard:"
+							style="display:block" />
+						<p:inputText id="url" style="width:100%"
+							value="#{questionnaireControler.editDto.url}" />
+						<p:commandButton type="button" id="copy" value="Copy"
+							onclick="copy();" immediate="true" />
+					</p:outputPanel>
+					<p:separator />
+					<p:outputLabel value="Share to SNS:" style="display:block"/>
+					<h:outputScript name="js/test.js" />
+					<script
+						src="http://qzonestyle.gtimg.cn/qzone/app/qzlike/qzopensl.js#jsdate=20111201"
+						charset="utf-8">
+					</script>
+
+					<p:outputPanel
+						style="text-align:center; width:800px ;margin:0 auto">
+						<p:outputLabel value="#{questionnaireControler.editDto.name}"
+							style="display:block;font-size: 20px;font-weight: bold;color: #f53d05;" />
+						<p:outputLabel
+							value="#{questionnaireControler.editDto.description}"
+							style="display:block;color: #555555;line-height: 24px;text-align: center;font-size: 14px" />
+						<p:separator />
+					</p:outputPanel>
+					<p:outputPanel style="width:800px;margin:0 auto" id="preview">
+						<c:forEach items="#{questionnaireControler.editDto.questions}"
+							var="question" varStatus="loop">
+							<p:outputPanel>
+								<p:outputLabel value="#{loop.index+1}.&nbsp;" />
+								<p:outputLabel value="#{question.name}" />
+								<h:panelGroup layout="block" styleClass="selection">
+									<p:selectOneRadio rendered="#{question.type.seq == 1}"
+										layout="pageDirection" style="width:100%">
+										<f:selectItems value="#{question.items}" />
+									</p:selectOneRadio>
+								</h:panelGroup>
+								<h:panelGroup layout="block" styleClass="selection">
+									<p:selectManyCheckbox rendered="#{question.type.seq == 2}"
+										layout="pageDirection" style="width:100%">
+										<f:selectItems value="#{question.items}" />
+									</p:selectManyCheckbox>
+								</h:panelGroup>
+
+								<p:inputTextarea rendered="#{question.type.seq == 3}" cols="80"
+									style="display:block" />
+								<p:separator />
+							</p:outputPanel>
+						</c:forEach>
+					</p:outputPanel>
+
+					<p:outputPanel style="text-align:center">
+						<p:commandButton value="Submit" />
+					</p:outputPanel>
+				</p:tab>
+			</p:tabView>
+		</p:panel>
+	</h:form>
+
+	<p:dialog id="availableList" header="Available Questions" width="80%"
+		widgetVar="availableList_w" closable="true" modal="true">
+		<h:form id="questionListForm">
+			<p:panel id="questionListPanel">
+				<p:dataTable id="availableTable" widgetVar="availableTable_w"
+					value="#{questionnaireControler.availableQuestionListModel}"
+					var="question" selection="#{questionnaireControler.addedQuestions}">
+					<f:facet name="header">
+						<p:outputLabel value="Questions" />
+					</f:facet>
+					<p:column selectionMode="multiple" width="2%"
+						style="text-align:center">
+					</p:column>
+					<p:column headerText="Question" filterBy="#{question.name}"
+						filterMatchMode="contains">
+						<h:outputText value="#{question.name}" />
+					</p:column>
+					<p:column headerText="Type" style="text-align:center"
+						filterBy="#{question.type.name}" filterMatchMode="contains">
+						<h:outputText value="#{question.type.name}" />
+					</p:column>
+					<p:column headerText="Added Time" style="text-align:right"
+						sortBy="#{question.formatAddDate}">
+						<h:outputText value="#{question.formatAddDate}" />
+					</p:column>
+					<p:column headerText="Last Modified Time" style="text-align:right"
+						sortBy="#{question.formatModDate}">
+						<h:outputText value="#{question.formatModDate}" />
+					</p:column>
+					<p:column headerText="Items">
+						<h:outputText value="#{question.formatItems}" />
+					</p:column>
+				</p:dataTable>
+				<p:commandButton value="OK"
+					actionListener="#{questionnaireControler.addQuestions}"
+					update=":mainForm" process=":questionListForm"
+					onclick="availableList_w.hide();" />
+				<p:commandButton value="Cancel" onclick="availableList_w.hide()"
+					immediate="true" />
+			</p:panel>
+		</h:form>
+	</p:dialog>
+
+	<p:dialog id="reorder" header="Reorder Questions" widgetVar="reorder_w"
+		closable="true" modal="true">
+		<h:form id="reorderForm">
+			<p:orderList id="orderList"
+				value="#{questionnaireControler.editDto.questions}" var="question"
+				itemValue="#{question}" converter="questionConverter"
+				controlsLocation="left">
+				<p:column>
+					<h:outputText value="#{question.name}" />
+				</p:column>
+			</p:orderList>
+			<p:commandButton value="OK" process="@this orderList" ajax="true"
+				actionListener="#{questionnaireControler.reorder}"
+				oncomplete="reorder_w.hide()" update=":mainForm" />
+			<p:commandButton value="Cancel" onclick="reorder_w.hide()" />
+		</h:form>
+	</p:dialog>
+
+
+
+	<p:dialog id="editQuestion" widgetVar="editQuestion_w"
+		header="Question Info" closable="true" modal="true">
+		<h:form id="questionForm">
+			<p:messages id="messages" closable="true" />
+			<p:panelGrid>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Question" for="name" />
+					</p:column>
+					<p:column>
+						<h:outputText id="name"
+							value="#{questionnaireControler.editQuestion.name}" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Type" />
+					</p:column>
+					<p:column>
+						<h:outputText
+							value="#{questionnaireControler.editQuestion.type.name}" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column colspan="2">
+						<p:outputPanel id="options">
+							<p:panel header="Options"
+								rendered="#{questionnaireControler.editQuestion.type.seq != 3}">
+								<p:selectManyCheckbox>
+									<f:selectItems
+										value="#{questionnaireControler.editQuestion.items}" />
+								</p:selectManyCheckbox>
+							</p:panel>
+						</p:outputPanel>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+			<p:separator />
+			<p:commandButton value="OK" onclick="editQuestion_w.hide()"
+				immediate="true" />
+		</h:form>
+	</p:dialog>
+</h:body>
+</html>

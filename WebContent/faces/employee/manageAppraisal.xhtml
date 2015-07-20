@@ -1,0 +1,391 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+	<link rel="stylesheet" href="../../css/manageAppraisal.css" />
+	<link rel="stylesheet" href="../../css/noborder.css" />
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:messages autoUpdate="true" closable="true" />
+		<p:tabView orientation="left" id="tabView"
+			activeIndex="#{manageAppraisalControler.activeIndex}">
+			<p:ajax event="tabChange"
+				listener="#{manageAppraisalControler.changeTab}" update="tabView" />
+			<p:tab>
+				<f:facet name="title">
+					<p:panel
+						header="#{manageAppraisalControler.appraisal.employee.name}">
+						<p:graphicImage
+							value="/photo/#{manageAppraisalControler.appraisal.employee.photoName}"
+							width="200px" height="200px" />
+					</p:panel>
+				</f:facet>
+			</p:tab>
+			<p:tab title="Details">
+				<p:panel id="details"
+					header="#{manageAppraisalControler.appraisal.template.name}: Details">
+					<p:panelGrid columns="2">
+						<p:outputLabel value="Employee Name" />
+						<h:outputText
+							value="#{manageAppraisalControler.appraisal.employee.name}" />
+
+						<p:outputLabel value="Description" for="description" />
+						<h:outputText
+							value="#{manageAppraisalControler.appraisal.description}"
+							rendered="#{!manageAppraisalControler.editDetailMode}" />
+						<p:inputText id="description"
+							value="#{manageAppraisalControler.appraisal.description}"
+							required="true" requiredMessage="Description is required."
+							rendered="#{manageAppraisalControler.editDetailMode}" />
+
+						<p:outputLabel value="Header Template" for="template" />
+						<h:outputText
+							value="#{manageAppraisalControler.appraisal.template.name}"
+							rendered="#{!manageAppraisalControler.editDetailMode}" />
+						<p:selectOneMenu id="template" required="true"
+							requiredMessage="Template is required."
+							value="#{manageAppraisalControler.appraisal.template.seq}"
+							rendered="#{manageAppraisalControler.editDetailMode}">
+							<f:selectItems value="#{templateControler.baseList}"
+								var="template" itemLabel="#{template.name}"
+								itemValue="#{template.seq}" />
+						</p:selectOneMenu>
+
+						<p:outputLabel value="From" for="from" />
+						<p:calendar id="from"
+							disabled="#{!manageAppraisalControler.editDetailMode}"
+							value="#{manageAppraisalControler.appraisal.from}" showOn="both"
+							required="true" requiredMessage="From Date is required."
+							pattern="yyyy-MM-dd" />
+
+						<p:outputLabel value="To" for="to" />
+						<p:calendar id="to"
+							disabled="#{!manageAppraisalControler.editDetailMode}"
+							value="#{manageAppraisalControler.appraisal.to}" showOn="both"
+							required="true" requiredMessage="To Date is required."
+							pattern="yyyy-MM-dd" />
+
+						<p:outputLabel value="Due" for="due" />
+						<p:calendar id="due"
+							disabled="#{!manageAppraisalControler.editDetailMode}"
+							value="#{manageAppraisalControler.appraisal.due}" showOn="both"
+							required="true" requiredMessage="Due Date is required."
+							pattern="yyyy-MM-dd" />
+					</p:panelGrid>
+					<p:separator />
+					<p:commandButton value="Edit"
+						rendered="#{!manageAppraisalControler.editDetailMode}"
+						actionListener="#{manageAppraisalControler.startEditDetail}"
+						update="details" />
+					<p:commandButton value="Save"
+						rendered="#{manageAppraisalControler.editDetailMode}"
+						actionListener="#{manageAppraisalControler.applyDetail}"  onclick="clearAppraisalControler()"
+						update="details" />
+					<p:commandButton value="Back"
+						action="#{mainMenuControler.transfer}">
+						<f:setPropertyActionListener
+							target="#{mainMenuControler.nextMenu}"
+							value="/faces/employee/appraisal.jsf" />
+					</p:commandButton>
+				</p:panel>
+			</p:tab>
+			<p:tab title="Form Design">
+				<p:outputPanel id="formDesign">
+					<p:panel id="design"
+						rendered="#{manageAppraisalControler.browseMode}"
+						header="#{manageAppraisalControler.appraisal.template.name}: Form Design">
+						<p:panel>
+							<f:facet name="header">
+								<p:outputPanel>
+									<p:commandLink value="Competencies" onclick="PF('cw_w').show()"
+										update=":cwContent" />
+									<p:outputLabel
+										value="(Weight #{manageAppraisalControler.appraisal.competencyWeight})" />
+									<p:commandButton value="Edit Section" style="float:right"
+										actionListener="#{manageAppraisalControler.startEditCompetencies}"
+										update="formDesign" />
+								</p:outputPanel>
+							</f:facet>
+							<p:dataTable value="#{manageAppraisalControler.acSelecteds}"
+								var="ac">
+								<p:column headerText="Competency" width="80%">
+									<h:outputText value="#{ac.competency.name}" />
+								</p:column>
+								<p:column headerText="Weight" width="20%">
+									<h:outputText value="#{ac.ratio}" />
+								</p:column>
+							</p:dataTable>
+						</p:panel>
+
+
+						<p:panel>
+							<f:facet name="header">
+								<p:outputPanel>
+									<p:commandLink value="Goals" onclick="PF('gw_w').show()"
+										update=":gwContent" />
+									<p:outputLabel
+										value="(Weight #{manageAppraisalControler.appraisal.goalWeight})" />
+									<p:commandButton value="Edit Section" style="float:right"
+										actionListener="#{manageAppraisalControler.startEditGoals}"
+										update="formDesign" />
+								</p:outputPanel>
+							</f:facet>
+							<p:dataTable value="#{manageAppraisalControler.agSelecteds}"
+								var="ac">
+								<p:column headerText="Goal" width="80%">
+									<h:outputText value="#{ac.goal.name}" />
+								</p:column>
+								<p:column headerText="Weight" width="20%">
+									<h:outputText value="#{ac.ratio}" />
+								</p:column>
+							</p:dataTable>
+						</p:panel>
+
+						<p:panel>
+							<f:facet name="header">
+								<p:outputPanel>
+									<p:commandLink value="Questions" onclick="PF('qw_w').show()"
+										update=":qwContent" />
+									<p:outputLabel
+										value="(Weight #{manageAppraisalControler.appraisal.questionWeight})" />
+									<p:commandButton value="Edit Section" style="float:right"
+										actionListener="#{manageAppraisalControler.startEditQuestions}"
+										update="formDesign" />
+								</p:outputPanel>
+							</f:facet>
+							<p:dataTable value="#{manageAppraisalControler.aqSelecteds}"
+								var="ac">
+								<p:column headerText="Question" width="80%">
+									<h:outputText value="#{ac.question.name}" />
+								</p:column>
+								<p:column headerText="Weight" width="20%">
+									<h:outputText value="#{ac.ratio}" />
+								</p:column>
+							</p:dataTable>
+						</p:panel>
+
+					</p:panel>
+
+
+					<p:panel header="Edit Section: Competencies"
+						rendered="#{manageAppraisalControler.editCompetencyMode}">
+						<p:dataTable value="#{manageAppraisalControler.acListModel}"
+							var="ac">
+							<p:column headerText="Competency" width="60%">
+								<h:outputText value="#{ac.competency.name}" />
+							</p:column>
+							<p:column headerText="Include in Section" width="15%"
+								style="text-align:center">
+								<p:selectBooleanCheckbox value="#{ac.selected}">
+									<p:ajax update="acWeight"
+										listener="#{manageAppraisalControler.clearAcRatio(ac)}" />
+								</p:selectBooleanCheckbox>
+							</p:column>
+							<p:column headerText="Weight" width="25%">
+								<p:outputPanel id="acWeight">
+									<p:inputText id="cw" value="#{ac.ratio}" style="width:100%" />
+									<p:slider id="cwSlide" for="cw" style="width: 100%"
+										displayTemplate="Set weight to {value}%"
+										disabled="#{!ac.selected}" />
+								</p:outputPanel>
+							</p:column>
+						</p:dataTable>
+						<p:separator />
+						<p:commandButton value="Save"
+							actionListener="#{manageAppraisalControler.applyCompetencies}"
+							update=":mainForm:tabView:formDesign"  onclick="clearAppraisalControler()"/>
+						<p:spacer />
+						<p:commandButton value="Back"
+							actionListener="#{manageAppraisalControler.clearAll}"
+							update="formDesign" />
+					</p:panel>
+
+					<p:panel header="Edit Section: Goals"
+						rendered="#{manageAppraisalControler.editGoalMode}">
+						<p:dataTable value="#{manageAppraisalControler.agListModel}"
+							var="ag">
+							<p:column headerText="Goal" width="60%">
+								<h:outputText value="#{ag.goal.name}" />
+							</p:column>
+							<p:column headerText="Include in Section" width="15%"
+								style="text-align:center">
+								<p:selectBooleanCheckbox value="#{ag.selected}">
+									<p:ajax update="agWeight"
+										listener="#{manageAppraisalControler.clearAgRatio(ag)}" />
+								</p:selectBooleanCheckbox>
+							</p:column>
+							<p:column headerText="Weight" width="25%">
+								<p:outputPanel id="agWeight">
+									<p:inputText id="gw" value="#{ag.ratio}" style="width:100%" />
+									<p:slider id="gwSlide" for="gw" style="width: 100%"
+										displayTemplate="Set weight to {value}%"
+										disabled="#{!ag.selected}" />
+								</p:outputPanel>
+							</p:column>
+						</p:dataTable>
+						<p:separator />
+						<p:commandButton value="Save"
+							actionListener="#{manageAppraisalControler.applyGoals}"   onclick="clearAppraisalControler()"/>
+						<p:spacer />
+						<p:commandButton value="Back"
+							actionListener="#{manageAppraisalControler.clearAll}"
+							update="formDesign" />
+					</p:panel>
+
+					<p:panel header="Edit Section: Questions"
+						rendered="#{manageAppraisalControler.editQuestionMode}">
+						<p:dataTable value="#{manageAppraisalControler.aqListModel}"
+							var="aq">
+							<p:column headerText="Question" width="60%">
+								<h:outputText value="#{aq.question.name}" />
+							</p:column>
+							<p:column headerText="Include in Section" width="15%"
+								style="text-align:center">
+								<p:selectBooleanCheckbox value="#{aq.selected}">
+									<p:ajax update="aqWeight"
+										listener="#{manageAppraisalControler.clearAqRatio(aq)}" />
+								</p:selectBooleanCheckbox>
+							</p:column>
+							<p:column headerText="Weight" width="25%">
+								<p:outputPanel id="aqWeight">
+									<p:inputText id="qw" value="#{aq.ratio}" style="width:100%" />
+									<p:slider id="qwSlide" for="qw" style="width: 100%"
+										displayTemplate="Set weight to {value}%"
+										disabled="#{!aq.selected}" />
+								</p:outputPanel>
+							</p:column>
+						</p:dataTable>
+						<p:separator />
+						<p:commandButton value="Save"
+							actionListener="#{manageAppraisalControler.applyQuestions}"  onclick="clearAppraisalControler()"/>
+						<p:spacer />
+						<p:commandButton value="Back"
+							actionListener="#{manageAppraisalControler.clearAll}"
+							update="formDesign" />
+					</p:panel>
+
+				</p:outputPanel>
+			</p:tab>
+			<p:tab title="Evaluators">
+				<p:panel
+					header="#{manageAppraisalControler.appraisal.template.name} : Evaluators">
+					<p:pickList value="#{manageAppraisalControler.evaluators}"
+						var="employee" itemValue="#{employee}"
+						itemLabel="#{employee.name}" required="true"
+						requiredMessage="Evaluators are required." showCheckbox="true"
+						showSourceFilter="true" showTargetFilter="true"
+						filterMatchMode="contains" converter="employeeConverter">
+						<f:facet name="sourceCaption">Available Evaluators</f:facet>
+						<f:facet name="targetCaption">Assigned Evaluators</f:facet>
+					</p:pickList>
+					<p:separator/>
+					<p:commandButton value="Save"
+						actionListener="#{manageAppraisalControler.applyEvaluators}" onclick="clearAppraisalControler()"/>
+					<p:spacer/>
+					<p:commandButton value="Back"
+						action="#{mainMenuControler.transfer}">
+						<f:setPropertyActionListener
+							target="#{mainMenuControler.nextMenu}"
+							value="/faces/employee/appraisal.jsf" />
+					</p:commandButton>
+				</p:panel>
+			</p:tab>
+		</p:tabView>
+		<p:remoteCommand name="clearAppraisalControler" actionListener="#{appraisalControler.clear}"/>
+	</h:form>
+	<p:dialog id="cw" widgetVar="cw_w" closable="true" resizable="false"
+		draggable="true" modal="true" header="Edit Section">
+		<h:form id="cwContent">
+			<p:panelGrid columns="2">
+				<p:outputLabel value="Section Name" />
+				<h:outputText value="Competencies" />
+				<p:outputLabel value="Competency Weight" />
+				<p:outputPanel>
+					<p:inputText id="cws"
+						value="#{manageAppraisalControler.appraisal.competencyWeight}" />
+					<p:slider for="cws" step="5" />
+				</p:outputPanel>
+			</p:panelGrid>
+			<p:separator />
+			<p:commandButton value="Save"
+				action="#{manageAppraisalControler.applyDetail}"
+				update=":mainForm:tabView:formDesign"  onclick="clearAppraisalControler()"/>
+			<p:spacer />
+			<p:commandButton value="Cancel" onclick="cw_w.hide()"
+				immediate="true" />
+		</h:form>
+	</p:dialog>
+
+	<p:dialog id="gw" widgetVar="gw_w" closable="true" resizable="false"
+		draggable="true" modal="true" header="Edit Section">
+		<h:form id="gwContent">
+			<p:panelGrid columns="2">
+				<p:outputLabel value="Section Name" />
+				<h:outputText value="Goals" />
+				<p:outputLabel value="Goal Weight" />
+				<p:outputPanel>
+					<p:inputText id="gws"
+						value="#{manageAppraisalControler.appraisal.goalWeight}" />
+					<p:slider for="gws" step="5" />
+				</p:outputPanel>
+			</p:panelGrid>
+			<p:separator />
+			<p:commandButton value="Save"
+				action="#{manageAppraisalControler.applyDetail}"
+				update=":mainForm:tabView:formDesign"  onclick="clearAppraisalControler()"/>
+			<p:spacer />
+			<p:commandButton value="Cancel" onclick="gw_w.hide()"
+				immediate="true" />
+		</h:form>
+	</p:dialog>
+
+	<p:dialog id="qw" widgetVar="qw_w" closable="true" resizable="false"
+		draggable="true" modal="true" header="Edit Section">
+		<h:form id="qwContent">
+			<p:panelGrid columns="2">
+				<p:outputLabel value="Section Name" />
+				<h:outputText value="Questions" />
+				<p:outputLabel value="Question Weight" />
+				<p:outputPanel>
+					<p:inputText id="qws"
+						value="#{manageAppraisalControler.appraisal.questionWeight}" />
+					<p:slider for="qws" step="5" />
+				</p:outputPanel>
+			</p:panelGrid>
+			<p:separator />
+			<p:commandButton value="Save"
+				action="#{manageAppraisalControler.applyDetail}"
+				update=":mainForm:tabView:formDesign"  onclick="clearAppraisalControler()"/>
+			<p:spacer />
+			<p:commandButton value="Cancel" onclick="qw_w.hide()"
+				immediate="true" />
+		</h:form>
+	</p:dialog>
+
+	<p:dialog id="weightErrorDialog" widgetVar="weightErrorDialog_w"
+		closable="true" resizable="false" draggable="true" modal="true"
+		header="Validation Error">
+		<p:outputLabel value="Total of the weights should be 100" />
+		<p:separator />
+		<p:commandButton value="OK" onclick="weightErrorDialog_w.hide()" />
+	</p:dialog>
+</h:body>
+</html>

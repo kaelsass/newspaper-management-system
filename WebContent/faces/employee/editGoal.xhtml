@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="Goal">
+			<p:messages id="messages" closable="true" />
+			<p:panelGrid columns="2">
+				<p:outputLabel value="Type" for="type" />
+				<p:selectOneMenu id="type" value="#{goalControler.editDto.type.seq}">
+					<f:selectItems value="#{goalTypeControler.baseList}" var="type"
+						itemLabel="#{type.name}" itemValue="#{type.seq}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel value="Goal Name" for="name" />
+				<p:inputText id="name" value="#{goalControler.editDto.name}"
+					required="true" requiredMessage="Goal Name is required." />
+
+				<p:outputLabel value="Description" />
+				<p:outputPanel>
+					<p:inputTextarea value="#{goalControler.editDto.description}"
+						rows="5" cols="30" counter="desDisplay" maxlength="500"
+						counterTemplate="{0} characters remaining." autoResize="false"
+						style="display:block" />
+					<h:outputText id="desDisplay" />
+				</p:outputPanel>
+
+				<p:outputLabel value="Due Date" for="due" />
+				<p:calendar id="due" value="#{goalControler.editDto.due}"
+					showOn="both" pattern="yyyy-MM-dd" required="true"
+					requiredMessage="Due Date is required." />
+
+				<p:outputLabel value="Status" for="status" />
+				<p:selectOneMenu id="status"
+					value="#{goalControler.editDto.status.seq}">
+					<f:selectItems value="#{goalStatusControler.baseList}" var="type"
+						itemLabel="#{type.name}" itemValue="#{type.seq}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel value="Completion(%)" for="completion" />
+				<p:outputPanel>
+					<p:inputText id="completion" value="#{goalControler.editDto.completion}" required="true" requiredMessage="Completion Ratio is required."/>
+					<p:slider for="completion" step="5"/>
+				</p:outputPanel>
+
+				<p:outputLabel value="Assigned to" for="owner"/>
+				<p:autoComplete id="owner" value="#{goalControler.editDto.employee.name}"
+					placeholder="Type for hint..." required="true" requiredMessage="Owner is required."
+					completeMethod="#{workInfoControler.completeEmployeeName}"
+					validator="#{workInfoControler.nameValidate}" />
+
+			</p:panelGrid>
+			<p:commandButton value="Save" actionListener="#{goalControler.apply}"
+				update="messages" action="#{mainMenuControler.transfer}"
+				onclick="blockui.show()" oncomplete="blockui.hide()">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/employee/goal.jsf" />
+			</p:commandButton>
+			<p:commandButton value="Cancel"
+				actionListener="#{goalControler.clear}" immediate="true"
+				action="#{mainMenuControler.transfer}" onclick="blockui.show()">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/employee/goal.jsf" />
+			</p:commandButton>
+		</p:panel>
+	</h:form>
+</h:body>
+</html>

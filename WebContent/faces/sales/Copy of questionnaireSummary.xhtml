@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<link rel="stylesheet" href="../../css/questionnaire.css" />
+	<link rel="stylesheet" href="../../css/addQRecord.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="Questionnaire Statistics">
+			<p:messages id="messages" closable="true" />
+			<p:tabView id="tabView"
+				activeIndex="#{questionnaireControler.activeIndex}">
+				<p:tab title="Record List">
+					<p:panel header="Search Records">
+						<p:panelGrid columns="2" id="searchOptions"
+							style="margin:0;width:100%;">
+							<p:outputPanel>
+								<p:outputLabel style="display:block" value="From" />
+								<p:calendar label="From"
+									value="#{questionnaireControler.recordCondition.from}"
+									showOn="both" pattern="yyyy-MM-dd" />
+							</p:outputPanel>
+							<p:outputPanel>
+								<p:outputLabel style="display:block" value="To" />
+								<p:calendar label="To"
+									value="#{questionnaireControler.recordCondition.to}"
+									showOn="both" pattern="yyyy-MM-dd" />
+							</p:outputPanel>
+						</p:panelGrid>
+						<p:separator />
+						<p:commandButton value="Search" update="recordTable"
+							actionListener="#{questionnaireControler.searchRecord}" />
+						<p:commandButton value="Reset" update="searchOptions"
+							actionListener="#{questionnaireControler.recordCondition.clear}" />
+					</p:panel>
+					<p:panel header="Record List">
+						<p:commandButton value="Add"
+							actionListener="#{questionnaireControler.startAddRecord}"
+							action="#{mainMenuControler.transfer}">
+							<f:setPropertyActionListener
+								target="#{mainMenuControler.nextMenu}"
+								value="/faces/sales/addQRecord.jsf" />
+						</p:commandButton>
+						<p:commandButton value="Delete"
+							onclick="PF('deleteConfirm_w').show();" />
+
+						<p:dataTable id="recordTable" rowIndexVar="index"
+							value="#{questionnaireControler.recordListModel}" var="record"
+							selection="#{questionnaireControler.selectedRecords}" rows="10">
+							<p:column width="2%" selectionMode="multiple">
+							</p:column>
+							<p:column headerText="Index">
+								<h:outputText value="#{index+1}" />
+							</p:column>
+							<p:column sortBy="#{record.formatDate}" headerText="Submit Time">
+								<h:outputText value="#{record.formatDate}" />
+							</p:column>
+
+							<p:column headerText="Elapsed Time(Seconds)">
+								<h:outputText value="#{record.time}" />
+							</p:column>
+							<p:column headerText="IP">
+								<h:outputText value="#{record.ip}" />
+							</p:column>
+							<p:column style="text-align:center">
+								<p:commandButton update=":mainForm:tabView:recordPanel"
+									icon="ui-icon-search"
+									actionListener="#{questionnaireControler.startViewRecord(record)}">
+								</p:commandButton>
+							</p:column>
+						</p:dataTable>
+					</p:panel>
+
+					<p:outputPanel id="recordPanel">
+						<p:panel header="Record Detail"
+							rendered="#{questionnaireControler.viewMode}">
+							<p:dataTable
+								value="#{questionnaireControler.editRecord.questions}"
+								var="question">
+								<p:column headerText="Question">
+									<h:outputText value="#{question.index}.&nbsp;#{question.name}" />
+								</p:column>
+								<p:column headerText="Type">
+									<h:outputText value="#{question.type.name}" />
+								</p:column>
+								<p:column headerText="Answer">
+									<h:outputText value="#{question.selectedItem}"
+										rendered="#{question.type.seq == 1 }" />
+									<h:outputText value="#{question.formatSelectedItems}"
+										rendered="#{question.type.seq == 2}" />
+									<h:outputText value="#{question.answer}"
+										rendered="#{question.type.seq == 3}" />
+								</p:column>
+							</p:dataTable>
+							<p:separator />
+							<p:commandButton value="Close"
+								actionListener="#{questionnaireControler.endViewRecord}"
+								update=":mainForm:tabView:recordPanel" />
+						</p:panel>
+					</p:outputPanel>
+					<p:confirmDialog id="deleteConfirm"
+						widgetVar="deleteConfirm_w"
+						message="Are you sure to delete these records?"
+						header="NP Pillar - Confirm Required" severity="alert">
+						<p:focus context="deleteConfirm_w" for="cancelBtn1" />
+						<p:commandButton value="OK" update=":mainForm:tabView:recordTable"
+							onclick="PF('deleteConfirm_w').hide();"
+							actionListener="#{questionnaireControler.deleteRecord}" />
+						<p:commandButton id="cancelBtn1" value="Cancel"
+							onclick="PF('deleteConfirm_w').hide();" />
+					</p:confirmDialog>
+				</p:tab>
+			</p:tabView>
+		</p:panel>
+	</h:form>
+</h:body>
+</html>

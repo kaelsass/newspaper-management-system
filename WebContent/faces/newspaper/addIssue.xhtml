@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<link rel="stylesheet" href="../../css/noborder.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="Add Issue">
+			<p:panelGrid style="border:none;margin:0;width:900px;">
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Newspaper" />
+					</p:column>
+					<p:column>
+						<p:selectOneMenu value="#{issueControler.editDto.newspaper.seq}"
+							style="width:180px" validator="#{newspaperControler.seqValidate}">
+							<f:selectItem itemLabel="-- Select --" itemValue="0" />
+							<f:selectItems value="#{newspaperControler.allList}"
+								var="newspaper" itemLabel="#{newspaper.name}"
+								itemValue="#{newspaper.seq}" />
+							<p:ajax listener="#{issueControler.selectNewspaper}"
+								update="mainForm" />
+						</p:selectOneMenu>
+					</p:column>
+					<p:column></p:column>
+
+					<p:column>
+						<p:outputLabel value="Quantity"
+							rendered="#{issueControler.editDto.newspaper.seq > 0}" />
+					</p:column>
+					<p:column>
+						<p:spinner value="#{issueControler.editDto.quantity}" min="1"
+							rendered="#{issueControler.editDto.newspaper.seq > 0}"
+							stepFactor="200" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Issue Number"
+							rendered="#{issueControler.editDto.newspaper.seq > 0}" />
+					</p:column>
+					<p:column>
+						<p:outputPanel style="width:100%">
+							<p:spinner value="#{issueControler.editDto.number}"
+								rendered="#{issueControler.editDto.newspaper.seq > 0}"
+								required="true" requiredMessage="Issue number is required."
+								validator="#{issueControler.numberValidate}" />
+						</p:outputPanel>
+						<h:outputText
+							rendered="#{issueControler.editDto.newspaper.seq > 0}"
+							value="You have added #{issueControler.issueCount} issues." />
+					</p:column>
+					<p:column></p:column>
+					<p:column>
+						<p:outputLabel value="Issue Date"
+							rendered="#{issueControler.editDto.newspaper.seq > 0}" />
+					</p:column>
+					<p:column>
+						<p:outputPanel
+							rendered="#{issueControler.editDto.newspaper.seq > 0}">
+							<p:calendar value="#{issueControler.editDto.time}"
+								navigator="true" showOn="both" pattern="yyyy-MM-dd"
+								required="true" requiredMessage="Issue Date is required." />
+						</p:outputPanel>
+
+						<h:outputText rendered="#{issueControler.editDto.newspaper.seq > 0}"
+							value="Next Issue Date is #{issueControler.editDto.formatTime}" />
+					</p:column>
+				</p:row>
+
+			</p:panelGrid>
+			<p:messages autoUpdate="true" />
+			<p:separator />
+			<p:commandButton value="Save"
+				actionListener="#{issueControler.apply}"
+				action="#{mainMenuControler.transfer}" onclick="blockui.show()"
+				oncomplete="blockui.hide()">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/newspaper/issue.jsf" />
+			</p:commandButton>
+			<p:commandButton value="Cancel"
+				actionListener="#{issueControler.clear}"
+				action="#{mainMenuControler.transfer}" onclick="blockui.show()"
+				oncomplete="blockui.hide()" immediate="true">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/newspaper/issue.jsf" />
+			</p:commandButton>
+		</p:panel>
+	</h:form>
+</h:body>
+</html>

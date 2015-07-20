@@ -1,0 +1,6 @@
+@CHARSET "UTF-8";
+.ui-panel .ui-panel-content
+{
+	margin:0 auto;
+	padding: 5px;
+}

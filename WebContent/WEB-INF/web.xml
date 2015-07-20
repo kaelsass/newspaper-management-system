@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+	<display-name>PrimeSecond</display-name>
+	<servlet>
+		<servlet-name>Faces Servlet</servlet-name>
+		<servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Faces Servlet</servlet-name>
+		<url-pattern>*.jsf</url-pattern>
+	</servlet-mapping>
+	<context-param>
+		<param-name>javax.faces.DEFAULT_SUFFIX</param-name>
+		<param-value>.xhtml</param-value>
+	</context-param>
+	<context-param>
+		<param-name>primefaces.THEME</param-name>
+		<param-value>cupertino</param-value>
+	</context-param>
+	<filter>
+		<filter-name>PrimeFaces FileUpload Filter</filter-name>
+		<filter-class>org.primefaces.webapp.filter.FileUploadFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>PrimeFaces FileUpload Filter</filter-name>
+		<servlet-name>Faces Servlet</servlet-name>
+	</filter-mapping>
+	<filter>
+		<filter-name>adminFilter</filter-name>
+		<filter-class>npp.utils.AdminFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>adminFilter</filter-name>
+		<url-pattern>/faces/admin/*</url-pattern>
+	</filter-mapping>
+	<filter>
+		<filter-name>employeeFilter</filter-name>
+		<filter-class>npp.utils.EmployeeFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>employeeFilter</filter-name>
+		<url-pattern>/faces/employee/*</url-pattern>
+	</filter-mapping>
+	<filter>
+		<filter-name>hrFilter</filter-name>
+		<filter-class>npp.utils.HRFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>hrFilter</filter-name>
+		<url-pattern>/faces/hr/*</url-pattern>
+	</filter-mapping>
+	<filter>
+		<filter-name>newspaperFilter</filter-name>
+		<filter-class>npp.utils.NewspaperFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>newspaperFilter</filter-name>
+		<url-pattern>/faces/newspaper/*</url-pattern>
+	</filter-mapping>
+	<filter>
+		<filter-name>salesFilter</filter-name>
+		<filter-class>npp.utils.SalesFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>salesFilter</filter-name>
+		<url-pattern>/faces/sales/*</url-pattern>
+	</filter-mapping>
+
+	<servlet>
+		<servlet-name>LoginServlet</servlet-name>
+		<servlet-class>npp.utils.LoginServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>InvalidateServlet</servlet-name>
+		<servlet-class>npp.utils.InvalidateServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>LoginServlet</servlet-name>
+		<url-pattern>/loginServlet</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>InvalidateServlet</servlet-name>
+		<url-pattern>/invalidateServlet</url-pattern>
+	</servlet-mapping>
+	<welcome-file-list>
+		<welcome-file>login.jsf</welcome-file>
+	</welcome-file-list>
+	<servlet>
+		<servlet-name>SendMail</servlet-name>
+		<servlet-class>npp.utils.SendMail</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>SendMail</servlet-name>
+		<url-pattern>/sendMail</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>ipUtil</servlet-name>
+		<servlet-class>npp.utils.IPUtil</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>ipUtil</servlet-name>
+		<url-pattern>/ipUtil</url-pattern>
+	</servlet-mapping>
+</web-app>

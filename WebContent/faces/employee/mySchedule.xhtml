@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<link rel="stylesheet" href="../../css/schedule.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+
+	<h:form id="mainForm">
+		<p:messages autoUpdate="true" closable="true" />
+		<p:layout
+			style="min-width:400px;min-height:200px;width:100%;height:900px">
+			<p:layoutUnit position="center">
+				<p:outputPanel>
+					<p:schedule value="#{scheduleControler.eventModel}" editable="true"
+						style="width:100% !important; height:50%" resizable="true"
+						widgetVar="myschedule" timeFormat="HH:mm">
+						<p:ajax event="dateSelect"
+							listener="#{scheduleControler.onDateSelect}"
+							update=":dialogForm:eventDetails"
+							oncomplete="PF('eventDialog_w').show();" />
+						<p:ajax event="eventSelect"
+							listener="#{scheduleControler.onEventSelect}"
+							update=":dialogForm:eventDetails"
+							oncomplete="PF('eventDialog_w').show();" />
+						<p:ajax event="eventMove"
+							listener="#{scheduleControler.onEventMove}" />
+						<p:ajax event="eventResize"
+							listener="#{scheduleControler.onEventResize}" />
+					</p:schedule>
+				</p:outputPanel>
+			</p:layoutUnit>
+			<p:layoutUnit position="east" size="40%">
+				<p:panel style="height:100%">
+					<p:commandButton value="Add"
+						actionListener="#{scheduleControler.startAdd}"
+						onclick="eventDialog_w.show()" update=":dialogForm:eventDetails" />
+					<p:commandButton value="Delete"
+						actionListener="#{scheduleControler.startDelete}"
+						onclick="deleteConfirm_w.show()" />
+					<p:dataTable id="scheduleTable"
+						value="#{scheduleControler.listModel}" var="event"
+						rowStyleClass="#{event.needNotify ?  'orange' : (event.expire ? 'red' : 'null')}"
+						selection="#{scheduleControler.selecteds}">
+						<f:facet name="header">
+            				Event List
+        				</f:facet>
+						<p:column selectionMode="multiple" width="2%" />
+						<p:column headerText="Title">
+							<p:commandLink value="#{event.title}"
+								actionListener="#{scheduleControler.startEdit}"
+								onclick="eventDialog_w.show()" update=":dialogForm:eventDetails">
+								<f:attribute name="event" value="#{event}" />
+							</p:commandLink>
+						</p:column>
+						<p:column headerText="Time">
+							<h:outputText value="#{event.formatDate}" />
+						</p:column>
+						<p:column style="width:10%" headerText="Status">
+							<p:selectOneMenu value="#{event.complete}">
+								<f:selectItem itemLabel="Complete" itemValue="1" />
+								<f:selectItem itemLabel="In Process" itemValue="0" />
+								<p:ajax listener="#{scheduleControler.applyStatus(event)}"
+									update="scheduleTable" />
+							</p:selectOneMenu>
+						</p:column>
+					</p:dataTable>
+				</p:panel>
+			</p:layoutUnit>
+		</p:layout>
+
+		<p:confirmDialog id="deleteConfirm" widgetVar="deleteConfirm_w"
+			message="Are you sure to delete these tracker logs?"
+			visible="#{scheduleControler.deleteMode}"
+			header="NP Pillar - Confirm Required" severity="alert">
+			<p:focus context="deleteConfirm" for="cancelBtn" />
+			<p:commandButton id="confirmBtn" value="OK" update="mainForm"
+				onclick="PF('deleteConfirm_w').hide();"
+				actionListener="#{scheduleControler.delete}" />
+			<p:commandButton id="cancelBtn" value="Cancel" immediate="true"
+				onclick="PF('deleteConfirm_w').hide();" />
+		</p:confirmDialog>
+
+	</h:form>
+	<p:dialog id="eventDialog" widgetVar="eventDialog_w" modal="true" showEffect="fade"
+		visible="#{scheduleControler.addMode or scheduleControler.editMode}"
+		header="Event Details">
+		<h:form id="dialogForm">
+			<p:outputPanel id="eventDetails">
+				<p:messages id="dialogMessage" autoUpdate="true" closable="true" />
+				<p:panelGrid columns="2">
+					<p:outputLabel for="title" value="Title" />
+					<p:inputText id="title" value="#{scheduleControler.editDto.title}"
+						required="true" requiredMessage="Title is required." />
+					<p:outputLabel for="from" value="From" />
+					<p:calendar id="from" value="#{scheduleControler.editDto.dateFrom}"
+						showOn="both" showButtonPanel="true" pattern="yyyy-MM-dd HH:mm"
+						required="true" requiredMessage="From Date is required." />
+					<p:outputLabel for="to" value="To" />
+					<p:calendar id="to" value="#{scheduleControler.editDto.dateTo}"
+						showOn="both" showButtonPanel="true" pattern="yyyy-MM-dd HH:mm"
+						required="true" requiredMessage="To Date is required." />
+					<p:outputLabel value="Notify Time" />
+					<p:selectOneMenu value="#{scheduleControler.editDto.reminder.seq}">
+						<f:selectItems value="#{reminderControler.baseList}"
+							var="reminder" itemLabel="#{reminder.name}"
+							itemValue="#{reminder.seq}" />
+					</p:selectOneMenu>
+
+					<p:outputLabel value="Email Notification" />
+					<p:selectBooleanCheckbox
+						value="#{scheduleControler.editDto.emailNotification}">
+						<p:ajax update="emailNotification email" />
+					</p:selectBooleanCheckbox>
+					<p:outputPanel id="emailNotification">
+						<p:outputLabel value="Email"
+							rendered="#{scheduleControler.editDto.emailNotification}" />
+					</p:outputPanel>
+					<p:outputPanel id="email">
+						<p:inputText value="#{scheduleControler.editDto.email}"
+							rendered="#{scheduleControler.editDto.emailNotification}"
+							validator="#{workInfoControler.emailValidate}" />
+					</p:outputPanel>
+					<p:outputLabel for="note" value="Note" />
+					<p:inputTextarea id="note"
+						value="#{scheduleControler.editDto.note}" rows="5" cols="30"
+						maxlength="200" autoResize="false" style="display:block" />
+				</p:panelGrid>
+				<p:separator />
+				<p:outputPanel id="operationBtns" style="float:left"
+					rendered="#{scheduleControler.editMode}">
+					<p:commandButton value="Mark Complete"
+						rendered="#{scheduleControler.editDto.complete == 0}"
+						actionListener="#{scheduleControler.markComplete(1)}"
+						update="operationBtns" />
+					<p:commandButton value="Reopen"
+						rendered="#{scheduleControler.editDto.complete == 1}"
+						actionListener="#{scheduleControler.markComplete(0)}"
+						update="operationBtns" />
+				</p:outputPanel>
+				<p:outputPanel style="float:right">
+					<p:commandButton value="Save"
+						actionListener="#{scheduleControler.addEvent}"
+						update=":mainForm :eventDialog" />
+					<p:commandButton value="Cancel" immediate="true"
+						actionListener="#{scheduleControler.clear}"
+						onclick="eventDialog_w.hide();" />
+				</p:outputPanel>
+			</p:outputPanel>
+		</h:form>
+	</p:dialog>
+</h:body>
+</html>

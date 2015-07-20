@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="Performance Trackers List">
+			<p:dataTable id="trackerTable" value="#{trackerControler.listModel}"
+				var="tracker" selection="#{trackerControler.selecteds}" rows="10">
+				<p:column style="width:10%" headerText="Tracker Name"
+					sortBy="#{tracker.name}">
+					<p:commandLink value="#{tracker.name}"
+						actionListener="#{trackerLogControler.startEditTracker}" action="#{mainMenuControler.transfer}">
+						<f:attribute name="tracker" value="#{tracker}" />
+						<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}" value="/faces/employee/editTrackerLog.jsf"/>
+					</p:commandLink>
+				</p:column>
+				<p:column style="width:10%" headerText="Employee Name"
+					sortBy="#{tracker.employee.name}">
+					<h:outputText value="#{tracker.employee.name}" />
+				</p:column>
+				<p:column style="width:10%" headerText="Added Date"
+					sortBy="#{tracker.formatAddDate}">
+					<h:outputText value="#{tracker.formatAddDate}" />
+				</p:column>
+				<p:column style="width:10%" headerText="Modified Date"
+					sortBy="#{tracker.formatModDate}">
+					<h:outputText value="#{tracker.formatModDate}" />
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+	</h:form>
+</h:body>
+</html>

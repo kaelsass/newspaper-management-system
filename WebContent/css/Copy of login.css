@@ -1,0 +1,157 @@
+@CHARSET "UTF-8";
+
+* {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	color: #333;
+	font: 12px/22px 宋体, arial, serif;
+}
+
+a,a:link,a:visited {
+	color: #666;
+	text-decoration: none;
+}
+
+a:focus,input:focus {
+	outline: none;
+}
+
+img {
+	border: 0;
+}
+
+.loginBox {
+	margin: 100px auto;
+	width: 418px;
+	height: 303px;
+	border: 1px solid #ccc;
+}
+
+.loginBox .title {
+	font-family: "Microsoft YaHei", arial, serif;
+	font-size: 22px;
+	padding: 13px 0 0 20px;
+}
+
+.enterLogin {
+	display: block;
+}
+
+.scanLogin {
+	display: none;
+}
+
+.enterLogin form {
+	margin: 0 auto;
+	margin-top: 55px;
+	width: 270px;
+	height: 150px;
+}
+
+.enterLogin .lgnForm fieldset {
+	border: 0;
+	padding: 0;
+}
+
+.enterLogin .lgnForm legend {
+	display: none;
+}
+
+.enterLogin .lgnForm p {
+	margin-top: 15px;
+}
+
+.enterLogin .lgnForm .inputTxt {
+	width: 258px;
+	height: 38px;
+	border: 1px solid #ccc;
+	border-radius: 2px;
+	padding-left: 10px;
+	font-size: 14px;
+	color: #999;
+}
+
+.enterLogin .lgnForm .inputBtn {
+	width: 110px;
+	height: 33px;
+	background-color: #6c3;
+	border: 1px solid #3c0;
+	border-radius: 2px;
+	color: #fff;
+	font-size: 16px;
+	font-weight: bold;
+	letter-spacing: 3px;
+	line-height: 33px;
+	cursor: pointer;
+}
+
+.enterLogin .lgnForm .inputBtn:hover {
+	background-color: #5cd93a;
+}
+
+.enterLogin .footer {
+	color: #ccc;
+	text-align: right;
+	margin-top: 37px;
+	padding-right: 10px;
+}
+
+.enterLogin .footer a:hover,.scanLogin .footer a:hover {
+	text-decoration: underline;
+}
+
+.scanLogin {
+
+}
+
+.scanLogin .txt {
+	color: #000;
+	font-size: 14px;
+	text-align: center;
+	margin-top: 40px;
+}
+
+.scanLogin .pic {
+	margin: 0 auto;
+	margin-top: 20px;
+	width: 280px;
+	height: 115px;
+	background: url(../images/erwbg.jpg) no-repeat left center;
+}
+
+.scanLogin .pic img {
+	float: right;
+	width: 113px;
+	height: 113px;
+	border: 1px solid #ccc;
+}
+
+.scanLogin .footer {
+	color: #ccc;
+	text-align: right;
+	margin-top: 45px;
+	padding-right: 10px;
+}
+
+.checkInfo {
+	display: none;
+	position: absolute;
+	margin-top: -238px;
+	margin-left: 74px;
+	padding: 3px 15px 3px 15px;
+	background-color: #ffc;
+	border: 1px solid #fcc;
+}
+
+.drag {
+	position: absolute;
+	width: 55px;
+	height: 73px;
+	margin-top: -299px;
+	margin-left: 360px;
+	background: url(../images/drag.jpg) no-repeat center bottom;
+	cursor: pointer;
+}

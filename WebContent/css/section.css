@@ -1,0 +1,32 @@
+.ui-tabs-left > .ui-tabs-nav {
+width: 15%;
+height: 100%;
+}
+.ui-tabs .ui-tabs-panel {
+margin: 0 auto;
+padding: 5px 10px 5px 10px;
+margin-bottom: 2px;
+}
+
+.ui-tabs {
+	position: relative;
+	padding: 0;
+	margin: 0;
+	height: 96%;
+}
+
+.ui-tabs-left>.ui-tabs-panels {
+	float: left;
+	width: 83%;
+	height: 100%
+}
+
+.ui-accordion .ui-accordion-content
+{
+	padding: 5px;
+}
+
+ul, ol
+{
+	padding: 5px;
+}

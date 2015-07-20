@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title></h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel header="#{educationControler.addMode? 'Add Education' : 'Edit Education'}" rendered="#{!educationControler.browseMode}">
+		<p:panelGrid columns="2">
+			<p:outputLabel value="Name:"/>
+			<p:inputText value="#{educationControler.editDto.name}" validator="#{educationControler.nameValidate}"/>
+		</p:panelGrid>
+			<p:messages autoUpdate="true" closable="true"/>
+			<p:commandButton value="Save"
+				actionListener="#{educationControler.apply}"
+				update="mainForm"/>
+			<p:commandButton value="Cancel" immediate="true"
+				actionListener="#{educationControler.clear}" update="mainForm" />
+		</p:panel>
+		<p:panel header="Educations">
+			<p:commandButton value="Add" rendered="#{educationControler.browseMode}"
+				actionListener="#{educationControler.startAdd}"
+				update="mainForm"/>
+
+			<p:commandButton value="Delete" rendered="#{educationControler.browseMode}" onclick="PF('deleteConfirm_w').show();"
+				actionListener="#{educationControler.startDelete}" update="deleteConfirm" />
+			<p:spacer />
+			<p:dataTable value="#{educationControler.listModel}"
+				var="education" selection="#{educationControler.selecteds}" rows="10"
+				first="#{educationControler.first}">
+				<p:column style="width:1%;text-align: center" selectionMode="multiple" >
+				</p:column>
+				<p:column style="width:10%;text-align: center" sortBy="#{education.name}" headerText="Education">
+					<p:commandLink value="#{education.name}" actionListener="#{educationControler.startEdit}"
+						update=":mainForm">
+						<f:attribute name="education" value="#{education}" />
+					</p:commandLink>
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+				<p:confirmDialog id="deleteConfirm" widgetVar="deleteConfirm_w"
+			message="Are you sure to delete these educations?"
+			visible="#{educationControler.deleteMode}"
+			header="NP Pillar - Confirm Required" severity="alert">
+			<p:focus context="deleteConfirm" for="cancelBtn" />
+			<p:commandButton id="confirmBtn" value="OK" update="mainForm"
+				onclick="PF('deleteConfirm_w').hide();"
+				actionListener="#{educationControler.delete}" />
+			<p:commandButton id="cancelBtn" value="Cancel" actionListener="#{educationControler.endDelete}" immediate="true"
+				onclick="PF('deleteConfirm_w').hide();"/>
+		</p:confirmDialog>
+	</h:form>
+</h:body>
+</html>

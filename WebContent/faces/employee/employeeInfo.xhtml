@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+	<link rel="stylesheet" href="../../css/employeeInfo.css" />
+	<link rel="stylesheet" href="../../css/noborder.css" />
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<ui:insert name="dialog">
+		<ui:include src="../template/dialog.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:messages autoUpdate="true" closable="true" />
+		<p:tabView orientation="left" id="tabView"
+			activeIndex="#{personInfoControler.activeIndex}">
+			<p:tab>
+				<f:facet name="title">
+					<p:outputPanel id="photo">
+						<p:graphicImage cache="false"
+							value="/photo/#{personInfoControler.personInfo.photoName}"
+							width="200px" height="200px" />
+					</p:outputPanel>
+				</f:facet>
+				<p:panel header="Photograph">
+					<p:panelGrid columns="2">
+						<h:outputText value="Change Photo" />
+						<p:fileUpload
+							fileUploadListener="#{personInfoControler.uploadPhoto}"
+							mode="advanced" dragDropSupport="false"
+							allowTypes="/(\.|\/)(gif|jpe?g|png)$/" />
+						<p:spacer />
+						<h:outputText
+							value="Accepts jpg, .png, .gif up to 1MB. Recommended dimensions: 200px X 200px"
+							style="color:#A9A9A9" />
+					</p:panelGrid>
+					<p:commandButton value="Save"
+						actionListener="#{personInfoControler.apply}" update="photo" />
+				</p:panel>
+			</p:tab>
+			<p:tab title="Personal Details">
+				<p:panel id="personInfo" header="Personal Details">
+					<p:panelGrid columns="6"
+						style="border:none;margin:0 auto;width:100% ">
+						<p:outputLabel value="First Name" />
+						<h:outputText value="#{personInfoControler.personInfo.firstName}"
+							rendered="#{!personInfoControler.editPersonInfoMode}" />
+						<p:inputText value="#{personInfoControler.personInfo.firstName}"
+							rendered="#{personInfoControler.editPersonInfoMode}" />
+
+						<p:spacer width="30" />
+
+
+						<p:outputLabel value="Last Name" />
+						<h:outputText value="#{personInfoControler.personInfo.lastName}"
+							rendered="#{!personInfoControler.editPersonInfoMode}" />
+						<p:inputText value="#{personInfoControler.personInfo.lastName}"
+							rendered="#{personInfoControler.editPersonInfoMode}" />
+						<p:spacer width="30" />
+
+						<p:outputLabel value="Employee ID" />
+						<h:outputText value="#{personInfoControler.personInfo.id}"
+							rendered="#{!personInfoControler.editPersonInfoMode}" />
+						<p:inputText value="#{personInfoControler.personInfo.id}"
+							rendered="#{personInfoControler.editPersonInfoMode}" />
+						<p:spacer width="30" />
+
+						<p:outputLabel value="Gender" />
+						<h:outputText value="#{personInfoControler.personInfo.sex.name}"
+							rendered="#{!personInfoControler.editPersonInfoMode}" />
+						<p:selectOneRadio
+							value="#{personInfoControler.personInfo.sex.name}"
+							rendered="#{personInfoControler.editPersonInfoMode}">
+							<f:selectItems value="#{sexControler.baseList}" var="sex"
+								itemLabel="#{sex.name}" itemValue="#{sex.name}" />
+						</p:selectOneRadio>
+						<p:spacer width="30" />
+
+						<p:outputLabel value="Date of Birth" />
+						<h:outputText
+							value="#{personInfoControler.personInfo.formatBirth}"
+							rendered="#{!personInfoControler.editPersonInfoMode}" />
+						<p:calendar value="#{personInfoControler.personInfo.birth}"
+							showOn="both"
+							rendered="#{personInfoControler.editPersonInfoMode}"
+							navigator="true" pattern="yyyy-MM-dd" />
+						<p:spacer width="30" />
+
+						<p:outputLabel value="Phone" />
+						<h:outputText value="#{personInfoControler.personInfo.phone}"
+							rendered="#{!personInfoControler.editPersonInfoMode}" />
+						<p:inputText value="#{personInfoControler.personInfo.phone}"
+							rendered="#{personInfoControler.editPersonInfoMode}" />
+						<p:spacer width="30" />
+
+						<p:outputLabel value="Email" />
+						<h:outputText value="#{personInfoControler.personInfo.email}"
+							rendered="#{!personInfoControler.editPersonInfoMode}" />
+						<p:inputText value="#{personInfoControler.personInfo.email}"
+							rendered="#{personInfoControler.editPersonInfoMode}" />
+						<p:spacer width="30" />
+						<p:spacer width="30" />
+						<p:spacer width="30" />
+						<p:spacer width="30" />
+					</p:panelGrid>
+					<p:separator />
+					<p:commandButton value="Edit"
+						rendered="#{!personInfoControler.editPersonInfoMode}"
+						actionListener="#{personInfoControler.startEditPerson}"
+						update="personInfo" />
+					<p:commandButton value="Save"
+						rendered="#{personInfoControler.editPersonInfoMode}"
+						actionListener="#{personInfoControler.apply}" update="personInfo" />
+
+				</p:panel>
+			</p:tab>
+			<p:tab title="Job Details">
+				<p:panel id="workInfo" header="Job Details">
+					<p:panelGrid columns="6"
+						style="border:none;margin:0 auto;width:100%">
+						<p:outputLabel value="Job Title" />
+						<h:outputText
+							value="#{personInfoControler.workInfo.jobTitle.name}"
+							rendered="#{!personInfoControler.editWorkInfoMode}" />
+						<p:selectOneMenu
+							value="#{personInfoControler.workInfo.jobTitle.seq}"
+							rendered="#{personInfoControler.editWorkInfoMode}">
+							<f:selectItem itemLabel="Select" itemValue="0" />
+							<f:selectItems value="#{jobTitleControler.baseList}"
+								var="jobTitle" itemLabel="#{jobTitle.name}"
+								itemValue="#{jobTitle.seq}" />
+						</p:selectOneMenu>
+						<p:spacer width="30" />
+
+						<p:outputLabel value="Employment Status" />
+						<h:outputText value="#{personInfoControler.workInfo.status.name}"
+							rendered="#{!personInfoControler.editWorkInfoMode}" />
+						<p:selectOneMenu
+							value="#{personInfoControler.workInfo.status.seq}"
+							rendered="#{personInfoControler.editWorkInfoMode}">
+							<f:selectItem itemLabel="Select" itemValue="0" />
+							<f:selectItems value="#{statusControler.baseList}" var="status"
+								itemLabel="#{status.name}" itemValue="#{status.seq}" />
+						</p:selectOneMenu>
+						<p:spacer width="30" />
+
+						<p:outputLabel value="Job Category" />
+						<h:outputText
+							value="#{personInfoControler.workInfo.jobCategory.name}"
+							rendered="#{!personInfoControler.editWorkInfoMode}" />
+						<p:selectOneMenu
+							value="#{personInfoControler.workInfo.jobCategory.seq}"
+							rendered="#{personInfoControler.editWorkInfoMode}">
+							<f:selectItem itemLabel="Select" itemValue="0" />
+							<f:selectItems value="#{jobCategoryControler.baseList}" var="jc"
+								itemLabel="#{jc.name}" itemValue="#{jc.seq}" />
+						</p:selectOneMenu>
+						<p:spacer width="30" />
+
+						<p:outputLabel value="Sub Unit" />
+						<h:outputText
+							value="#{personInfoControler.workInfo.department.name}"
+							rendered="#{!personInfoControler.editWorkInfoMode}" />
+						<p:selectOneMenu
+							value="#{personInfoControler.workInfo.department.seq}"
+							rendered="#{personInfoControler.editWorkInfoMode}">
+							<f:selectItem itemLabel="Select" itemValue="0" />
+							<f:selectItems value="#{departmentControler.baseList}"
+								var="department" itemLabel="#{department.name}"
+								itemValue="#{department.seq}" />
+						</p:selectOneMenu>
+						<p:spacer width="30" />
+					</p:panelGrid>
+					<p:commandButton value="Edit"
+						rendered="#{!personInfoControler.editWorkInfoMode}"
+						actionListener="#{personInfoControler.startEditWork}"
+						update="workInfo" />
+					<p:commandButton value="Save"
+						rendered="#{personInfoControler.editWorkInfoMode}"
+						actionListener="#{personInfoControler.apply}" update="workInfo" />
+				</p:panel>
+			</p:tab>
+		</p:tabView>
+	</h:form>
+</h:body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel toggleable="true">
+			<f:facet name="header">
+				<p:outputLabel value="Attendance Total Summary Report" style="margin-right:800px"/>
+				<p:selectOneButton value="#{attendanceSummaryControler.viewMode}" style="float:right">
+					<p:ajax update="attendanceData" />
+					<f:selectItem itemLabel="List" itemValue="0" />
+					<f:selectItem itemLabel="Chart" itemValue="1" />
+				</p:selectOneButton>
+			</f:facet>
+			<p:panelGrid columns="2">
+
+				<p:outputLabel value="Employee Name" />
+				<p:outputLabel
+					value="#{attendanceSummaryControler.condition.employeeName}" />
+
+				<p:outputLabel value="Job Title" />
+				<p:outputLabel
+					value="#{attendanceSummaryControler.condition.jobTitle.name}" />
+
+				<p:outputLabel value="Sub Unit" />
+				<p:outputLabel
+					value="#{attendanceSummaryControler.condition.department.name}" />
+
+				<p:outputLabel value="Employment Status" />
+				<p:outputLabel
+					value="#{attendanceSummaryControler.condition.status.name}" />
+
+				<p:outputLabel value="From" />
+				<p:calendar value="#{attendanceSummaryControler.condition.from}" showOn="both"
+					navigator="true" pattern="yyyy-MM-dd" disabled="true" />
+
+				<p:outputLabel value="To" />
+				<p:calendar value="#{attendanceSummaryControler.condition.to}" showOn="both"
+					navigator="true" pattern="yyyy-MM-dd" disabled="true" />
+			</p:panelGrid>
+		</p:panel>
+		<p:panel id="attendanceData">
+			<p:dataTable id="attendTable" rendered="#{attendanceSummaryControler.viewMode == 0}"
+				value="#{attendanceSummaryControler.listModel}" var="record" scrollable="true"
+				selection="#{attendanceSummaryControler.selecteds}"
+				sortBy="employee.name" >
+
+				<p:column style="width:70%" sortBy="#{record.employee.name}">
+					<f:facet name="header">
+						<h:outputText value="Employ Name" />
+					</f:facet>
+					<h:outputText value="#{record.employee.name}" />
+				</p:column>
+				<p:column style="width:30%" sortBy="#{record.total}">
+					<f:facet name="header">
+						<h:outputText value="Time" />
+					</f:facet>
+					<h:outputText value="#{record.total}" />
+				</p:column>
+				<p:columnGroup type="footer">
+					<p:row>
+						<p:column style="text-align:left"
+							footerText="Total(Hours):" />
+						<p:column style="text-align:left" footerText="#{attendanceSummaryControler.total}" />
+					</p:row>
+				</p:columnGroup>
+			</p:dataTable>
+			<p:lineChart title="Attendance Time" xaxisLabel="Date" rendered="#{attendanceSummaryControler.viewMode == 1}"
+				yaxisLabel="Time" legendPosition="e"
+				value="#{attendanceSummaryControler.lineModel}"
+				style="height:600px"/>
+		</p:panel>
+	</h:form>
+</h:body>
+</html>

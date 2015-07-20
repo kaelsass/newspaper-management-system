@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<link rel="stylesheet" href="../../css/noborder.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel
+			header="#{retailControler.editMode? 'Edit Retail Information' : 'Add Retail order'}">
+			<p:messages id="messages" closable="true"/>
+			<p:panelGrid columns="9" style="border:none;margin:0;width:100%;">
+				<p:outputLabel value="Newspaper:" for="newspaper"/>
+				<p:selectOneMenu id="newspaper" filter="true" filterMatchMode="contains"
+					validator="#{newspaperControler.seqValidate}"
+					value="#{retailControler.editDto.issue.newspaper.seq}">
+					<f:selectItem itemLabel="-- Select --" itemValue="0" />
+					<f:selectItems var="newspaper"
+						value="#{newspaperControler.baseList}"
+						itemLabel="#{newspaper.name}" itemValue="#{newspaper.seq}" />
+					<p:ajax listener="#{retailControler.clearIssue}" update="issueList" />
+				</p:selectOneMenu>
+
+				<p:spacer width="30" />
+
+				<p:outputLabel value="Issue:" for="issueList"/>
+				<p:selectOneMenu id="issueList"
+					value="#{retailControler.editDto.issue.seq}"
+					validator="#{issueControler.seqValidate}">
+					<f:selectItem itemLabel="-- Select --" itemValue="0" />
+					<f:selectItems value="#{retailControler.issueList}" var="issue"
+						itemLabel="#{issue.formatIssue}" itemValue="#{issue.seq}" />
+				</p:selectOneMenu>
+
+				<p:spacer width="30" />
+
+				<p:outputLabel value="Quantity:" />
+				<p:spinner value="#{retailControler.editDto.quantity}" min="1">
+					<p:ajax update="totalPrice payables change" />
+				</p:spinner>
+				<p:spacer />
+				<p:outputLabel value="Unit Price:" />
+				<p:spinner value="#{retailControler.editDto.unitPrice}" min="0.0"
+					stepFactor="0.5">
+					<p:ajax update="totalPrice payables change" />
+				</p:spinner>
+
+				<p:spacer />
+
+				<p:outputLabel value="Discount:" />
+				<p:spinner value="#{retailControler.editDto.discount}" min="0.00"
+					stepFactor="0.05">
+					<p:ajax update="payables change" />
+				</p:spinner>
+
+				<p:spacer />
+
+				<p:outputLabel value="Money Paid:" />
+				<p:spinner value="#{retailControler.editDto.moneyPay}" min="0.00"
+					stepFactor="50">
+					<p:ajax update="change" />
+				</p:spinner>
+				<p:spacer />
+				<p:outputLabel value="Total Price:" />
+				<p:outputLabel id="totalPrice"
+					value="#{retailControler.editDto.money}" />
+
+				<p:spacer />
+
+				<p:outputLabel value="Payables:" />
+				<p:outputLabel id="payables"
+					value="#{retailControler.editDto.payables}" />
+
+				<p:spacer />
+
+				<p:outputLabel value="Change:" />
+				<p:outputLabel id="change" value="#{retailControler.editDto.change}" />
+				<p:spacer />
+				<p:outputLabel value="Order Date" for="orderDate"/>
+				<p:calendar id="orderDate" value="#{retailControler.editDto.orderDate}"
+					navigator="true" pattern="yyyy-MM-dd" showOn="both" required="true"
+					requiredMessage="Order Date is required." />
+
+				<p:spacer />
+
+				<p:outputLabel value="Responsible Person:" for="admin"/>
+				<p:autoComplete id="admin" value="#{retailControler.editDto.employee.name}"
+					placeholder="Type for hint..."
+					completeMethod="#{workInfoControler.completeEmployeeName}"
+					required="true" requiredMessage="Responsible Person is required."
+					validator="#{workInfoControler.nameValidate}" />
+
+				<p:spacer />
+
+				<p:outputLabel value="Information Source:" for="infoSource"/>
+				<p:selectOneMenu id="infoSource" filter="true" filterMatchMode="contains"
+					value="#{retailControler.editDto.promotion.seq}"
+					validator="#{promotionControler.seqValidate}">
+					<f:selectItem itemLabel="-- Select --" itemValue="0" />
+					<f:selectItems var="promotion"
+						value="#{promotionControler.allList}"
+						itemLabel="#{promotion.name}" itemValue="#{promotion.seq}" />
+				</p:selectOneMenu>
+				<p:spacer />
+				<p:outputLabel value="Add Client Detail Info" />
+				<p:selectBooleanCheckbox value="#{retailControler.addDetailMode}">
+					<p:ajax update="detailInfo" />
+				</p:selectBooleanCheckbox>
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+				<p:spacer />
+			</p:panelGrid>
+
+			<p:panelGrid id="detailInfo" columns="11"
+				style="border:none;margin:0;width:100%;">
+				<p:outputLabel value="Age"
+					rendered="#{retailControler.addDetailMode}" />
+				<p:spinner value="#{retailControler.editDto.age}" min="0"
+					rendered="#{retailControler.addDetailMode}" stepFactor="5" />
+				<p:spacer width="30" rendered="#{retailControler.addDetailMode}" />
+				<p:outputLabel value="Gender"
+					rendered="#{retailControler.addDetailMode}" />
+				<p:selectOneRadio value="#{retailControler.editDto.sex}"
+					rendered="#{retailControler.addDetailMode}">
+					<f:selectItems value="#{sexControler.baseList}" var="sex"
+						itemLabel="#{sex.name}" itemValue="#{sex.name}" />
+				</p:selectOneRadio>
+				<p:spacer width="30" rendered="#{retailControler.addDetailMode}" />
+				<p:outputLabel value="Occupation"
+					rendered="#{retailControler.addDetailMode}" />
+				<p:selectOneMenu value="#{retailControler.editDto.occupationSeq}"
+					rendered="#{retailControler.addDetailMode}">
+					<f:selectItems value="#{occupationControler.baseList}"
+						var="occupation" itemLabel="#{occupation.name}"
+						itemValue="#{occupation.seq}" />
+				</p:selectOneMenu>
+				<p:spacer width="30" rendered="#{retailControler.addDetailMode}" />
+				<p:outputLabel value="Education"
+					rendered="#{retailControler.addDetailMode}" />
+				<p:selectOneMenu value="#{retailControler.editDto.educationSeq}"
+					rendered="#{retailControler.addDetailMode}">
+					<f:selectItems value="#{educationControler.baseList}"
+						var="education" itemLabel="#{education.name}"
+						itemValue="#{education.seq}" />
+				</p:selectOneMenu>
+			</p:panelGrid>
+			<p:separator />
+			<p:commandButton value="Save"
+				actionListener="#{retailControler.apply}" update="mainForm"
+				action="#{mainMenuControler.transfer}" onclick="blockui.show()"
+				oncomplete="blockui.hide()">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/sales/retail.jsf" />
+			</p:commandButton>
+			<p:commandButton value="Cancel"
+				actionListener="#{retailControler.clear}"
+				action="#{mainMenuControler.transfer}" onclick="blockui.show()"
+				oncomplete="blockui.hide()" immediate="true">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/sales/retail.jsf" />
+			</p:commandButton>
+		</p:panel>
+	</h:form>
+</h:body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+	<link rel="stylesheet" href="../../css/noborder.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel
+			header="#{newspaperControler.editMode? 'Edit Newspaper' : 'Add Newspaper'}">
+			<p:messages id="messages" closable="true"/>
+			<p:panelGrid style="border:none;margin:0;width:900px;">
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Newspaper Name:" for="name"/>
+					</p:column>
+					<p:column>
+						<p:inputText id="name" value="#{newspaperControler.editDto.name}"
+							style="width:100%" required="true"
+							requiredMessage="Newspaper Name is Required." />
+					</p:column>
+					<p:column></p:column>
+					<p:column>
+						<p:outputLabel value="ISSN:" for="issn"/>
+					</p:column>
+					<p:column>
+						<p:inputText id="issn" value="#{newspaperControler.editDto.issn}"
+							style="width:100%" required="true"
+							requiredMessage="Newspaper ISSN is Required." />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Publication Date:" for="pdate"/>
+					</p:column>
+					<p:column>
+						<p:selectOneMenu id="pdate" value="#{newspaperControler.editDto.pdate.type}"
+							style="width:100%">
+							<f:selectItem itemLabel="Cycle" itemValue="0" />
+							<f:selectItem itemLabel="Every Month" itemValue="1" />
+							<f:selectItem itemLabel="Every Week" itemValue="2" />
+							<f:selectItem itemLabel="Every Day" itemValue="3" />
+							<p:ajax update="pday" />
+						</p:selectOneMenu>
+					</p:column>
+					<p:column>
+						<p:selectOneMenu id="pday" style="width:180px"
+							value="#{newspaperControler.editDto.pdate.day}">
+							<f:selectItem itemLabel="Day" itemValue="0" />
+							<f:selectItems value="#{newspaperControler.pdateList}"
+								var="pdate" itemLabel="#{pdate.formatPDay}"
+								itemValue="#{pdate.day}" />
+						</p:selectOneMenu>
+					</p:column>
+					<p:column colspan="2"></p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Unit Price:" />
+					</p:column>
+					<p:column>
+						<p:inputText value="#{newspaperControler.editDto.issuePrice}"
+							style="width:100%"
+							converterMessage="Cannot convert Unit Price to double.">
+							<f:validateDoubleRange minimum="0.0" maximum="1000000000.0" />
+						</p:inputText>
+					</p:column>
+					<p:column></p:column>
+					<p:column>
+						<p:outputLabel value="Month Price:" />
+					</p:column>
+					<p:column>
+						<p:inputText value="#{newspaperControler.editDto.monthPrice}"
+							style="width:100%"
+							converterMessage="Cannot convert Month Price to double.">
+							<f:validateDoubleRange minimum="0.0" maximum="1000000000.0" />
+						</p:inputText>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+			<p:separator></p:separator>
+			<p:commandButton value="Save"
+				actionListener="#{newspaperControler.apply}" update="mainForm"
+				action="#{mainMenuControler.transfer}" onclick="blockui.show()"
+				oncomplete="blockui.hide()">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/newspaper/newspaper.jsf" />
+			</p:commandButton>
+			<p:commandButton value="Cancel"
+				actionListener="#{newspaperControler.clear}"
+				action="#{mainMenuControler.transfer}" onclick="blockui.show()"
+				oncomplete="blockui.hide()" immediate="true">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/newspaper/newspaper.jsf" />
+			</p:commandButton>
+		</p:panel>
+	</h:form>
+</h:body>
+</html>

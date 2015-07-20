@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+
+	<ui:insert name="header">
+		<ui:include src="../template/header.xhtml" />
+	</ui:insert>
+	<h:form id="mainForm">
+		<p:panel
+			header="#{authorControler.editMode? 'Edit Author Information' : 'Add Author'}">
+			<p:messages id="messages" closable="true"/>
+			<p:panelGrid columns="2">
+				<p:outputLabel value="Name:" for="name"/>
+				<p:inputText id="name" value="#{authorControler.editDto.name}" required="true" requiredMessage="Author Name is required."/>
+
+				<p:outputLabel  value="Work Unit:" for="workUnit"/>
+				<p:inputText id="workUnit" value="#{authorControler.editDto.workUnit}"/>
+
+				<p:outputLabel value="Address:" for="address"/>
+				<p:inputText id="address" value="#{authorControler.editDto.address}" required="true" requiredMessage="Address is required."/>
+
+				<p:outputLabel value="Zip Code:" for="zipCode"/>
+				<p:inputText id="zipCode" value="#{authorControler.editDto.zipcode}"/>
+
+				<p:outputLabel value="Phone:"  for="phone"/>
+				<p:inputText id="phone" value="#{authorControler.editDto.phone}" required="true" requiredMessage="Phone Number is required." validator="#{workInfoControler.phoneValidate}"/>
+
+				<p:outputLabel value="Email:"  for="email"/>
+				<p:inputText id="email" value="#{authorControler.editDto.email}" validator="#{workInfoControler.emailValidate}"/>
+
+				<p:outputLabel value="Account Number:"  for="accountNumber"/>
+				<p:inputText id="accountNumber" value="#{authorControler.editDto.account}" required="true" requiredMessage="Account Number is required."/>
+			</p:panelGrid>
+			<p:separator/>
+			<p:commandButton value="Save"
+				actionListener="#{authorControler.apply}" update="mainForm"
+				action="#{mainMenuControler.transfer}" onclick="blockui.show()"
+				oncomplete="blockui.hide()">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/newspaper/author.jsf" />
+			</p:commandButton>
+			<p:commandButton value="Cancel"
+				actionListener="#{authorControler.clear}"
+				action="#{mainMenuControler.transfer}" onclick="blockui.show()"
+				oncomplete="blockui.hide()" immediate="true">
+				<f:setPropertyActionListener target="#{mainMenuControler.nextMenu}"
+					value="/faces/newspaper/author.jsf" />
+			</p:commandButton>
+		</p:panel>
+	</h:form>
+</h:body>
+</html>

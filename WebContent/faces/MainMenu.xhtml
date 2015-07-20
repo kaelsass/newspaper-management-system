@@ -1,0 +1,913 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+<h:head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link rel="stylesheet"
+		href="../../css/bootstrap.min.css" />
+	<title><h:outputText value="NP Pillar" /></title>
+</h:head>
+<h:body>
+	<h:form id="form01">
+		<p:layout fullPage="true">
+
+			<p:layoutUnit position="north" size="12%">
+				<p:toolbar>
+					<!-- first row, username and logout -->
+					<p:toolbarGroup align="right">
+						<p:commandLink style="margin-right:5px;"
+							value="#{dictionaryControler.dictionary['User']} : #{mainMenuControler.userName}"
+							action="#" icon="ui-icon-extlink" />
+						<p:commandButton
+							value="#{dictionaryControler.dictionary['Log out']}"
+							action="#{mainMenuControler.logoff}" icon="ui-icon-extlink" />
+					</p:toolbarGroup>
+				</p:toolbar>
+
+				<p:toolbar id="toolBtns">
+					<!-- second row, management btns and Add, edit delete etc. -->
+					<p:toolbarGroup align="left">
+						<p:commandButton value="Department Management" icon="ui-icon-home"
+							actionListener="#{departmentControler.browseDepartment}"
+							oncomplete="departmentDialog_w.show();"
+							update=":departmentDialog" />
+						<p:commandButton value="Employee Type Management"
+							icon="ui-icon-home"
+							actionListener="#{departmentControler.browsePosition}"
+							oncomplete="departmentDialog_w.show();"
+							update=":departmentDialog" />
+						<p:commandButton value="User Management" icon="ui-icon-home"
+							oncomplete="userDialog_w.show();" update=":userDialog" />
+
+						<span class="ui-separator"> <span
+							class="ui-icon ui-icon-grip-dotted-vertical" />
+						</span>
+
+						<p:commandButton value="Add" icon="ui-icon-plusthick"
+							actionListener="#{employeeControler.startAdd}"
+							oncomplete="detailDialog_w.show();" update=":detailDialog" />
+
+						<p:commandButton value="Edit" icon="ui-icon-pencil"
+							update=":detailDialog"
+							rendered="#{employeeControler.oneRowSelected}"
+							actionListener="#{employeeControler.startEdit}"
+							oncomplete="detailDialog_w.show()" />
+						<p:commandButton value="Delete" icon="ui-icon-trash"
+							rendered="#{employeeControler.rowSelected}"
+							onclick="deleteConfirmDialog_w.show()" />
+						<span class="ui-separator"> <span
+							class="ui-icon ui-icon-grip-dotted-vertical" />
+						</span>
+
+						<p:commandButton value="Upload" icon="ui-icon-arrowthick-1-n"
+							oncomplete="uploadDialog_w.show();" update=":uploadDialog" />
+
+						<span class="ui-separator"> <span
+							class="ui-icon ui-icon-grip-dotted-vertical" />
+						</span>
+
+						<p:commandButton value="Refresh From Database"
+							icon="ui-icon-arrowrefresh-1-e"
+							actionListener="#{employeeControler.refresh}"
+							update=":form01:employeeTable :form01:positionCombo :form01:departmentCombo" />
+					</p:toolbarGroup>
+				</p:toolbar>
+
+			</p:layoutUnit>
+			<p:layoutUnit position="west" size="15%">
+				<!-- position combo -->
+				<p:selectOneMenu style="width:100%;" id="positionCombo"
+					value="#{employeeControler.selectedPosition}" editable="false">
+					<f:selectItem itemLabel="All Employee Type" itemValue="-1" />
+					<f:selectItems value="#{departmentControler.basePositionList}"
+						var="position" itemLabel="#{position.name}"
+						itemValue="#{position.seq}" />
+					<p:ajax listener="#{employeeControler.reload}"
+						update=":form01:employeeTable :form01:toolBtns"
+						oncomplete="employeeTable_w.filter();" />
+				</p:selectOneMenu>
+
+				<!-- department combo  -->
+				<p:selectOneListbox id="departmentCombo"
+					style="width: 100%;position: absolute;top:40px;bottom: 0px;"
+					value="#{employeeControler.selectedDepartment}" editable="false">
+					<f:selectItem itemLabel="All Department" itemValue="-1" />
+					<f:selectItems value="#{departmentControler.baseDepartmentList}"
+						var="department" itemLabel="#{department.name}"
+						itemValue="#{department.seq}" />
+					<p:ajax listener="#{employeeControler.reload}"
+						update=":form01:employeeTable :form01:toolBtns"
+						oncomplete="employeeTable_w.filter();" />
+
+				</p:selectOneListbox>
+			</p:layoutUnit>
+			<p:layoutUnit position="center">
+
+				<!-- Main datatable, employees -->
+				<p:dataTable style="height:100%;width:100%;" id="employeeTable"
+					widgetVar="employeeTable_w"
+					value="#{employeeControler.employeeList}" var="employee"
+					selection="#{employeeControler.selectedEmployees}" paginator="true"
+					rows="5"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="5,10,15" sortMode="mulitple"
+					emptyMessage="No employee found with given criteria">
+					<p:ajax event="rowDblselect" oncomplete="detailDialog_w.show();"
+						update=":detailDialog" />
+					<p:ajax event="rowSelect" update=":form01:toolBtns" />
+					<p:ajax event="rowUnselect" update=":form01:toolBtns" />
+					<p:ajax event="rowSelectCheckbox" update=":form01:toolBtns" />
+					<p:ajax event="rowUnselectCheckbox" update=":form01:toolBtns" />
+					<p:ajax event="toggleSelect" update=":form01:toolBtns" />
+
+					<f:facet name="header">
+						<p:toolbar>
+							<p:toolbarGroup align="left">
+								<h:outputText value="Search all fields:" />
+								<p:inputText id="globalFilter"
+									onkeyup="PF('employeeTable_w').filter()" style="width:150px"
+									placeholder="Enter keyword" />
+							</p:toolbarGroup>
+							<p:toolbarGroup align="right">
+								<h:commandLink>
+									<p:graphicImage value="/images/pdf.png" width="24" />
+									<p:dataExporter type="pdf" target="employeeTable"
+										fileName="employees" />
+								</h:commandLink>
+
+								<h:commandLink>
+									<p:graphicImage value="/images/csv.png" width="24" />
+									<p:dataExporter type="csv" target="employeeTable"
+										fileName="employees" />
+								</h:commandLink>
+								<h:commandLink>
+									<p:graphicImage value="/images/excel.png" width="24" />
+									<p:dataExporter type="xls" target="employeeTable"
+										fileName="employees" />
+								</h:commandLink>
+							</p:toolbarGroup>
+						</p:toolbar>
+
+					</f:facet>
+
+
+					<p:column selectionMode="multiple" exportable="false"
+						style="width:1%;text-align:center">
+					</p:column>
+					<p:column filterBy="#{employee.id}" filterMatchMode="contains"
+						sortBy="#{employee.id}" style="width:2%">
+						<f:facet name="header">
+							<h:outputText value="#{dictionaryControler.dictionary['ID']}" />
+						</f:facet>
+						<h:outputText value="#{employee.id}" />
+					</p:column>
+					<p:column filterBy="#{employee.firstName}"
+						filterMatchMode="contains" sortBy="#{employee.firstName}"
+						style="width:10%">
+						<f:facet name="header">
+							<h:outputText
+								value="#{dictionaryControler.dictionary['First Name']}" />
+						</f:facet>
+						<h:outputText value="#{employee.firstName}" />
+					</p:column>
+					<p:column filterBy="#{employee.lastName}"
+						filterMatchMode="contains" sortBy="#{employee.lastName}"
+						style="width:10%">
+						<f:facet name="header">
+							<h:outputText
+								value="#{dictionaryControler.dictionary['Last Name']}" />
+						</f:facet>
+						<h:outputText value="#{employee.lastName}" />
+					</p:column>
+
+					<p:column filterBy="#{employee.sex.name}" filterMatchMode="exact"
+						sortBy="#{employee.sex.name}" style="width:5%">
+						<f:facet name="header">
+							<h:outputText value="#{dictionaryControler.dictionary['Sex']}" />
+						</f:facet>
+						<h:outputText value="#{employee.sex.name}" />
+					</p:column>
+
+					<p:column filterBy="#{employee.age}" filterMatchMode="contains"
+						sortBy="#{employee.age}" style="width:5%">
+						<f:facet name="header">
+							<h:outputText value="#{dictionaryControler.dictionary['Age']}" />
+						</f:facet>
+						<h:outputText value="#{employee.age}" />
+					</p:column>
+
+					<p:column filterBy="#{employee.phone}" filterMatchMode="contains"
+						sortBy="#{employee.phone}" style="width:10%">
+						<f:facet name="header">
+							<h:outputText value="#{dictionaryControler.dictionary['Phone']}" />
+						</f:facet>
+						<h:outputText value="#{employee.phone}" />
+					</p:column>
+					<p:column filterBy="#{employee.email}" filterMatchMode="contains"
+						sortBy="#{employee.email}" style="width:10%">
+						<f:facet name="header">
+							<h:outputText value="#{dictionaryControler.dictionary['E-Mail']}" />
+						</f:facet>
+						<h:outputText value="#{employee.email}" />
+					</p:column>
+
+					<p:column filterBy="#{employee.department.name}"
+						filterMatchMode="contains" sortBy="#{employee.department.name}"
+						style="width:10%">
+						<f:facet name="header">
+							<h:outputText
+								value="#{dictionaryControler.dictionary['Department']}" />
+						</f:facet>
+						<h:outputText value="#{employee.department.name}" />
+					</p:column>
+
+					<p:column style="width:1%" exportable="false">
+					</p:column>
+					<f:facet name="footer">
+						<h:outputText id="footer"
+							value="Total (not filtered): #{employeeControler.employeeListLength} Employees." />
+					</f:facet>
+				</p:dataTable>
+			</p:layoutUnit>
+		</p:layout>
+
+	</h:form>
+
+	<!-- dialog about employee operations and display -->
+	<p:dialog id="detailDialog" closable="false" appendTo="@(body)"
+		visible="#{employeeControler.editMode or employeeControler.addMode}"
+		widgetVar="detailDialog_w" modal="true" resizable="false"
+		draggable="true"
+		header="#{dictionaryControler.dictionary['Employee Detail']}">
+		<h:form>
+			<p:focus context="detailDialog" for="okBtn" />
+			<p:panelGrid columns="2">
+				<h:outputText value="#{dictionaryControler.dictionary['ID']}" />
+				<h:outputText value="#{employeeControler.selectedEmployee.id}"
+					rendered="#{employeeControler.browseMode or employeeControler.editMode}" />
+				<p:inputText value="#{employeeControler.editEmployee.id}"
+					rendered="#{employeeControler.addMode}" required="true" size="20"
+					maxlength="20"
+					requiredMessage="#{dictionaryControler.dictionary['employeeIdRequired']}" />
+
+				<h:outputText
+					value="#{dictionaryControler.dictionary['First Name']}" />
+				<h:outputText
+					value="#{employeeControler.selectedEmployee.firstName}"
+					rendered="#{employeeControler.browseMode}" />
+				<p:inputText value="#{employeeControler.editEmployee.firstName}"
+					rendered="#{employeeControler.addMode or employeeControler.editMode}"
+					required="true" size="20" maxlength="20"
+					requiredMessage="#{dictionaryControler.dictionary['firstNameRequired']}" />
+
+				<h:outputText value="#{dictionaryControler.dictionary['Last Name']}" />
+				<h:outputText value="#{employeeControler.selectedEmployee.lastName}"
+					rendered="#{employeeControler.browseMode}" />
+				<p:inputText value="#{employeeControler.editEmployee.lastName}"
+					rendered="#{employeeControler.addMode or employeeControler.editMode}"
+					required="true" size="20" maxlength="20"
+					requiredMessage="#{dictionaryControler.dictionary['lastNameRequired']}" />
+
+				<h:outputText value="#{dictionaryControler.dictionary['Sex']}" />
+				<h:outputText value="#{employeeControler.selectedEmployee.sex.name}"
+					rendered="#{employeeControler.browseMode}" />
+				<p:selectOneMenu value="#{employeeControler.editEmployee.sex_seq}"
+					rendered="#{employeeControler.addMode or employeeControler.editMode}"
+					required="true"
+					requiredMessage="#{dictionaryControler.dictionary['sexRequired']}">
+					<f:selectItems value="#{employeeControler.sexList}" var="sex"
+						itemLabel="#{sex.name}" itemValue="#{sex.seq}" />
+				</p:selectOneMenu>
+
+				<h:outputText value="#{dictionaryControler.dictionary['Age']}" />
+				<h:outputText value="#{employeeControler.selectedEmployee.age}"
+					rendered="#{employeeControler.browseMode}" />
+				<p:inputText value="#{employeeControler.editEmployee.age}"
+					rendered="#{employeeControler.addMode or employeeControler.editMode}"
+					required="true" size="20" maxlength="20"
+					requiredMessage="#{dictionaryControler.dictionary['invalidAge']}"
+					validator="#{employeeControler.ageValidate}" />
+
+				<h:outputText value="#{dictionaryControler.dictionary['Phone']}" />
+				<h:outputText value="#{employeeControler.selectedEmployee.phone}"
+					rendered="#{employeeControler.browseMode}" />
+				<p:inputText value="#{employeeControler.editEmployee.phone}"
+					rendered="#{employeeControler.addMode or employeeControler.editMode}"
+					required="true" size="20" maxlength="20"
+					requiredMessage="#{dictionaryControler.dictionary['invalidPhone']}"
+					validator="#{employeeControler.phoneValidate}" />
+
+				<h:outputText value="#{dictionaryControler.dictionary['E-Mail']}" />
+				<h:outputText value="#{employeeControler.selectedEmployee.email}"
+					rendered="#{employeeControler.browseMode}" />
+				<p:inputText value="#{employeeControler.editEmployee.email}"
+					rendered="#{employeeControler.addMode or employeeControler.editMode}"
+					size="20" maxlength="100" required="true"
+					requiredMessage="#{dictionaryControler.dictionary['invalidEmail']}"
+					validator="#{employeeControler.emailValidate}" />
+
+				<h:outputText
+					value="#{dictionaryControler.dictionary['Department']}" />
+				<h:outputText
+					value="#{employeeControler.selectedEmployee.department.name}"
+					rendered="#{employeeControler.browseMode}" />
+				<p:selectOneMenu
+					value="#{employeeControler.editEmployee.department_seq}"
+					rendered="#{employeeControler.addMode or employeeControler.editMode}"
+					required="true"
+					requiredMessage="#{dictionaryControler.dictionary['departmentRequired']}">
+					<f:selectItems value="#{departmentControler.baseDepartmentList}"
+						var="department" itemLabel="#{department.name}"
+						itemValue="#{department.seq}" />
+				</p:selectOneMenu>
+
+				<h:outputText value="#{dictionaryControler.dictionary['Type']}" />
+				<h:outputText
+					value="#{employeeControler.selectedEmployee.position.name}"
+					rendered="#{employeeControler.browseMode}" />
+				<p:selectOneMenu
+					value="#{employeeControler.editEmployee.position_seq}"
+					rendered="#{employeeControler.addMode or employeeControler.editMode}"
+					required="true"
+					requiredMessage="#{dictionaryControler.dictionary['typeRequired']}">
+					<f:selectItems value="#{employeeControler.positionList}"
+						var="position" itemLabel="#{position.name}"
+						itemValue="#{position.seq}" />
+				</p:selectOneMenu>
+			</p:panelGrid>
+
+			<!-- employee dialog btns -->
+			<p:panelGrid columns="2">
+				<p:toolbar>
+					<p:toolbarGroup align="left"
+						rendered="#{employeeControler.browseMode}">
+						<p:commandButton id="okBtn"
+							value="#{dictionaryControler.dictionary['OK']}" ajax="true"
+							onclick="detailDialog_w.hide();" update=":form01:employeeTable"
+							oncomplete="employeeTable_w.filter();" />
+					</p:toolbarGroup>
+					<p:toolbarGroup align="right"
+						rendered="#{employeeControler.browseMode}">
+						<p:commandButton value="#{dictionaryControler.dictionary['Edit']}"
+							ajax="true" update=":detailDialog"
+							actionListener="#{employeeControler.startEdit}"
+							oncomplete="detailDialog_w.show()" />
+						<p:commandButton id="DeleteBtn"
+							value="#{dictionaryControler.dictionary['Delete']}"
+							update=":form01:employeeTable :detailDialog"
+							onclick="deleteConfirmDialog_w.show()"
+							oncomplete="employeeTable_w.filter();" />
+					</p:toolbarGroup>
+					<p:toolbarGroup align="left"
+						rendered="#{!employeeControler.browseMode}">
+						<p:commandButton id="applyBtn"
+							value="#{dictionaryControler.dictionary['Apply']}" ajax="true"
+							actionListener="#{employeeControler.apply}"
+							update=":form01:employeeTable :detailDialog"
+							oncomplete="employeeTable_w.filter();" />
+					</p:toolbarGroup>
+					<p:toolbarGroup align="right"
+						rendered="#{!employeeControler.browseMode}">
+						<p:commandButton id="discardBtn"
+							value="#{dictionaryControler.dictionary['Discard']}" ajax="true"
+							actionListener="#{employeeControler.discard}"
+							update=":form01:employeeTable " onclick="detailDialog_w.hide()"
+							oncomplete="employeeTable_w.filter();" />
+					</p:toolbarGroup>
+				</p:toolbar>
+			</p:panelGrid>
+			<p:messages />
+		</h:form>
+	</p:dialog>
+	<!-- deleteEmployeeConfirmDialog -->
+	<p:confirmDialog id="deleteConfirmDialog"
+		widgetVar="deleteConfirmDialog_w"
+		message="#{dictionaryControler.dictionary['Are you sure to delete these employees?']}"
+		header="#{dictionaryControler.dictionary['Confirm Delete Employee']}"
+		severity="alert">
+		<p:commandButton value="#{dictionaryControler.dictionary['OK']}"
+			update=":form01:employeeTable :form01:toolBtns"
+			oncomplete="deleteConfirmDialog_w.hide(),employeeTable_w.filter();"
+			actionListener="#{employeeControler.deleteEmployee}" />
+		<p:commandButton value="#{dictionaryControler.dictionary['Cancel']}"
+			onclick="deleteConfirmDialog_w.hide()"
+			oncomplete="employeeTable_w.filter();" />
+	</p:confirmDialog>
+
+	<!-- department and position management dialog -->
+	<p:dialog id="departmentDialog" closable="false" appendTo="@(body)"
+		widgetVar="departmentDialog_w" modal="true" resizable="false"
+		draggable="true"
+		visible="#{departmentControler.browseDepartmentMode || departmentControler.browsePositionMode}"
+		header="#{departmentControler.browseDepartmentMode ? 'Department Detail' : 'Employee Type Detail'}">
+		<h:form>
+			<p:focus context="departmentDialog" for="departmentOkBtn" />
+			<p:dataTable id="departmentTable" style="width:500px" editable="true"
+				value="#{departmentControler.departmentList}"
+				rendered="#{departmentControler.browseDepartmentMode}"
+				var="department" paginator="true" paginatorAlwaysVisible="true"
+				paginatorPosition="bottom" rows="10"
+				paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				rowsPerPageTemplate="5,10,15"
+				selection="#{departmentControler.selectedDepartments}"
+				emptyMessage="No department found with given criteria">
+				<p:ajax event="rowEdit" listener="#{departmentControler.onRowEdit}"
+					update="departmentTable :form01:employeeTable :form01:departmentCombo" />
+				<p:ajax event="rowEditCancel"
+					listener="#{departmentControler.onRowCancel}"
+					update="departmentTable" />
+				<p:column selectionMode="multiple" style="width:1%" />
+				<p:column headerText="ID" style="width:10%"
+					sortBy="#{department.seq}">
+					<h:outputText value="#{department.seq}" />
+				</p:column>
+				<p:column headerText="Name" style="width:10%"
+					sortBy="#{department.name}">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{department.name}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:inputText value="#{department.name}" style="width:100%" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column style="width:10%">
+					<p:rowEditor />
+				</p:column>
+			</p:dataTable>
+			<p:dataTable id="positionTable" style="width:500px" editable="true"
+				value="#{departmentControler.positionList}" var="position"
+				rendered="#{departmentControler.browsePositionMode}"
+				selection="#{departmentControler.selectedPositions}"
+				paginator="true" paginatorAlwaysVisible="true"
+				paginatorPosition="bottom" rows="10"
+				paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				rowsPerPageTemplate="5,10,15"
+				emptyMessage="No position found with given criteria">
+				<p:ajax event="rowEdit" listener="#{departmentControler.onRowEdit}"
+					update="positionTable :form01:employeeTable :form01:positionCombo" />
+				<p:ajax event="rowEditCancel"
+					listener="#{departmentControler.onRowCancel}"
+					update="positionTable" />
+				<p:column selectionMode="multiple" style="width:1%" />
+				<p:column headerText="ID" style="width:30%" sortBy="#{position.seq}">
+					<h:outputText value="#{position.seq}" />
+				</p:column>
+				<p:column headerText="Name" style="width:30%"
+					sortBy="#{position.name}">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{position.name}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:inputText value="#{position.name}" style="width:100%" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column style="width:30%">
+					<p:rowEditor />
+				</p:column>
+			</p:dataTable>
+			<p:panelGrid columns="2">
+				<p:toolbar>
+					<p:toolbarGroup align="left">
+						<p:commandButton id="departmentOkBtn"
+							value="#{dictionaryControler.dictionary['OK']}" ajax="true"
+							onclick="departmentDialog_w.hide();"
+							actionListener="#{departmentControler.discard}"
+							update=":form01:employeeTable"
+							oncomplete="employeeTable_w.filter();" />
+					</p:toolbarGroup>
+					<p:toolbarGroup align="right">
+						<p:commandButton value="#{dictionaryControler.dictionary['Add']}"
+							ajax="true" update=":departmentDialog :addDepartmentDialog"
+							actionListener="#{departmentControler.startAdd}"
+							oncomplete="addDepartmentDialog_w.show()" />
+						<p:commandButton
+							value="#{dictionaryControler.dictionary['Delete']}"
+							onclick="deleteDepartmentConfirmDialog_w.show()" />
+					</p:toolbarGroup>
+				</p:toolbar>
+			</p:panelGrid>
+			<p:messages />
+		</h:form>
+	</p:dialog>
+	<!-- add department dialog -->
+	<p:dialog id="addDepartmentDialog" closable="false" appendTo="@(body)"
+		widgetVar="addDepartmentDialog_w" modal="true" resizable="false"
+		draggable="true" paginator="true"
+		header="#{departmentControler.browseDepartmentMode? 'Department Detail' : 'Position Detail'}">
+		<h:form>
+			<p:focus context="addDepartmentDialog" for="departmentAddOkBtn" />
+			<p:panelGrid rendered="#{departmentControler.browseDepartmentMode}"
+				columns="2">
+				<h:outputText value="#{dictionaryControler.dictionary['ID']}" />
+				<p:inputText value="#{departmentControler.editDepartment.seq}"
+					required="true" size="20" maxlength="20"
+					requiredMessage="#{dictionaryControler.dictionary['departmentIDRequired']}" />
+				<h:outputText value="#{dictionaryControler.dictionary['Name']}" />
+				<p:inputText value="#{departmentControler.editDepartment.name}"
+					required="true" size="20" maxlength="20"
+					requiredMessage="#{dictionaryControler.dictionary['departmentNameRequired']}" />
+			</p:panelGrid>
+			<p:panelGrid rendered="#{departmentControler.browsePositionMode}"
+				columns="2">
+				<h:outputText value="#{dictionaryControler.dictionary['ID']}" />
+				<p:inputText value="#{departmentControler.editPosition.seq}"
+					required="true" size="20" maxlength="20"
+					requiredMessage="#{dictionaryControler.dictionary['positionIDRequired']}" />
+				<h:outputText value="#{dictionaryControler.dictionary['Name']}" />
+				<p:inputText value="#{departmentControler.editPosition.name}"
+					required="true" size="20" maxlength="20"
+					requiredMessage="#{dictionaryControler.dictionary['positionNameRequired']}" />
+			</p:panelGrid>
+			<p:panelGrid columns="2">
+				<p:toolbar>
+					<p:toolbarGroup align="left">
+						<p:commandButton id="departmentAddOkBtn"
+							value="#{dictionaryControler.dictionary['Apply']}" ajax="true"
+							actionListener="#{departmentControler.apply}"
+							onclick="addDepartmentDialog_w.hide();"
+							update=":form01:departmentCombo :form01:positionCombo :departmentDialog" />
+					</p:toolbarGroup>
+					<p:toolbarGroup align="right">
+						<p:commandButton
+							value="#{dictionaryControler.dictionary['Discard']}" ajax="true"
+							actionListener="#{departmentControler.discard}"
+							update=":departmentDialog" onclick="addDepartmentDialog_w.hide()" />
+					</p:toolbarGroup>
+				</p:toolbar>
+			</p:panelGrid>
+			<p:messages />
+		</h:form>
+	</p:dialog>
+	<!-- delete department confirmdialog  -->
+	<p:growl id="message" showDetail="true" />
+	<p:confirmDialog id="deleteDepartmentConfirmDialog"
+		widgetVar="deleteDepartmentConfirmDialog_w"
+		message="#{departmentControler.browseDepartmentMode? 'Are you sure to delete these departments?' : 'Are you sure to delete these positions?'}"
+		header="#{departmentControler.browseDepartmentMode? 'Confirm Delete Department' : 'Confirm Delete Position'}"
+		severity="alert">
+		<h:form>
+			<p:commandButton id="confirmBtn"
+				value="#{dictionaryControler.dictionary['OK']}"
+				update=":departmentDialog :form01:departmentCombo :form01:positionCombo :message"
+				oncomplete="deleteDepartmentConfirmDialog_w.hide()"
+				actionListener="#{departmentControler.deleteDP}" />
+			<p:commandButton id="cancelBtn"
+				value="#{dictionaryControler.dictionary['Cancel']}"
+				onclick="deleteDepartmentConfirmDialog_w.hide()" />
+		</h:form>
+	</p:confirmDialog>
+
+
+
+	<!-- user management dialog -->
+	<p:dialog id="userDialog" closable="false" appendTo="@(body)"
+		widgetVar="userDialog_w" modal="true" resizable="false"
+		draggable="true" header="User Detail">
+		<h:form>
+			<p:focus context="userDialog" for="userOkBtn" />
+			<p:panelGrid columns="2">
+				<p:outputLabel for="departmentCombo"
+					value="#{dictionaryControler.dictionary['Department']}" />
+				<p:selectOneMenu id="departmentCombo"
+					value="#{userMeintenanceControler.selectedDepartment}"
+					editable="false">
+					<f:selectItem itemLabel="All Departments" itemValue="-1" />
+					<f:selectItems value="#{departmentControler.baseDepartmentList}"
+						var="department" itemLabel="#{department.name}"
+						itemValue="#{department.seq}" />
+					<p:ajax listener="#{userMeintenanceControler.reload}"
+						oncomplete="userDialog_w.show()" update=":userDialog" />
+				</p:selectOneMenu>
+			</p:panelGrid>
+			<p:dataTable id="userTable" style="width:900px"
+				value="#{userMeintenanceControler.userList}" var="user"
+				selectionMode="single"
+				selection="#{userMeintenanceControler.selectedUser}" rows="10"
+				paginator="true" paginatorAlwaysVisible="true"
+				paginatorPosition="bottom"
+				paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				rowsPerPageTemplate="5,10,15"
+				first="#{userMeintenanceControler.first}" sortMode="mulitple">
+				<p:ajax event="rowSelect" oncomplete="userDetailDialog_w.show();"
+					update=":userDetailDialog" />
+				<p:column style="width:10%" sortBy="#{user.id}">
+					<f:facet name="header">
+						<h:outputText value="#{dictionaryControler.dictionary['ID']}" />
+					</f:facet>
+					<h:outputText value="#{user.id}" />
+				</p:column>
+				<p:column style="width:10%" sortBy="#{user.firstName}">
+					<f:facet name="header">
+						<h:outputText
+							value="#{dictionaryControler.dictionary['First Name']}" />
+					</f:facet>
+					<h:outputText value="#{user.firstName}" />
+				</p:column>
+				<p:column style="width:10%" sortBy="#{user.lastName}">
+					<f:facet name="header">
+						<h:outputText
+							value="#{dictionaryControler.dictionary['Last Name']}" />
+					</f:facet>
+					<h:outputText value="#{user.lastName}" />
+				</p:column>
+				<p:column style="width:10%" sortBy="#{user.phone}">
+					<f:facet name="header">
+						<h:outputText value="#{dictionaryControler.dictionary['Phone']}" />
+					</f:facet>
+					<h:outputText value="#{user.phone}" />
+				</p:column>
+				<p:column style="width:10%" sortBy="#{user.email}">
+					<f:facet name="header">
+						<h:outputText value="#{dictionaryControler.dictionary['E-Mail']}" />
+					</f:facet>
+					<h:outputText value="#{user.email}" />
+				</p:column>
+				<p:column style="width:5%">
+				</p:column>
+			</p:dataTable>
+			<p:panelGrid columns="2">
+				<p:toolbar>
+					<p:toolbarGroup align="left">
+						<p:commandButton id="userOkBtn"
+							value="#{dictionaryControler.dictionary['OK']}" ajax="true"
+							onclick="userDialog_w.hide();" />
+					</p:toolbarGroup>
+					<p:toolbarGroup align="right">
+						<p:commandButton value="#{dictionaryControler.dictionary['Add']}"
+							ajax="true" update=":userDetailDialog"
+							actionListener="#{userMeintenanceControler.startAdd}"
+							oncomplete="userDetailDialog_w.show()" />
+						<p:commandButton
+							value="#{dictionaryControler.dictionary['Delete']}"
+							onclick="deleteDepartmentConfirmDialog_w.show()" />
+					</p:toolbarGroup>
+				</p:toolbar>
+			</p:panelGrid>
+			<p:messages />
+		</h:form>
+	</p:dialog>
+
+
+	<!--one user information dialog -->
+	<p:dialog id="userDetailDialog" closable="false"
+		visible="#{userMeintenanceControler.editMode or userMeintenanceControler.addMode}"
+		widgetVar="userDetailDialog_w" modal="true" resizable="false"
+		draggable="true"
+		header="#{dictionaryControler.dictionary['User Detail']}">
+		<h:form>
+			<p:focus context="userDetailDialog" for="userOkBtn" />
+			<p:panelGrid columns="2">
+				<h:outputText value="#{dictionaryControler.dictionary['ID']}" />
+				<h:outputText value="#{userMeintenanceControler.selectedUser.id}"
+					rendered="#{userMeintenanceControler.browseMode or userMeintenanceControler.editMode}" />
+				<p:inputText value="#{userMeintenanceControler.editUser.id}"
+					rendered="#{userMeintenanceControler.addMode}" required="true"
+					size="20" maxlength="20"
+					requiredMessage="#{dictionaryControler.dictionary['userIdRequired']}" />
+
+				<h:outputText
+					value="#{dictionaryControler.dictionary['First Name']}" />
+				<h:outputText
+					value="#{userMeintenanceControler.selectedUser.firstName}"
+					rendered="#{userMeintenanceControler.browseMode}" />
+				<p:inputText value="#{userMeintenanceControler.editUser.firstName}"
+					rendered="#{userMeintenanceControler.addMode or userMeintenanceControler.editMode}"
+					required="true" size="20" maxlength="20"
+					requiredMessage="#{dictionaryControler.dictionary['firstNameRequired']}" />
+
+				<h:outputText value="#{dictionaryControler.dictionary['Last Name']}" />
+				<h:outputText
+					value="#{userMeintenanceControler.selectedUser.lastName}"
+					rendered="#{userMeintenanceControler.browseMode}" />
+				<p:inputText value="#{userMeintenanceControler.editUser.lastName}"
+					rendered="#{userMeintenanceControler.addMode or userMeintenanceControler.editMode}"
+					required="true" size="20" maxlength="20"
+					requiredMessage="#{dictionaryControler.dictionary['lastNameRequired']}" />
+
+				<h:outputText value="#{dictionaryControler.dictionary['Phone']}" />
+				<h:outputText value="#{userMeintenanceControler.selectedUser.phone}"
+					rendered="#{userMeintenanceControler.browseMode}" />
+				<p:inputText value="#{userMeintenanceControler.editUser.phone}"
+					rendered="#{userMeintenanceControler.addMode or userMeintenanceControler.editMode}"
+					required="true" size="20" maxlength="20"
+					requiredMessage="#{dictionaryControler.dictionary['invalidPhone']}"
+					validator="#{employeeControler.phoneValidate}" />
+
+				<h:outputText value="#{dictionaryControler.dictionary['E-Mail']}" />
+				<h:outputText value="#{userMeintenanceControler.selectedUser.email}"
+					rendered="#{userMeintenanceControler.browseMode}" />
+				<p:inputText value="#{userMeintenanceControler.editUser.email}"
+					rendered="#{userMeintenanceControler.addMode or userMeintenanceControler.editMode}"
+					size="20" maxlength="100"
+					requiredMessage="#{dictionaryControler.dictionary['invalidEmail']}"
+					validator="#{employeeControler.emailValidate}" />
+
+				<h:outputText
+					value="#{dictionaryControler.dictionary['Department']}" />
+				<h:outputText
+					value="#{userMeintenanceControler.selectedUser.department.name}"
+					rendered="#{userMeintenanceControler.browseMode}" />
+				<p:selectOneMenu
+					value="#{userMeintenanceControler.editUser.departmentSeq}"
+					rendered="#{userMeintenanceControler.addMode or userMeintenanceControler.editMode}">
+					<f:selectItems value="#{departmentControler.baseDepartmentList}"
+						var="department" itemLabel="#{department.name}"
+						itemValue="#{department.seq}" />
+				</p:selectOneMenu>
+				<h:outputText value="#{dictionaryControler.dictionary['Password']}"
+					rendered="#{userMeintenanceControler.addMode or userMeintenanceControler.editMode}" />
+				<p:commandButton value="Password Change"
+					rendered="#{userMeintenanceControler.addMode or userMeintenanceControler.editMode}"
+					oncomplete="passwordDialog_w.show()"
+					actionListener="#{userMeintenanceControler.startPasswordEdit}"
+					immediate="true" update=":passwordDialog" />
+
+			</p:panelGrid>
+			<p:dataTable id="userRoleTable"
+				value="#{userMeintenanceControler.selectedUser.roleList}"
+				var="userRole" rendered="#{userMeintenanceControler.browseMode}">
+				<p:column>
+					<f:facet name="header">
+						<h:outputText value="#{dictionaryControler.dictionary['Role']}" />
+					</f:facet>
+					<h:outputText value="#{userRole.role}" />
+				</p:column>
+			</p:dataTable>
+			<p:dataTable id="userRoleTableEdit"
+				value="#{userMeintenanceControler.roleListModel}" var="userRole"
+				rendered="#{userMeintenanceControler.editMode or userMeintenanceControler.addMode}"
+				selection="#{userMeintenanceControler.roleSelection}">
+				<p:column selectionMode="multiple" style="width:28px" />
+				<p:column>
+					<f:facet name="header">
+						<h:outputText value="#{dictionaryControler.dictionary['Role']}" />
+					</f:facet>
+					<h:outputText value="#{userRole.role}" />
+				</p:column>
+			</p:dataTable>
+			<p:panelGrid columns="2">
+				<p:toolbar>
+					<p:toolbarGroup align="left"
+						rendered="#{userMeintenanceControler.browseMode}">
+						<p:commandButton id="userOkBtn"
+							value="#{dictionaryControler.dictionary['OK']}" ajax="true"
+							onclick="userDetailDialog_w.hide();" update=":userDialog" />
+					</p:toolbarGroup>
+					<p:toolbarGroup align="right"
+						rendered="#{userMeintenanceControler.browseMode}">
+						<p:commandButton value="#{dictionaryControler.dictionary['Edit']}"
+							ajax="true" update=":userDetailDialog"
+							actionListener="#{userMeintenanceControler.startEdit}"
+							oncomplete="userDetailDialog_w.show()" />
+						<p:commandButton id="DeleteBtn"
+							value="#{dictionaryControler.dictionary['Delete']}"
+							onclick="userDeleteConfirmDialog_w.show()" />
+					</p:toolbarGroup>
+					<p:toolbarGroup align="left"
+						rendered="#{!userMeintenanceControler.browseMode}">
+						<p:commandButton
+							value="#{dictionaryControler.dictionary['Apply']}" ajax="true"
+							actionListener="#{userMeintenanceControler.apply}"
+							update=":userDialog :userDetailDialog" />
+					</p:toolbarGroup>
+					<p:toolbarGroup align="right"
+						rendered="#{!userMeintenanceControler.browseMode}">
+						<p:commandButton id="discardBtn"
+							value="#{dictionaryControler.dictionary['Discard']}" ajax="true"
+							actionListener="#{userMeintenanceControler.discard}"
+							immediate="true" update=":userDetailDialog"
+							onclick="userDetailDialog_w.hide()" />
+					</p:toolbarGroup>
+				</p:toolbar>
+			</p:panelGrid>
+			<p:messages />
+		</h:form>
+	</p:dialog>
+	<p:dialog id="passwordDialog" widgetVar="passwordDialog_w"
+		closable="false" resizable="false" draggable="true" modal="true"
+		header="#{dictionaryControler.dictionary['Password Setting']}"
+		visible="#{userMeintenanceControler.passwordEdit}">
+		<p:growl id="passwordEditMessage" showDetail="true" />
+		<h:form>
+			<h:outputText
+				value="#{dictionaryControler.dictionary['Enter Password']}" />
+			<p:panelGrid columns="2">
+				<h:outputText value="#{dictionaryControler.dictionary['Password']}" />
+				<p:password value="#{userMeintenanceControler.password}"
+					required="true"
+					requiredMessage="#{dictionaryControler.dictionary['passwordRequired']}"
+					rendered="#{userMeintenanceControler.passwordEdit}" />
+				<h:outputText
+					value="#{dictionaryControler.dictionary['Password Confirm']}" />
+				<p:password value="#{userMeintenanceControler.passwordConfirm}"
+					required="true"
+					requiredMessage="#{dictionaryControler.dictionary['passwordConfirmRequired']}"
+					rendered="#{userMeintenanceControler.passwordEdit}" />
+			</p:panelGrid>
+			<p:panelGrid columns="2">
+				<p:commandButton value="#{dictionaryControler.dictionary['OK']}"
+					actionListener="#{userMeintenanceControler.applyPassword}"
+					update=":passwordDialog" oncomplete="passwordDialog_w.hide()"
+					rendered="#{userMeintenanceControler.passwordEdit}" />
+				<p:commandButton value="#{dictionaryControler.dictionary['Cancel']}"
+					immediate="true"
+					actionListener="#{userMeintenanceControler.discardPassword}"
+					oncomplete="passwordDialog_w.hide()"
+					rendered="#{userMeintenanceControler.passwordEdit}" />
+			</p:panelGrid>
+		</h:form>
+	</p:dialog>
+	<p:confirmDialog id="userDeleteConfirmDialog"
+		widgetVar="userDeleteConfirmDialog_w"
+		message="#{dictionaryControler.dictionary['Are you sure delete this user?']}"
+		header="#{dictionaryControler.dictionary['Confirm Delete User']}"
+		severity="alert">
+		<h:form>
+			<p:commandButton id="confirmBtn"
+				value="#{dictionaryControler.dictionary['OK']}"
+				update=":userDialog :userDetailDialog"
+				oncomplete="userDeleteConfirmDialog_w.hide()"
+				actionListener="#{userMeintenanceControler.deleteUser}" />
+			<p:commandButton id="cancelBtn"
+				value="#{dictionaryControler.dictionary['Cancel']}"
+				onclick="userDeleteConfirmDialog_w.hide()" type="button" />
+		</h:form>
+	</p:confirmDialog>
+
+	<p:dialog id="uploadDialog" widgetVar="uploadDialog_w">
+		<h:form enctype="multipart/form-data">
+			<p:growl id="uploadMessage" showDetail="true" />
+			<p:outputLabel>
+			File Type: .xls<br />
+			File Format: <br />
+			&nbsp;&nbsp;1. First line must be fields.<br />
+			&nbsp;&nbsp;2. Fields should contain "ID", "First Name", "Last Name", "Sex", "Age", "Department", "Employee Type".<br />
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Missing fields will be remain blank on the table.<br />
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other fields not included in these will not be displayed on the screen.<br />
+			Example:<br />
+			</p:outputLabel>
+			<p:dataTable value="#{employeeControler.exampleList}" var="employee">
+				<p:column headerText="id">
+					<p:outputLabel value="#{employee.id}"></p:outputLabel>
+				</p:column>
+				<p:column headerText="First Name">
+					<p:outputLabel value="#{employee.firstName}"></p:outputLabel>
+				</p:column>
+
+				<p:column headerText="Last Name">
+					<p:outputLabel value="#{employee.lastName}"></p:outputLabel>
+				</p:column>
+
+				<p:column headerText="Sex">
+					<p:outputLabel value="#{employee.sex.name}"></p:outputLabel>
+				</p:column>
+
+				<p:column headerText="Age">
+					<p:outputLabel value="#{employee.age}"></p:outputLabel>
+				</p:column>
+
+				<p:column headerText="Phone">
+					<p:outputLabel value="#{employee.phone}"></p:outputLabel>
+				</p:column>
+
+				<p:column headerText="Email">
+					<p:outputLabel value="#{employee.email}"></p:outputLabel>
+				</p:column>
+
+				<p:column headerText="Department">
+					<p:outputLabel value="#{employee.department.name}"></p:outputLabel>
+				</p:column>
+
+				<p:column headerText="Employee Type">
+					<p:outputLabel value="#{employee.position.name}"></p:outputLabel>
+				</p:column>
+			</p:dataTable>
+			<p:fileUpload value="#{employeeControler.uploadFile}" mode="simple"
+				description="Select Data Files" />
+			<p:commandButton value="Upload" ajax="false"
+				update=":form01:employeeTable"
+				actionListener="#{employeeControler.upload}" />
+		</h:form>
+	</p:dialog>
+
+
+	<!-- ajax related -->
+	<p:ajaxStatus onstart="statusDialog.show()"
+		onsuccess="statusDialog.hide()" />
+
+	<p:dialog widgetVar="statusDialog" modal="true" draggable="false"
+		closable="false" resizable="false" showHeader="false">
+		<p:graphicImage value="/images/loading.gif" />
+	</p:dialog>
+</h:body>
+</html>
